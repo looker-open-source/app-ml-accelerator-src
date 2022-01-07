@@ -1,0 +1,10 @@
+sequenceDiagram
+    User->>UI: Evaluate training results
+    UI->>BQ API: Create view (modelname_evaluation)
+    UI->>Looker: Run query to get model evaluation results
+    UI->>User: Display summary statistics
+
+
+
+
+            
