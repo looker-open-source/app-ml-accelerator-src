@@ -1,0 +1,18 @@
+sequenceDiagram
+    User->>UI: Select explore
+    UI->>+Looker: GET explore
+    UI->>User: Display fields
+    User->>UI: Select target and features
+    UI->>Looker: Create query and GET SQL (make target filtered for not-null)
+    Looker->>UI: Return SQL
+    UI->>UI: Manipulate SQL (alias column)
+    UI->>Looker: Run AutoML query with gen. SQL as param
+    UI->>Looker: Query training set summary
+    UI->>User: Display training set summary
+    User->>UI: Create model
+    UI->>BQ API: Schedule creation of model
+    UI->>BQ API: Log new model creation
+    
+
+
+            
