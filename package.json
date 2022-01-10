@@ -1,0 +1,97 @@
+{
+  "name": "looker-bqml-app",
+  "version": "0.0.1",
+  "description": "Bootstrapped Looker Extension with React and Typescript",
+  "main": "dist/bundle.js",
+  "author": "4mile",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "node src/server.js",
+    "analyze": "export ANALYZE_MODE=static && yarn build",
+    "build": "export BABEL_ENV=build && webpack --config webpack.prod.js  ",
+    "clean": "rm -rf dist",
+    "develop": "webpack serve --hot --port 8080 --disable-host-check --config webpack.develop.js",
+    "prebuild": "yarn clean",
+    "test": "jest"
+  },
+  "engines": {
+    "node": ">=17"
+  },
+  "dependencies": {
+    "@looker/components": "2.8.4",
+    "@looker/embed-sdk": "^1.6.0",
+    "@looker/extension-sdk": "^21.4.5",
+    "@looker/extension-sdk-react": "^21.4.5",
+    "@looker/icons": "1.1.5",
+    "@looker/sdk": "^21.4.3",
+    "@looker/sdk-rtl": "^21.0.12",
+    "@styled-icons/material": "10.28.0",
+    "@styled-icons/material-outlined": "10.28.0",
+    "@styled-icons/material-rounded": "10.28.0",
+    "babel-loader": "^8.2.2",
+    "babel-loader-exclude-node-modules-except": "^1.1.2",
+    "cors": "^2.8.5",
+    "date-fns": "^2.12.0",
+    "express": "^4.17.1",
+    "lodash": "^4.17.15",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-is": "^16.13.1",
+    "react-router-dom": "6",
+    "semver": "^7.3.4",
+    "styled-components": "^5.2.1",
+    "webpack": "^5.61.0",
+    "webpack-bundle-analyzer": "^4.2.0",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.13.16",
+    "@babel/core": "^7.13.16",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.13.8",
+    "@babel/plugin-transform-react-jsx": "^7.13.12",
+    "@babel/plugin-transform-runtime": "^7.13.15",
+    "@babel/preset-env": "^7.12.10",
+    "@babel/preset-react": "^7.12.10",
+    "@babel/preset-typescript": "^7.12.7",
+    "@babel/runtime": "^7.12.5",
+    "@types/jest": "^27.0.1",
+    "@types/lodash": "^4.14.165",
+    "@types/node": "^14.14.12",
+    "@types/react": "^16.14.2",
+    "@types/react-dom": "^16.9.10",
+    "@types/react-router-dom": "^5.3.2",
+    "@types/readable-stream": "^2.3.5",
+    "@types/semver": "^7.3.1",
+    "@types/styled-components": "5.1.5",
+    "babel-preset-nano-react-app": "^0.1.0",
+    "css-loader": "^6.3.0",
+    "jest": "^27.2.0",
+    "minimist": "^1.2.2",
+    "nodemon": "^2.0.6",
+    "npm-run-all": "^4.1.5",
+    "react-hot-loader": "^4.12.20",
+    "sass": "^1.42.1",
+    "sass-loader": "^12.1.0",
+    "style-loader": "^3.3.0",
+    "ts-jest": "^27.0.5",
+    "typescript": "4.1.2"
+  },
+  "babel": {
+    "presets": [
+      "nano-react-app"
+    ],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-class-properties"
+      ],
+      [
+        "@babel/plugin-transform-react-jsx",
+        {
+          "pragmaFrag": "React.Fragment"
+        }
+      ]
+    ]
+  }
+}
