@@ -37,7 +37,7 @@
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-is": "^16.13.1",
-    "react-router-dom": "6",
+    "react-router-dom": "^5.1.2",
     "semver": "^7.3.4",
     "styled-components": "^5.2.1",
     "webpack": "^5.61.0",
