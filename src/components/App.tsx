@@ -18,12 +18,19 @@
   * and returns the logged in user.
 */
 import React from 'react'
+import { ComponentsProvider } from '@looker/components'
 import { ExtensionProvider } from '@looker/extension-sdk-react'
+import { BrowserRouter } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
+import ExtensionApp from './ExtensionApp'
 
 
 export const App = hot(() => (
   <ExtensionProvider>
-    <div>hi</div>
+    <BrowserRouter>
+      <ComponentsProvider>
+        <ExtensionApp />
+      </ComponentsProvider>
+    </BrowserRouter>
   </ExtensionProvider>
 ))

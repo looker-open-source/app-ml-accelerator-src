@@ -1,0 +1,67 @@
+.TitleBar_container {
+  align-items: center;
+  background: rgb(45, 126, 234);
+  // border-bottom: 1px solid #E4E5E6;
+  color: white;
+  display: flex;
+  font-size: 24px;
+  height: 50px;
+  justify-content: space-between;
+  min-height: 50px;
+  padding: 0 20px;
+  width: 100%;
+
+  .button_container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .ToolBar-button {
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    height: 30px;
+    padding: 0 1rem;
+    font-size: 12px;
+    letter-spacing: 0.4px;
+
+    &:hover {
+      background-color: white;
+      color: rgb(45, 126, 234);
+    }
+  }
+
+  .icon {
+    color: rgb(153, 148, 153);
+    font-size: 2rem;
+    margin-left: 10px;
+  }
+  .icon:hover {
+    cursor: pointer;
+    color: black;
+    transition: 0.8s;
+  }
+
+  .run-button {
+    font-size: 12px;
+    font-weight: 400;
+    border-radius: 2px;
+    height: 29px;
+  }
+
+  .title-logo {
+    display: flex;
+  }
+  .title-logo-text {
+    color: white;
+    padding-left: 10px;
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 700;
+    font-weight: 100;
+    font-size: 20px;
+
+    span {
+      opacity: .4;
+    }
+  }
+}
