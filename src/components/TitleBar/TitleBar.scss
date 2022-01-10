@@ -1,7 +1,6 @@
 .TitleBar_container {
   align-items: center;
-  background: rgb(45, 126, 234);
-  // border-bottom: 1px solid #E4E5E6;
+  background: #4285F4;
   color: white;
   display: flex;
   font-size: 24px;
@@ -27,7 +26,7 @@
 
     &:hover {
       background-color: white;
-      color: rgb(45, 126, 234);
+      color: #4285F4;
     }
   }
 
@@ -55,10 +54,9 @@
   .title-logo-text {
     color: white;
     padding-left: 10px;
-    font-family: "Source Sans Pro", sans-serif;
-    font-weight: 700;
-    font-weight: 100;
-    font-size: 20px;
+    font-family: "Google Sans", sans-serif;
+    font-weight: bold;
+    font-size: 18px;
 
     span {
       opacity: .4;

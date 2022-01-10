@@ -15,5 +15,3 @@ export const TitleBar : React.FC = () => {
     </div>
   )
 }
-
-export default TitleBar

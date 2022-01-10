@@ -1,0 +1,23 @@
+.NavBar-container {
+  width: 100%;
+  border-bottom: 1px solid #C1C6CC;
+  font-family: "Roboto", sans-serif;
+}
+
+.NavBar-item {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  height: 30px;
+  padding: 6px 38px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #4C535B;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+
+  &.active {
+    border-bottom: 3px solid #4285F4;
+  }
+}

@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+
 html,
 body,
 #root {
@@ -10,7 +10,8 @@ body,
 
 .bqml-app {
   height: 100%;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
   height: 100%;
   display: flex;
   position: relative;
@@ -22,5 +23,13 @@ body,
 
   * {
     box-sizing: border-box;
+  }
+
+  .bqml-app-container {
+    padding: 16px 28px 0 28px;
+  }
+
+  .page-contents {
+    padding: 28px;
   }
 }

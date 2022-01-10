@@ -20,17 +20,14 @@
 import React from 'react'
 import { ComponentsProvider } from '@looker/components'
 import { ExtensionProvider } from '@looker/extension-sdk-react'
-import { BrowserRouter } from 'react-router-dom'
 import { hot } from 'react-hot-loader/root'
-import ExtensionApp from './ExtensionApp'
+import { ExtensionApp } from './ExtensionApp'
 
 
 export const App = hot(() => (
   <ExtensionProvider>
-    <BrowserRouter>
-      <ComponentsProvider>
-        <ExtensionApp />
-      </ComponentsProvider>
-    </BrowserRouter>
+    <ComponentsProvider>
+      <ExtensionApp />
+    </ComponentsProvider>
   </ExtensionProvider>
 ))
