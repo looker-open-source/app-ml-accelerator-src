@@ -1,0 +1,12 @@
+sequenceDiagram
+    User->>UI: See a list of ML models I can run
+    UI->>BQ: Query ML models and status
+    User->>UI: Select a trained ML model to apply
+    UI->>Looker: Query BQ ML model status table to find Explore 
+    UI->>User: Show list of feature fields
+    User->>UI: Select feature fields & filters
+    User->>UI: Run ML model
+    UI->>Looker: Run ML model with selected fields & filters
+    Looker->>UI: Concatented key, and predicated values
+    UI->>Looker: Run merge query to join key, pred. value and base Explore 
+    UI->>User: Display / visualze ML model results
