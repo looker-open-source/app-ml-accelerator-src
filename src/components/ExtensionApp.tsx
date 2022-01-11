@@ -1,8 +1,8 @@
 import React from 'react'
-import { Switch, Route, withRouter } from 'react-router-dom'
+import { Switch, Route, Link, withRouter } from 'react-router-dom'
 import './ExtensionApp.scss'
 import TitleBar from './TitleBar'
-import NavBar from './NavBar'
+import MLWizard from './MLWizard'
 
 export const _ExtensionApp: React.FC = () => {
 
@@ -10,23 +10,15 @@ export const _ExtensionApp: React.FC = () => {
     <div className="bqml-app">
       <TitleBar></TitleBar>
       <div className="bqml-app-container">
-        <NavBar></NavBar>
-        <div className="page-contents">
-          <Switch>
-            <Route exact path="/">
-              Home
-            </Route>
-            <Route path="/objective">
-              objective
-            </Route>
-            <Route path="/source">
-              source
-            </Route>
-            <Route path="/model">
-              model
-            </Route>
-          </Switch>
-        </div>
+        <Switch>
+          <Route exact path="/">
+            Home
+            <Link to="/ml">ML</Link>
+          </Route>
+          <Route path="/ml">
+            <MLWizard />
+          </Route>
+        </Switch>
       </div>
     </div>
   )

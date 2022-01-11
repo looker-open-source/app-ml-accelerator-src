@@ -1,5 +1,5 @@
 
-project_name: "looker-bqml-app"
+project_name: "Looker BQML App"
 
 application: looker-bqml-app {
   label: "looker-bqml-app"

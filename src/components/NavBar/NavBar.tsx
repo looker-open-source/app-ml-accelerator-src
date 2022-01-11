@@ -1,23 +1,37 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 
-export const NavBar : React.FC = () => {
+type NavBarProps = {
+  url: string
+}
+
+export const NavBar : React.FC<NavBarProps> = ({ url }) => {
   return (
     <nav className="NavBar-container">
       <NavLink
-        to="/objective"
+        to={`${url}/objective`}
         className="NavBar-item">
         Objective
       </NavLink>
       <NavLink
-        to="/source"
+        to={`${url}/source`}
         className="NavBar-item">
         Source
       </NavLink>
       <NavLink
-        to="/model"
+        to={`${url}/model`}
         className="NavBar-item">
         Model
+      </NavLink>
+      <NavLink
+        to={`${url}/review`}
+        className="NavBar-item">
+        Review
+      </NavLink>
+      <NavLink
+        to={`${url}/apply`}
+        className="NavBar-item">
+        Apply
       </NavLink>
     </nav>
   )
