@@ -1,45 +1,35 @@
 import React from "react"
-import { useStore } from "../../contexts/StoreProvider"
 import { NavLink } from "react-router-dom"
 import { WIZARD_STEPS } from "../../constants"
 
 type NavBarProps = {
-  url: string
+  url: string,
+  currentStep: number
 }
 
-export const NavBar : React.FC<NavBarProps> = ({ url }) => {
-  const { state, dispatch } = useStore()
-  const increaseWizardStep = () => {
-    dispatch({
-      type: 'setCurrentStep',
-      step: state.wizard.currentStep + 1
-    })
-  }
+export const NavBar : React.FC<NavBarProps> = ({ url, currentStep }) => {
   return (
-    <>
-      <button onClick={increaseWizardStep}>Increase</button> {state.wizard.currentStep}
-      <nav className="NavBar-container">
-        <WizardNavLink
-          to={`${url}/${WIZARD_STEPS.step1}`}
-          title="Objective" />
-        <WizardNavLink
-          to={`${url}/${WIZARD_STEPS.step2}`}
-          disabled={(state.wizard.currentStep < 2)}
-          title="Source" />
-        <WizardNavLink
-          to={`${url}/${WIZARD_STEPS.step3}`}
-          disabled={(state.wizard.currentStep < 3)}
-          title="Model" />
-        <WizardNavLink
-          to={`${url}/${WIZARD_STEPS.step4}`}
-          disabled={(state.wizard.currentStep < 4)}
-          title="Review" />
-        <WizardNavLink
-          to={`${url}/${WIZARD_STEPS.step5}`}
-          disabled={(state.wizard.currentStep < 5)}
-          title="Apply" />
-      </nav>
-    </>
+    <nav className="NavBar-container">
+      <WizardNavLink
+        to={`${url}/${WIZARD_STEPS.step1}`}
+        title={WIZARD_STEPS.step1} />
+      <WizardNavLink
+        to={`${url}/${WIZARD_STEPS.step2}`}
+        disabled={(currentStep < 2)}
+        title={WIZARD_STEPS.step2} />
+      <WizardNavLink
+        to={`${url}/${WIZARD_STEPS.step3}`}
+        disabled={(currentStep < 3)}
+        title={WIZARD_STEPS.step3} />
+      <WizardNavLink
+        to={`${url}/${WIZARD_STEPS.step4}`}
+        disabled={(currentStep < 4)}
+        title={WIZARD_STEPS.step4} />
+      <WizardNavLink
+        to={`${url}/${WIZARD_STEPS.step5}`}
+        disabled={(currentStep < 5)}
+        title={WIZARD_STEPS.step5} />
+    </nav>
   )
 }
 
@@ -49,7 +39,7 @@ type WizardNavLinkProps = {
   title: string
 }
 
-export const WizardNavLink : React.FC<WizardNavLinkProps> = ({ to, title, disabled }) => {
+const WizardNavLink : React.FC<WizardNavLinkProps> = ({ to, title, disabled }) => {
   if (disabled) {
     return (
       <div className="NavBar-item disabled">
