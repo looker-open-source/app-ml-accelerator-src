@@ -1,0 +1,41 @@
+.NavBar-container {
+  width: 100%;
+  border-bottom: 1px solid #C1C6CC;
+  font-family: "Roboto", sans-serif;
+}
+
+.NavBar-item {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  height: 30px;
+  padding: 6px 38px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #4C535B;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+
+  &::after {
+    content: "";
+    display: block;
+    height: 3px;
+    width: 100%;
+    bottom: 0;
+    position: absolute;
+    left: 0;
+    transform: scaleX(0);
+    transition: transform 150ms ease-in-out;
+  }
+
+  &.active::after {
+    background-color: #4285F4;
+    transform: scaleX(1);
+  }
+
+  &:hover::after {
+    background-color: #4285F4;
+    transform: scaleX(1);
+  }
+}
