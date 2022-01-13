@@ -17,6 +17,13 @@
   font-size: 12px;
   font-weight: 500;
 
+  &.disabled {
+    color: #cecece;
+    &::after {
+      display: none;
+    }
+  }
+
   &::after {
     content: "";
     display: block;
