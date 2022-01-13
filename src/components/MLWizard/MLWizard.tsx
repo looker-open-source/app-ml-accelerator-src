@@ -3,6 +3,7 @@ import { Switch, Route, Redirect, withRouter, useRouteMatch } from 'react-router
 import { useStore } from "../../contexts/StoreProvider"
 import './MLWizard.scss'
 import NavBar from '../NavBar'
+import Step1 from '../Step1'
 import { WIZARD_STEPS } from "../../constants"
 
 export const _MLWizard: React.FC = () => {
@@ -30,7 +31,7 @@ export const _MLWizard: React.FC = () => {
             <Redirect to={`${path}/${WIZARD_STEPS.step1}`} />
           </Route>
           <Route path={`${path}/${WIZARD_STEPS.step1}`}>
-            objective
+            <Step1 />
           </Route>
           <WizardRoute
             path={`${path}/${WIZARD_STEPS.step2}`}
