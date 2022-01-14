@@ -44,7 +44,7 @@ export const getActualStep = (locationPath, dispatch) => {
   } catch (error: any) {
     dispatch({
       type: 'AddError',
-      message: "Something went wrong finding your page.  Please try again."
+      error: "Something went wrong finding your page.  Please try again."
     })
   }
 }

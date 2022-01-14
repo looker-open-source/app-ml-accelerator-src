@@ -1,0 +1,14 @@
+.error_link {
+  float: right;
+  position: relative;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.top-layer {
+  position: relative;
+  z-index: 9999;
+}
+.tooltip-button {
+  margin-left: 10px;
+}

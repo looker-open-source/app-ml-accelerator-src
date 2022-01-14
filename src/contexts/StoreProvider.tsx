@@ -5,6 +5,7 @@ import { WizardState } from '../types'
 
 type StoreProviderProps = {children: React.ReactNode}
 type StoreState = {
+  errors: [object],
   wizard: WizardState
 }
 
@@ -14,6 +15,7 @@ const StoreContext = React.createContext<
 
 function StoreProvider({children}: StoreProviderProps) {
   const [state, dispatch] = useCombinedReducers<any, any>({
+    errors: React.useReducer(reducers.errorsReducer, initialStates.errorsInitialState),
     wizard: React.useReducer(reducers.wizardReducer, initialStates.wizardInitialState)
   })
 
