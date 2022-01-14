@@ -1,12 +1,12 @@
 import { WizardState } from '../types'
 
 type Action = {type: 'setCurrentStep', step: number} |
-{type: 'setStepData', step: string, data: any}
+{type: 'addToStepData', step: string, data: any}
 
 const wizardInitialState: WizardState = {
   currentStep: 1,
   steps: {
-    step1: { data: null },
+    step1: { objective: null },
     step2: { data: null },
     step3: { data: null },
     step4: { data: null },
@@ -19,12 +19,15 @@ function wizardReducer(state: WizardState, action: Action): any {
     case 'setCurrentStep': {
       return {...state, currentStep: action.step}
     }
-    case 'setStepData': {
+    case 'addToStepData': {
       return {
         ...state,
         steps: {
           ...state.steps,
-          [action.step]: {...action.data}
+          [action.step]: {
+            ...state.steps[action.step],
+            ...action.data
+          }
         }
       }
     }

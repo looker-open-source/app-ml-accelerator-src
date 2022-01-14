@@ -10,7 +10,7 @@ export type WizardState = {
 }
 
 export type Step1State = {
-  data: any
+  objective: string | undefined
 }
 
 export type Step2State = {

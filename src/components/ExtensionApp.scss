@@ -18,7 +18,6 @@ body,
   z-index: 0;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
   width: 100vw;
 
   * {
@@ -26,6 +25,23 @@ body,
   }
 
   .bqml-app-container {
-    padding: 16px 28px 0 28px;
+    padding: 58px 30px;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 44px;
+    padding: 0;
+    margin: 0;
+  }
+
+  p {
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    color: #5F6368;
+    line-height: 18px;
+    padding: 0;
+    margin: 0;
   }
 }

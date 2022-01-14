@@ -1,0 +1,38 @@
+.step-container {
+  .step1-sub-details {
+    width: 582px;
+  }
+
+  .step1-search {
+    width: 429px;
+    margin: 15px 0 25px;
+  }
+
+  .modeltypes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 30px;
+  }
+  .modeltypecard {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-color: #F6F6F6;
+    padding: 16px;
+    min-height: 240px;
+    cursor: pointer;
+
+    &.active {
+      background-color: #bed2f3;
+    }
+  }
+
+  .modeltypecard-footer {
+    text-align: right;
+    color: #5F6368;
+    padding-top: 8px;
+    justify-self: flex-end;
+    margin-top: auto;
+    font-size: 10px;
+  }
+}
