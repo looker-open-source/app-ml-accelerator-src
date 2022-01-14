@@ -4,7 +4,7 @@ import { InputSearch } from "@looker/components"
 import './Step1.scss'
 import { MODEL_TYPES } from '../../services/modelTypes'
 import withWizardStep from '../WizardStepHOC'
-import { hasNoEmptyValues } from '../../services/wizard'
+import { getWizardStepCompleteCallback } from '../../services/wizard'
 
 const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { state, dispatch } = useStore()
@@ -24,7 +24,6 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   return (
     <section className="step-container">
-      { stepComplete.toString() }
       <h2>Choose your objective</h2>
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
       <InputSearch
@@ -81,6 +80,6 @@ export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, t
 }
 
 export const WizardStep1 = withWizardStep({
-  isStepComplete: (stepData) => hasNoEmptyValues(stepData),
+  isStepComplete: getWizardStepCompleteCallback("step1"),
   stepNumber: 1
 })(Step1)

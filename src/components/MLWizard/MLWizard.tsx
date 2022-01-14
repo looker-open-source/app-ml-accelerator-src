@@ -1,17 +1,23 @@
 import React from 'react'
-import { Switch, Route, Redirect, withRouter, useRouteMatch } from 'react-router-dom'
+import { Switch, Route, Redirect, withRouter, useRouteMatch, useHistory, useLocation } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import './MLWizard.scss'
+import { TrendingFlat } from "@styled-icons/material"
 import NavBar from '../NavBar'
 import Step1 from '../Step1'
 import { WIZARD_STEPS } from "../../constants"
+import { getActualStep, getWizardStepCompleteCallback } from "../../services/wizard"
+import { Step1State, Step2State, Step3State, Step4State, Step5State } from '../../types'
 
 export const _MLWizard: React.FC = () => {
   let { path, url } = useRouteMatch();
+  const location = useLocation()
   const { state, dispatch } = useStore()
-  const { currentStep } = state.wizard
+  const history = useHistory()
+  const { currentStep } = state.wizard  // the step the user is allowed to view
   const currentStepName = WIZARD_STEPS[`step${currentStep}`];
   const enforcementPath = `${path}/${currentStepName}`
+  const actualStep = getActualStep(location.pathname, dispatch) // the step the user is viewing
 
 
   const increaseWizardStep = () => {
@@ -59,6 +65,13 @@ export const _MLWizard: React.FC = () => {
           </WizardRoute>
         </Switch>
       </div>
+      <StepComplete
+        path={path}
+        stepName={actualStep}
+        stepData={state.wizard.steps[actualStep]}
+        history={history}
+        currentStep={currentStep}
+      />
     </div>
   )
 }
@@ -78,6 +91,35 @@ const WizardRoute: React.FC<WizardRouteProps> = ({ path, enforcementPath, redire
     <Route path={path}>
       {children}
     </Route>
+  )
+}
+
+type StepCompleteParams = {
+  path: string,
+  stepName: string,
+  stepData: Step1State | Step2State | Step3State | Step4State | Step5State,
+  history: any
+  currentStep: number
+}
+
+const StepComplete: React.FC<StepCompleteParams> = ({ path, stepName, stepData, history, currentStep }) => {
+  const handleClick = () => {
+    if (!isStepComplete) { return }
+    history.push(`${path}/${WIZARD_STEPS[`step${currentStep}`]}`)
+  }
+
+  // determine if StepComplete button should be shown
+  const isStepComplete = getWizardStepCompleteCallback(stepName)(stepData)
+  const btnClass = isStepComplete ? 'complete' : ''
+
+  return (
+    <div
+      className={`wizard-next-step-btn ${btnClass}`}
+      onClick={handleClick}
+    >
+      Continue
+      <TrendingFlat fontSize="small"/>
+    </div>
   )
 }
 

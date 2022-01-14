@@ -1,3 +1,40 @@
 .mlwizard-page-contents {
   padding: 34px 47px;
 }
+
+.wizard-next-step-btn {
+  position: fixed;
+  bottom: -100px;
+  right: -100px;
+  text-align: center;
+  padding: 92px 66px 0 0;
+  line-height: 20px;
+  width: 0px;
+  height: 0px;
+  border-radius: 200px;
+  background-color: #4285F4;
+  color: white;
+  font-size: 28px;
+  transition: 150ms;
+  opacity: 0.95;
+  font-weight: 500;
+  overflow: hidden;
+
+  &.complete {
+    width: 300px;
+    height: 300px;
+    cursor: pointer;
+
+    &:hover {
+      width: 310px;
+      height: 310px;
+      padding: 98px 66px 0 0;
+    }
+  }
+
+  svg {
+    height: 40px;
+    display: block;
+    margin: 0 auto;
+  }
+}
