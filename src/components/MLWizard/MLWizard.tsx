@@ -4,6 +4,7 @@ import { useStore } from "../../contexts/StoreProvider"
 import './MLWizard.scss'
 import NavBar from '../NavBar'
 import Step1 from '../Step1'
+import Step2 from '../Step2'
 import StepComplete from '../StepComplete'
 import { WIZARD_STEPS } from "../../constants"
 import { getActualStep } from "../../services/wizard"
@@ -42,7 +43,7 @@ export const _MLWizard: React.FC = () => {
             path={`${path}/${WIZARD_STEPS.step2}`}
             enforcementPath={enforcementPath}
             redirect={currentStep < 2}>
-              source
+              <Step2 />
           </WizardRoute>
           <WizardRoute
             path={`${path}/${WIZARD_STEPS.step3}`}

@@ -7,7 +7,7 @@ const wizardInitialState: WizardState = {
   currentStep: 1,
   steps: {
     step1: { objective: null },
-    step2: { data: null },
+    step2: { exploreName: null, modelName: null, exploreLabel: null },
     step3: { data: null },
     step4: { data: null },
     step5: { data: null }

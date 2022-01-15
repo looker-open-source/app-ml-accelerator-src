@@ -1,0 +1,36 @@
+.step2-header {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.text-field {
+  width: 282px;
+}
+
+.selected-explore {
+  line-height: 36px;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-left: 36px;
+  color: #aeaeae;
+  border-bottom: 3px solid #4285F4;
+
+  span {
+    padding-left: 12px;
+    color: #4C535B;
+    font-size: 18px;
+  }
+}
+
+.explore-list {
+  margin-top: 20px;
+  padding: 30px;
+  background-color: #F9F9F9;
+  height: calc(100vh - 300px);
+}
+
+.explore-list-contents {
+  height: 100%;
+  overflow: scroll;
+}
