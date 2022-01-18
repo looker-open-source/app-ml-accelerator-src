@@ -14,7 +14,9 @@ export type Step1State = {
 }
 
 export type Step2State = {
-  data: any
+  exploreName: string | undefined,
+  modelName: string | undefined,
+  exploreLabel: string | undefined
 }
 
 export type Step3State = {

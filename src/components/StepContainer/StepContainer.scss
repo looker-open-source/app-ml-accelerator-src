@@ -1,0 +1,23 @@
+.step-container-loading-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  background-color: #aeaeae;
+  opacity: 0.4;
+  top: 0;
+  left: 0;
+}
+
+.step-container-spinner-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+
+  .step-container-spinner {
+    margin: 100px auto;
+  }
+}
