@@ -5,19 +5,14 @@ import './MLWizard.scss'
 import NavBar from '../NavBar'
 import Step1 from '../Step1'
 import Step2 from '../Step2'
-import StepComplete from '../StepComplete'
 import { WIZARD_STEPS } from "../../constants"
-import { getActualStep } from "../../services/wizard"
 
 export const _MLWizard: React.FC = () => {
   let { path, url } = useRouteMatch();
-  const location = useLocation()
   const { state, dispatch } = useStore()
-  const history = useHistory()
   const { currentStep } = state.wizard  // the step the user is allowed to view
   const currentStepName = WIZARD_STEPS[`step${currentStep}`];
   const enforcementPath = `${path}/${currentStepName}`
-  const actualStep = getActualStep(location.pathname, dispatch) // the step the user is viewing
 
 
   // const increaseWizardStep = () => {
@@ -65,13 +60,6 @@ export const _MLWizard: React.FC = () => {
           </WizardRoute>
         </Switch>
       </div>
-      <StepComplete
-        path={path}
-        stepName={actualStep}
-        stepData={state.wizard.steps[actualStep]}
-        history={history}
-        currentStep={currentStep}
-      />
     </div>
   )
 }

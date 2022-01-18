@@ -24,7 +24,7 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const searchValue = MODEL_TYPES[objective]?.label || ''
 
   return (
-    <StepContainer>
+    <StepContainer stepComplete={stepComplete} stepNumber={1}>
       <h2>Choose your objective</h2>
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
       <InputSearch

@@ -1,12 +1,15 @@
 import React from 'react'
 import Spinner from '../Spinner'
+import StepComplete from '../StepComplete'
 
 type StepContainerParams = {
   isLoading?: boolean
+  stepComplete?: boolean
+  stepNumber: number
   children: any
 }
 
-export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, children }) => {
+export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepComplete, stepNumber, children }) => {
   const loadingClass = isLoading ? 'loading' : ''
 
   return (
@@ -23,6 +26,10 @@ export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, childr
         )
       }
       { children }
+      <StepComplete
+        isStepComplete={stepComplete}
+        stepNumber={stepNumber}
+      />
     </section>
   )
 }

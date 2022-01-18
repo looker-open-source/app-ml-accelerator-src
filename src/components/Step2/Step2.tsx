@@ -12,17 +12,6 @@ import { getWizardStepCompleteCallback } from '../../services/wizard'
 import { filterExplores, fetchSortedModelsAndExplores } from '../../services/explores'
 
 const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-
-  const handleSelect = (selection: any) => {
-    dispatch({
-      type: 'addToStepData',
-      step: 'step2',
-      data: {
-        objective: selection ? selection.value : undefined
-      }
-    })
-  }
-
   const { core40SDK } = useContext(ExtensionContext);
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
@@ -56,7 +45,7 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const selectedExplore = state.wizard.steps.step2.exploreLabel
   return (
-    <StepContainer isLoading={isLoading}>
+    <StepContainer isLoading={isLoading} stepComplete={stepComplete} stepNumber={2}>
       <h2>Select your input data</h2>
       <div className="step2-header">
         <div className="text-field">
