@@ -13,6 +13,7 @@
 // limitations under the License.
 
 const commonConfig = require("./webpack.config");
+const webpack = require('webpack');
 
 module.exports = {
   ...commonConfig,
@@ -40,5 +41,10 @@ module.exports = {
         "X-Requested-With, content-type, Authorization",
     },
   },
-  plugins: [...commonConfig.plugins],
+  plugins: [
+    ...commonConfig.plugins,
+    new webpack.EnvironmentPlugin({
+      'BIGQUERY_CONN': '4mile_bigquery'
+    })
+  ],
 };

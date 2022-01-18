@@ -8,5 +8,13 @@ application: looker-bqml-app {
   entitlements: {
     core_api_methods: ["all_lookml_models"]
     use_form_submit:  yes
+    scoped_user_attributes: [
+      "bigquery_connection_name"
+    ]
   }
+}
+
+constant: CONNECTION_NAME {
+  value: "4mile_bigquery"
+  export: override_optional
 }

@@ -1,0 +1,28 @@
+{
+  "label": "Looker BigQueryML Extension App",
+  "category_label": "Applications",
+  "branding": {
+    "tagline": "Looker BigQueryML Extension App",
+    "brand_color": "#4285F4"
+  },
+  "models": [
+    {
+      "name": "looker-bqml-app",
+      "connection_constant": "CONNECTION_NAME"
+    }
+  ],
+  "constants": {
+    "CONNECTION_NAME": {
+      "description": "Connection Description",
+      "label": "Connection Name",
+      "value_constraint": "connection"
+    }
+  },
+  "user_attributes": {
+    "bigquery_connection_name": {
+      "label": "BigQuery Connection Name",
+      "type": "string",
+      "default_value": "4mile_bigquery"
+    }
+  }
+}
