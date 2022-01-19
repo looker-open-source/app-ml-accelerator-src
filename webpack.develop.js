@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const commonConfig = require("./webpack.config");
-const webpack = require('webpack');
+const dotenv = require('dotenv-webpack');
 
 module.exports = {
   ...commonConfig,
@@ -43,8 +43,6 @@ module.exports = {
   },
   plugins: [
     ...commonConfig.plugins,
-    new webpack.EnvironmentPlugin({
-      'BIGQUERY_CONN': '4mile_bigquery'
-    })
+    new dotenv()
   ],
 };
