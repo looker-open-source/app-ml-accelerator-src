@@ -13,8 +13,3 @@ application: looker-bqml-app {
     ]
   }
 }
-
-constant: CONNECTION_NAME {
-  value: "4mile_bigquery"
-  export: override_optional
-}
