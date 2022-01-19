@@ -1,0 +1,15 @@
+{
+  "label": "Looker BigQueryML Extension App",
+  "category_label": "Applications",
+  "branding": {
+    "tagline": "Looker BigQueryML Extension App",
+    "brand_color": "#4285F4"
+  },
+  "user_attributes": {
+    "bigquery_connection_name": {
+      "label": "BigQuery Connection Name",
+      "type": "string",
+      "default_value": "4mile_bigquery"
+    }
+  }
+}

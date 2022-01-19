@@ -12,7 +12,7 @@ import { getWizardStepCompleteCallback } from '../../services/wizard'
 import { filterExplores, fetchSortedModelsAndExplores } from '../../services/explores'
 
 const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { core40SDK } = useContext(ExtensionContext);
+  const { extensionSDK, core40SDK } = useContext(ExtensionContext);
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const [textInput, setTextInput] = useState("")
@@ -20,7 +20,7 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [filteredExplores, setFilteredExplores] = useState<ILookmlModel[]>([])
 
   useEffect(() => {
-    fetchSortedModelsAndExplores(core40SDK)
+    fetchSortedModelsAndExplores(extensionSDK, core40SDK)
       .then((modelExplores: ILookmlModel[]) => {
         setExploreArr(modelExplores)
         setFilteredExplores(modelExplores)
@@ -28,7 +28,7 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       .catch((err: any) => {
         dispatch({
           type: 'addError',
-          error: 'Failed to fetch Models and Explores.  Please reload the page.'
+          error: 'Failed to fetch Models and Explores.  Please reload the page. - ' + err
         })
         console.error(err)
       })

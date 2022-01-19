@@ -2,16 +2,33 @@ import { Looker40SDK as LookerSDK } from "@looker/sdk"
 import { ILookmlModel } from "@looker/sdk/lib/4.0/models"
 import { compact } from 'lodash'
 
+async function getBigQueryConnectionName(extensionSDK) {
+  try {
+    const { value: result } = await extensionSDK.userAttributeGetItem("bigquery_connection_name")
+    return result
+  } catch (error) {
+    try {
+      // Hardcoded value for when the extension has not been installed via the marketplace
+      return process.env.BIGQUERY_CONN
+    } catch (err) {
+      throw new Error("A big query connection name must be provided.")
+    }
+  }
+}
+
 /*
 * Fetch all explores and associated models and sort them
 */
-export async function fetchSortedModelsAndExplores(sdk: LookerSDK): Promise<any[]> {
+export async function fetchSortedModelsAndExplores(extensionSDK: any, sdk: LookerSDK): Promise<any[]> {
   try {
+    const connectionName = await getBigQueryConnectionName(extensionSDK)
     const { value: result } = await sdk.all_lookml_models({})
     const modelExplores = (result || [])
       .filter(
         (model: ILookmlModel) =>
-          model.explores?.length && model.label !== "System Activity"
+          model.explores?.length &&
+            model.label !== "System Activity" &&
+            model.allowed_db_connection_names.indexOf(connectionName) >= 0
       )
       .sort(alphabeticSortByLabel)
       .map((model: ILookmlModel) => ({
@@ -29,7 +46,7 @@ export async function fetchSortedModelsAndExplores(sdk: LookerSDK): Promise<any[
       }))
     return modelExplores
   } catch (error) {
-      throw new Error("Error loading models and explores " + error)
+      throw new Error(error)
   }
 }
 

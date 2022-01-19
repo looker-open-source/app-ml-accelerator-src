@@ -13,6 +13,7 @@
 // limitations under the License.
 
 const commonConfig = require("./webpack.config");
+const dotenv = require('dotenv-webpack');
 
 module.exports = {
   ...commonConfig,
@@ -40,5 +41,8 @@ module.exports = {
         "X-Requested-With, content-type, Authorization",
     },
   },
-  plugins: [...commonConfig.plugins],
+  plugins: [
+    ...commonConfig.plugins,
+    new dotenv()
+  ],
 };
