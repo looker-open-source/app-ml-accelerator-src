@@ -1,0 +1,31 @@
+.summary-table {
+  margin-top: 40px;
+
+  table {
+    width: 100%;
+    font-size: 13px;
+  }
+
+  tr {
+    height: 30px;
+  }
+
+  th {
+    background-color: #E3EDFD;
+    font-weight: 500;
+    padding: 0 10px;
+  }
+
+  td {
+    font-weight: 400;
+    padding: 10px 10px 5px 10px;
+  }
+
+  td.right {
+    text-align: right;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #F7F7F7;
+  }
+}

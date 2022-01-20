@@ -97,3 +97,18 @@ export const filterExplores = (textValue: string | null, modelsArray: ILookmlMod
 
   return resultsArr;
 }
+
+export async function fetchExplore(sdk: LookerSDK, modelName: string, exploreName: string) {
+  let result;
+
+  try {
+    result = await sdk.lookml_model_explore(
+      modelName,
+      exploreName
+    );
+  } catch (error) {
+    throw new Error("Error loading explore " + error);
+  }
+
+  return result;
+};

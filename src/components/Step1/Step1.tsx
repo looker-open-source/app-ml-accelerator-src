@@ -68,7 +68,7 @@ export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, t
   const selectedClass = selected ? 'active' : ''
   return (
     <div
-      className={`modeltypecard ${selectedClass}`}
+      className={`wizard-card modeltypecard ${selectedClass}`}
       onClick={() => handleSelect({ value: type })}
     >
       <h2>{title}</h2>

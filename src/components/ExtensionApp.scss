@@ -45,3 +45,15 @@ body,
     margin: 0;
   }
 }
+
+.wizard-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: #F6F6F6;
+  padding: 16px;
+
+  &.active {
+    background-color: #bed2f3;
+  }
+}
