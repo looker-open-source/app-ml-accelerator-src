@@ -6,7 +6,6 @@ export async function getBigQueryConnectionName(extensionSDK) {
     return result
   } catch (error) {
     try {
-      debugger;
       // Hardcoded value for when the extension has not been installed via the marketplace
       return process.env.BIGQUERY_CONN
     } catch (err) {
