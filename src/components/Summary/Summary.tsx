@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { buildHeaders, toggleSelectedField } from '../../services/summary'
-import { Field, DataTableHeaderItem } from '../../types'
+import { SummaryField, DataTableHeaderItem } from '../../types'
 import { Checkbox } from "@looker/components"
 import { SummaryTableRows } from './SummaryTableRows'
 
 type SummaryParams = {
-  fields?: Field[] | undefined,
+  fields?: SummaryField[] | undefined,
   summaryData: any[] | undefined,
   selectedFields: string[],
   updateSelectedFields: (selectedFields) =>  void

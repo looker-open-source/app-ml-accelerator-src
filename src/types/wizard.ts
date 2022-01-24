@@ -1,3 +1,5 @@
+import { ExploreData } from './explore'
+import { SelectedFields } from './selectedFields'
 import { Summary } from './summary'
 export type WizardState = {
   currentStep: number,
@@ -17,7 +19,10 @@ export type Step1State = {
 export type Step2State = {
   exploreName: string | undefined,
   modelName: string | undefined,
-  exploreLabel: string | undefined
+  exploreLabel: string | undefined,
+  exploreData: ExploreData | undefined,
+  limit: string,
+  selectedFields: SelectedFields
 }
 
 export type Step3State = {

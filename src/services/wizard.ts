@@ -1,4 +1,3 @@
-import { Exception } from "sass"
 import { WIZARD_STEPS } from "../constants"
 
 export const determineWizardStep = (wizard) => {
@@ -46,5 +45,17 @@ export const getActualStep = (locationPath, dispatch) => {
       type: 'AddError',
       error: "Something went wrong finding your page.  Please try again."
     })
+  }
+}
+
+export const getStepStateClone = (state: any, stepName: string): any => {
+  return {
+    ...state,
+    steps: {
+      ...state.steps,
+      [stepName]: {
+        ...state.steps[stepName]
+      }
+    }
   }
 }

@@ -1,5 +1,5 @@
 import React from "react"
-import { useStore } from "../../contexts/StoreProvider"
+import { useStore } from "../../../contexts/StoreProvider"
 
 type ExploreItemProps = {
   label?: string,
