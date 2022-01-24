@@ -24,11 +24,45 @@ export const getSummaryData = async(sdk: Looker40SDK): Promise<any> => {
   return results
 }
 
+const splitFieldName = (fieldName) => {
+  const names = fieldName.split('.')
+  return names.length >= 1 ? names[1] : fieldName
+}
+
 export const buildHeaders = (fields: Field[]): DataTableHeaderItem[] => {
-  return fields.map((field) => ({
-    title: field.label_short,
-    name: field.name,
-    type: field.category,
-    align: field.align
-  }))
+  return fields.map((field) => {
+    const colName = splitFieldName(field.name)
+    return {
+      title: field.label_short,
+      fullName: field.name,
+      name: colName,
+      type: field.category,
+      align: field.align
+    }
+  })
+}
+
+export const renameSummaryDataKeys = (summaryData) => {
+  return summaryData.map((row) => {
+    const newRow = {}
+    for (const key in row) {
+      newRow[splitFieldName(key)] = row[key]
+    }
+    return newRow
+  })
+}
+
+export const hasSummaryData = (summary, exploreName, modelName) => (
+  summary.exploreName === exploreName && summary.modelName === modelName && summary.data?.length > 0
+)
+
+export const toggleSelectedField = (selectedFields, fieldName): string[] => {
+  const selectedIndex: number = selectedFields.indexOf(fieldName);
+  if (selectedIndex < 0) {
+    selectedFields.push(fieldName)
+    return selectedFields
+  }
+
+  selectedFields.splice(selectedIndex, 1)
+  return selectedFields
 }

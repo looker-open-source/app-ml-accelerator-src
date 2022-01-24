@@ -6,40 +6,48 @@ import './Step3.scss'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { getSummaryData } from '../../services/summary'
+import { getSummaryData, hasSummaryData, renameSummaryDataKeys } from '../../services/summary'
 import Summary from '../Summary'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { extensionSDK, core40SDK: sdk } = useContext(ExtensionContext);
+  const { core40SDK: sdk } = useContext(ExtensionContext);
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const [textInput, setTextInput] = useState("")
   const { exploreName, modelName } = state.wizard.steps.step2
-  const { summary } = state.wizard.steps.step3
+  const { summary, selectedFields } = state.wizard.steps.step3
 
   useEffect(() => {
+    if (hasSummaryData(summary, exploreName, modelName)) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true)
     getSummaryData(sdk)
-    .then((results) => {
-      if (results?.ok && results?.value) {
-        const fields = (results.value.fields || {})
-        dispatch({
-          type: 'addToStepData',
-          step: 'step3',
-          data: {
-            summary: {
-              data: results.value.data,
-              fields: [...fields.dimensions, ...fields.measures]
+      .then((results) => {
+        if (results?.ok && results?.value) {
+          const fields = (results.value.fields || {})
+          const summaryData = renameSummaryDataKeys(results.value.data)
+          dispatch({
+            type: 'addToStepData',
+            step: 'step3',
+            data: {
+              selectedFields: summaryData.map((d) => d["column_name"]),
+              summary: {
+                exploreName,
+                modelName,
+                data: summaryData,
+                fields: [...fields.dimensions, ...fields.measures]
+              }
             }
-          }
-        })
-      } else {
-        setError()
-      }
-    }).catch((err: string) => {
-      setError(err)
-    }).finally(() => setIsLoading(false))
+          })
+        } else {
+          setError()
+        }
+      }).catch((err: string) => {
+        setError(err)
+      }).finally(() => setIsLoading(false))
   }, [exploreName])
 
   const setError = (err?: string) => {
@@ -50,9 +58,19 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     })
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newTextValue = e.target.value
     setTextInput(newTextValue)
+  }
+
+  const updateSelectedFields = (selectedFields) => {
+    dispatch({
+      type: 'addToStepData',
+      step: 'step3',
+      data: {
+        selectedFields
+      }
+    })
   }
 
   return (
@@ -81,7 +99,13 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         </div>
       </div>
       <div>
-        { summary && (<Summary data={summary.data} fields={summary.fields}></Summary>) }
+        { summary.data &&
+          (<Summary
+            summaryData={summary.data}
+            fields={summary.fields}
+            selectedFields={selectedFields}
+            updateSelectedFields={updateSelectedFields} />)
+        }
       </div>
     </StepContainer>
   )
