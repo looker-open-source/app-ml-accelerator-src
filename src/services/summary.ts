@@ -29,6 +29,7 @@ const splitFieldName = (fieldName) => {
   return names.length >= 1 ? names[1] : fieldName
 }
 
+// Transforms fields into table header objects
 export const buildHeaders = (fields: Field[]): DataTableHeaderItem[] => {
   return fields.map((field) => {
     const colName = splitFieldName(field.name)
@@ -42,6 +43,8 @@ export const buildHeaders = (fields: Field[]): DataTableHeaderItem[] => {
   })
 }
 
+// Removes the table name from the column keys
+// e.g. summary_table.pct_null => pct_null
 export const renameSummaryDataKeys = (summaryData) => {
   return summaryData.map((row) => {
     const newRow = {}
