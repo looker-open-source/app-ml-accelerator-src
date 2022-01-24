@@ -1,20 +1,7 @@
 import { Looker40SDK as LookerSDK } from "@looker/sdk"
 import { ILookmlModel } from "@looker/sdk/lib/4.0/models"
 import { compact } from 'lodash'
-
-async function getBigQueryConnectionName(extensionSDK) {
-  try {
-    const { value: result } = await extensionSDK.userAttributeGetItem("bigquery_connection_name")
-    return result
-  } catch (error) {
-    try {
-      // Hardcoded value for when the extension has not been installed via the marketplace
-      return process.env.BIGQUERY_CONN
-    } catch (err) {
-      throw new Error("A big query connection name must be provided.")
-    }
-  }
-}
+import { getBigQueryConnectionName } from './userAttributes'
 
 /*
 * Fetch all explores and associated models and sort them
@@ -97,3 +84,18 @@ export const filterExplores = (textValue: string | null, modelsArray: ILookmlMod
 
   return resultsArr;
 }
+
+export async function fetchExplore(sdk: LookerSDK, modelName: string, exploreName: string) {
+  let result;
+
+  try {
+    result = await sdk.lookml_model_explore(
+      modelName,
+      exploreName
+    );
+  } catch (error) {
+    throw new Error("Error loading explore " + error);
+  }
+
+  return result;
+};

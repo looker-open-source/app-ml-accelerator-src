@@ -1,10 +1,4 @@
 export const MODEL_TYPES = {
-  ARIMA_PLUS: {
-    label: 'Time series forecasting',
-    value: 'ARIMA_PLUS',
-    detail: 'ARIMA_PLUS',
-    description: 'Univariate time-series forecasting with many modeling components under the hood such as ARIMA model for the trend, STL and ETS for seasonality, holiday effects, and so on.'
-  },
   AUTOML_REGRESSOR: {
     label: 'Regression',
     value: 'AUTOML_REGRESSOR',
@@ -16,6 +10,12 @@ export const MODEL_TYPES = {
     value: 'AUTOML_CLASSIFIER',
     detail: 'AUTOML_CLASSIFIER',
     description: 'Create a classification model using AutoML Tables.'
+  },
+  ARIMA_PLUS: {
+    label: 'Time series forecasting',
+    value: 'ARIMA_PLUS',
+    detail: 'ARIMA_PLUS',
+    description: 'Univariate time-series forecasting with many modeling components under the hood such as ARIMA model for the trend, STL and ETS for seasonality, holiday effects, and so on.'
   },
   KMEANS: {
     label: 'Clustering',

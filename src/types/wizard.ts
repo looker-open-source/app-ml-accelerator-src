@@ -1,3 +1,4 @@
+import { Summary } from './summary'
 export type WizardState = {
   currentStep: number,
   steps: {
@@ -20,7 +21,10 @@ export type Step2State = {
 }
 
 export type Step3State = {
-  data: any
+  bqModelName: string | undefined,
+  targetField: string | undefined,
+  selectedFields: string[] | undefined,
+  summary: Summary
 }
 
 export type Step4State = {

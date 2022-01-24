@@ -5,3 +5,6 @@ export const WIZARD_STEPS = {
   step4: 'review',
   step5: 'apply'
 }
+
+// user attribute keys from marketplace.json
+export const BIGQUERY_CONN = "bigquery_connection_name"
