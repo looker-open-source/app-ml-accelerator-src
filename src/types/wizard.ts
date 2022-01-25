@@ -1,6 +1,5 @@
-import { ExploreData } from './explore'
-import { SelectedFields } from './selectedFields'
-import { Summary } from './summary'
+import { ResultsTableHeaderItem, RanQuery, ExploreData, SelectedFields, Summary} from '.'
+
 export type WizardState = {
   currentStep: number,
   steps: {
@@ -21,8 +20,11 @@ export type Step2State = {
   modelName: string | undefined,
   exploreLabel: string | undefined,
   exploreData: ExploreData | undefined,
-  limit: string,
-  selectedFields: SelectedFields
+  limit: string | undefined,
+  selectedFields: SelectedFields | undefined,
+  sorts: string[] | undefined,
+  tableHeaders: ResultsTableHeaderItem[] | undefined,
+  ranQuery: RanQuery | undefined
 }
 
 export type Step3State = {

@@ -1,5 +1,5 @@
 import { Looker40SDK } from '@looker/sdk'
-import { SummaryField, DataTableHeaderItem } from '../types'
+import { SummaryField, SummaryTableHeaderItem } from '../types'
 import { fetchExplore } from './explores'
 
 const parameterizeFilterValue = (filterValue: string): string => {
@@ -30,7 +30,7 @@ const splitFieldName = (fieldName) => {
 }
 
 // Transforms fields into table header objects
-export const buildHeaders = (fields: SummaryField[]): DataTableHeaderItem[] => {
+export const buildHeaders = (fields: SummaryField[]): SummaryTableHeaderItem[] => {
   return fields.map((field) => {
     const colName = splitFieldName(field.name)
     return {

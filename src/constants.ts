@@ -8,3 +8,5 @@ export const WIZARD_STEPS = {
 
 // user attribute keys from marketplace.json
 export const BIGQUERY_CONN = "bigquery_connection_name"
+
+export const DESC_STRING = "desc"

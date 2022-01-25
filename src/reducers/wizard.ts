@@ -26,7 +26,10 @@ const wizardInitialState: WizardState = {
         measures: [],
         parameters: [],
         filters: {}
-      }
+      },
+      ranQuery: null,
+      sorts: [],
+      tableHeaders: []
     },
     step3: {
       bqModelName: null,

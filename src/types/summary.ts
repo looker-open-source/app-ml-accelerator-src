@@ -7,7 +7,7 @@ export type Summary = {
   modelName: string
 }
 
-export type DataTableHeaderItem = {
+export type SummaryTableHeaderItem = {
   type: string
   title: string
   name: string

@@ -1,9 +1,17 @@
+.step-container {
+  padding: 34px 47px;
+
+  &.step2-container {
+    padding: 0 47px;
+  }
+}
+
 .step-container-loading-overlay {
   position: absolute;
   width: 100%;
   height: 100%;
   z-index: 9998;
-  background-color: #aeaeae;
+  background-color: #fff;
   opacity: 0.4;
   top: 0;
   left: 0;
@@ -18,6 +26,6 @@
   left: 0;
 
   .step-container-spinner {
-    margin: 100px auto;
+    margin: 200px auto;
   }
 }

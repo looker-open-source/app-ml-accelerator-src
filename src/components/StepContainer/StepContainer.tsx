@@ -5,15 +5,16 @@ import StepComplete from '../StepComplete'
 type StepContainerParams = {
   isLoading?: boolean
   stepComplete?: boolean
+  customClass?: string
   stepNumber: number
   children: any
 }
 
-export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepComplete, stepNumber, children }) => {
+export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepComplete, customClass, stepNumber, children }) => {
   const loadingClass = isLoading ? 'loading' : ''
 
   return (
-    <section className={`step-container ${loadingClass}`}>
+    <section className={`step-container ${loadingClass} ${customClass}`}>
       { isLoading &&
         (
           <>

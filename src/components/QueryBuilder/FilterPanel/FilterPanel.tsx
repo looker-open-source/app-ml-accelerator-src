@@ -11,7 +11,6 @@ type FilterPanelProps = {
   filters: any,
   onChange: (filterName: string, value: string) => void
   onRemove: (filterName: string) => void
-  useFieldSelect?: boolean
 }
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({
