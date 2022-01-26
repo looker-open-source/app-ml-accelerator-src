@@ -1,9 +1,9 @@
-import { Field, WizardState } from '../types'
+import { Field, WizardState, WizardSteps } from '../types'
 import { toggleArrayEntry } from '../services/array'
 import { getStepStateClone } from '../services/wizard'
 
 type Action = { type: 'setCurrentStep', step: number } |
-  { type: 'addToStepData', step: string, data: any } |
+  { type: 'addToStepData', step: keyof WizardSteps, data: any } |
   { type: 'setSelectedDimension', field: Field } |
   { type: 'setSelectedMeasure', field: Field } |
   { type: 'setSelectedParameter', field: Field } |
@@ -64,7 +64,6 @@ function wizardReducer(state: WizardState, action: Action): any {
         }
       }
     }
-    // TODO: refactor this nesting with a getStepStateClone or something
     case 'setSelectedDimension': {
       const { selectedFields } = state.steps.step2
       const dimensions = toggleArrayEntry(selectedFields.dimensions, action.field.name)
@@ -119,6 +118,23 @@ function wizardReducer(state: WizardState, action: Action): any {
         filters: newFilters
       }
       return newState
+    }
+    case 'setFilterValue': {
+      const { filters } = state.steps.step2.selectedFields
+      if (!filters.hasOwnProperty(action.key)) {
+        console.error('That filter does not exist')
+      }
+
+      const newFilters = {
+        ...filters,
+        [action.key]: action.expression
+      }
+      const newState = getStepStateClone(state, 'step2')
+      newState.steps.step2.selectedFields = {
+        ...state.steps.step2.selectedFields,
+        filters: newFilters
+      }
+      return newState;
     }
     case 'clearExplore': {
       const newState = getStepStateClone(state, 'step2')

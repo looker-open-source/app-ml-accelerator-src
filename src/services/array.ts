@@ -7,9 +7,9 @@
  */
  export function removeExactMatches(sourceArray: any[], toMatch: any, useKey = false) {
   if (useKey) {
-      return sourceArray.filter(
-          (item) => item.key !== toMatch.key || item === toMatch
-      );
+    return sourceArray.filter(
+      (item) => item.key !== toMatch.key || item === toMatch
+    );
   }
   return sourceArray.filter((item) => item !== toMatch);
 }
@@ -23,8 +23,8 @@
 */
 export function toggleArrayEntry(sourceArray: any[], toMatch: any, useKey = false) {
   if (sourceArray.includes(toMatch)) {
-      return removeExactMatches(sourceArray, toMatch, useKey);
+    return removeExactMatches(sourceArray, toMatch, useKey);
   } else {
-      return [...sourceArray, toMatch];
+    return [...sourceArray, toMatch];
   }
 }

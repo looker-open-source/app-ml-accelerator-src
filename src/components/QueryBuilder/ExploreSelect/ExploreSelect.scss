@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+
+  .spinner {
+    margin-top: 36px;
+  }
 }
 
 .text-field {

@@ -1,7 +1,7 @@
 import React from 'react'
 
 type QueryLimitFieldProps = {
-  limitValue: string
+  limitValue: string | undefined
   onChange: (value: string) => void
 }
 

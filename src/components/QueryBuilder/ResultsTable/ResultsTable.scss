@@ -63,9 +63,6 @@
   th.calculation {
     background-color: #c9dfc5;
   }
-  th.segmentIndicator {
-    text-align: right;
-  }
   tr:nth-child(2) th,
   tr:nth-child(2) th.dimension {
     background-color: #e4ecf3;
@@ -119,7 +116,6 @@
     text-align: right;
     padding-right: 3px;
   }
-  th.segmentIndicator,
   td:last-of-type {
     padding-right: 10px;
   }

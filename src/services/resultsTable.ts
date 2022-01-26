@@ -4,7 +4,7 @@ import { SelectedFields, ResultsTableHeaderItem, ExploreData, Step2State } from 
 import { find, some } from 'lodash'
 
 /*
-  getHeaderColumns creates an an array of header columns based on the dimensions, measures, segments selected
+  getHeaderColumns creates an an array of header columns based on the dimensions, measures selected
 */
 export const getHeaderColumns = (
   selectedFields: SelectedFields,
@@ -75,10 +75,6 @@ async function createBaseQuery(
   return baseQuery
 }
 
-/*
-* Run the Query
-* Executes either a segmented query or a regular query depending on whether segment is selected
-*/
 export async function createAndRunQuery(
   sdk: Looker40SDK,
   stepData: Step2State,

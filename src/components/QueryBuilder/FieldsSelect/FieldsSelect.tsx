@@ -14,7 +14,7 @@ export const FieldsSelect: React.FC = () => {
   const { exploreName, modelName, exploreData } = state.wizard.steps.step2
 
   useEffect(() => {
-    if (!exploreName) { return }
+    if (!modelName || !exploreName) { return }
     fetchExplore(core40SDK, modelName, exploreName).then((results) => {
       if (results?.ok && results?.value) {
         // convert raw JSON response to just the subset and shape of data we want
@@ -54,7 +54,7 @@ export const FieldsSelect: React.FC = () => {
       {!isLoading && <CurrentExplore />}
       <div className="fields-tabs">
         {isLoading ? (
-          <div className="center">
+          <div className="spinner center">
             <Spinner />
           </div>
         ) : (

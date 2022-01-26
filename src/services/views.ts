@@ -2,20 +2,20 @@ import { View, Field } from '../types'
 
 function isMatchingFieldGroup(group1: Field, group2: Field): boolean {
   if (
-      !(
-          group1 &&
-          group1.type == "field_group" &&
-          group2 &&
-          group2.type == "field_group"
-      )
+    !(
+      group1 &&
+      group1.type == "field_group" &&
+      group2 &&
+      group2.type == "field_group"
+    )
   ) {
-      return false;
+    return false;
   }
   if (group1.label !== group2.label) {
-      return false;
+    return false;
   }
   if (group1.isHidden || group2.isHidden) {
-      return false;
+    return false;
   }
   return true;
 }
@@ -34,18 +34,18 @@ function isMatchingFieldGroup(group1: Field, group2: Field): boolean {
 */
 function concatFieldGroupsWithSameLabel(fields: [string, Field][]) {
   const fieldGroupsWithSameLabelGrouped = fields.reduce(
-      (acc: any, [label, tier]) => {
-          if (isMatchingFieldGroup(acc[label], tier)) {
-              // we've found field groups with matching labels, combine their fields
-              const currFieldMap = acc[label].fields;
-              acc[label].fields = new Map([...currFieldMap, ...tier.fields]);
-          } else {
-              // otherwise do not modify field selection tier
-              acc[label] = tier;
-          }
-          return acc;
-      },
-      {}
+    (acc: any, [label, tier]) => {
+      if (isMatchingFieldGroup(acc[label], tier)) {
+        // we've found field groups with matching labels, combine their fields
+        const currFieldMap = acc[label].fields;
+        acc[label].fields = new Map([...currFieldMap, ...tier.fields]);
+      } else {
+        // otherwise do not modify field selection tier
+        acc[label] = tier;
+      }
+      return acc;
+    },
+    {}
   );
   return Object.entries(fieldGroupsWithSameLabelGrouped);
 }
@@ -58,7 +58,7 @@ type ExcludeEmptyViewsProps = {
 
 function excludeEmptyViews({ dimensions, measures, parameters }: ExcludeEmptyViewsProps): boolean {
   const isViewEmpty =
-      dimensions.length + measures.length + parameters.length === 0;
+    dimensions.length + measures.length + parameters.length === 0;
   return !isViewEmpty;
 }
 

@@ -54,7 +54,7 @@ export const ExploreSelect: React.FC = () => {
         />
       </div>
       {isLoading ? (
-        <div className="center">
+        <div className="spinner center">
             <Spinner />
         </div>
       ) : (

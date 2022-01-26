@@ -10,16 +10,16 @@ export const CurrentExplore: React.FC = () => {
   return (
     <div className="current-explore">
       <div className="back-btn">
-          <ButtonOutline
-              size="xsmall"
-              color="neutral"
-              onClick={() => dispatch({type: 'clearExplore'})}
-          >
-              Back
-          </ButtonOutline>
+        <ButtonOutline
+          size="xsmall"
+          color="neutral"
+          onClick={() => dispatch({type: 'clearExplore'})}
+        >
+          Back
+        </ButtonOutline>
       </div>
       <div className="explore-label">
-          {exploreData?.exploreLabel}
+        {exploreData?.exploreLabel}
       </div>
     </div>
   )

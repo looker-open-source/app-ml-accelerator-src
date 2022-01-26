@@ -21,7 +21,7 @@ export const HighlightContext = createContext({ term: '' })
 type FieldPickerItemProps = {
   field: any
   selectorAction: 'setSelectedDimension' | 'setSelectedMeasure' | 'setSelectedParameter'
-  color?: ToggleColor | 'segment'
+  color?: ToggleColor
   filter?: boolean
   pivot?: boolean
   selected?: boolean
@@ -69,7 +69,7 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
             shape="square"
             toggle={isFilter}
             toggleBackground
-            toggleColor={color == 'segment' ? undefined : color}
+            toggleColor={color}
             icon={<FilterList />}
             label="Filter"
             tooltipPlacement="top"

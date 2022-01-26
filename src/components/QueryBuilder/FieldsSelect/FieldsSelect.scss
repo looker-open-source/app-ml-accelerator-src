@@ -16,11 +16,6 @@
   }
 }
 
-.fields-tabs {
-  font-family: Roboto,'Noto Sans','Noto Sans JP','Noto Sans CJK KR','Noto Sans Arabic UI','Noto Sans Devanagari UI','Noto Sans Hebrew','Noto Sans Thai UI',Helvetica,Arial,sans-serif;
-
-  [role="tablist"] > button {
-    height: 50px;
-    letter-spacing: 0.03;
-  }
+.fields-tabs .spinner {
+  margin-top: 36px;
 }

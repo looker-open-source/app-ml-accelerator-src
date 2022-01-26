@@ -36,11 +36,11 @@ export const QueryPane: React.FC<QueryPaneProps> = ({ runQuery }) => {
         <button onClick={runQuery}>Run</button>
       </div>
       <ExpanderBar
-          title="Filters"
-          expanderBodyClasses="filter-expander"
-          isOpen={state.ui.filtersOpen}
-          setIsOpen={() => dispatch({type: 'setFiltersOpen', value: !state.ui.filtersOpen})}
-          showFieldsEvenWhenClosed
+        title="Filters"
+        expanderBodyClasses="filter-expander"
+        isOpen={state.ui.filtersOpen}
+        setIsOpen={() => dispatch({type: 'setFiltersOpen', value: !state.ui.filtersOpen})}
+        showFieldsEvenWhenClosed
       >
         <div>
           <FilterPanel
