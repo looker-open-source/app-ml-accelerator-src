@@ -2,7 +2,7 @@ import React from 'react'
 import { ResultsTableHeaderItem } from '../../../types'
 
 type ResultsTableRowsProps = {
-  data: any[]
+  data: any[] | undefined
   headers: ResultsTableHeaderItem[]
 }
 

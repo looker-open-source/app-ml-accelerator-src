@@ -1,6 +1,4 @@
-import React, { useContext, useState } from 'react'
-import { useStore } from "../../contexts/StoreProvider"
-import { ExtensionContext } from "@looker/extension-sdk-react"
+import React, { useState } from 'react'
 import './Step2.scss'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
@@ -8,7 +6,6 @@ import { getWizardStepCompleteCallback } from '../../services/wizard'
 import QueryBuilder from '../QueryBuilder'
 
 const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { state } = useStore()
   const [isLoading, setIsLoading] = useState(false)
 
   return (

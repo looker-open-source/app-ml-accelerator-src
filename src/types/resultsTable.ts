@@ -12,5 +12,6 @@ export type RanQuery = {
   dimensions: Field[],
   measures: Field[],
   data: any[],
+  sql: string,
   exploreUrl: string
 }

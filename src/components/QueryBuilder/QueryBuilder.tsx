@@ -34,10 +34,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
         dispatch({type: 'addToStepData', step: 'step2', data: { sorts: [] }})
         return
       }
-      const {results, exploreUrl} = await createAndRunQuery(
-        sdk,
-        step2
-      )
+      const {results, exploreUrl} = await createAndRunQuery(sdk, step2)
       saveQueryToState(results, exploreUrl)
     } catch (err) {
       dispatch({
@@ -49,7 +46,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     }
   }
 
-  const saveQueryToState = (data: any[], exploreUrl: string | undefined) => {
+  const saveQueryToState = (results: any, exploreUrl: string | undefined) => {
     dispatch({
       type: 'addToStepData',
       step: 'step2',
@@ -57,7 +54,8 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
         ranQuery: {
           dimensions: step2.selectedFields.dimensions,
           measures: step2.selectedFields.measures,
-          data,
+          data: results.data,
+          sql: results.sql,
           exploreUrl
         }
       }

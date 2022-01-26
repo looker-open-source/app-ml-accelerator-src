@@ -1,10 +1,10 @@
 import { Field } from './field'
 
 export type Summary = {
-  fields: Field[]
-  data: any[]
-  exploreName: string
-  modelName: string
+  fields: Field[] | undefined
+  data: any[] | undefined
+  exploreName: string | undefined
+  modelName: string | undefined
 }
 
 export type SummaryTableHeaderItem = {

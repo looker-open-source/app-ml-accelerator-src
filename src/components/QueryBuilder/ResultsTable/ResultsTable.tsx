@@ -55,13 +55,13 @@ export const ResultsTable: React.FC = () => {
       <div className="results-table">
         <table>
           <ResultsTableHeaders
-            headers={tableHeaders}
+            headers={tableHeaders || []}
             onHeaderClick={onHeaderClick}
             sorts={sorts}
           />
           <tbody>
             <ResultsTableRows
-              headers={tableHeaders}
+              headers={tableHeaders || []}
               data={ranQuery?.data}
             />
           </tbody>

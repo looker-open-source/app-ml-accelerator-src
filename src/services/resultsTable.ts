@@ -9,9 +9,12 @@ import { find, some } from 'lodash'
 export const getHeaderColumns = (
   selectedFields: SelectedFields,
   ranQuery: any,
-  exploreData: ExploreData
+  exploreData: ExploreData | undefined
 ): ResultsTableHeaderItem[] => {
-  if (selectedFields.dimensions.length <= 0 && selectedFields.measures.length <= 0) {
+  if (
+    !exploreData ||
+    (selectedFields.dimensions.length <= 0 && selectedFields.measures.length <= 0)
+  ) {
     return []
   }
   const ranDimensions = ranQuery?.dimensions || []
@@ -90,7 +93,7 @@ export async function createAndRunQuery(
     limit: Number(stepData.limit) || 500,
     result_format: "json_detail",
   })
-  return { results: results.data, exploreUrl: baseQuery.share_url }
+  return { results, exploreUrl: baseQuery.share_url }
 }
 
 /*

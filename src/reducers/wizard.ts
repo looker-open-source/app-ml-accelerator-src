@@ -14,12 +14,12 @@ type Action = { type: 'setCurrentStep', step: number } |
 const wizardInitialState: WizardState = {
   currentStep: 1,
   steps: {
-    step1: { objective: null },
+    step1: { objective: undefined },
     step2: {
-      exploreName: null,
-      modelName: null,
-      exploreLabel: null,
-      exploreData: null,
+      exploreName: undefined,
+      modelName: undefined,
+      exploreLabel: undefined,
+      exploreData: undefined,
       limit: "500",
       selectedFields: {
         dimensions: [],
@@ -27,19 +27,19 @@ const wizardInitialState: WizardState = {
         parameters: [],
         filters: {}
       },
-      ranQuery: null,
+      ranQuery: undefined,
       sorts: [],
       tableHeaders: []
     },
     step3: {
-      bqModelName: null,
-      targetField: null,
+      bqModelName: undefined,
+      targetField: undefined,
       selectedFields: [],
       summary: {
-        exploreName: null,
-        modelName: null,
-        fields: null,
-        data: null
+        exploreName: undefined,
+        modelName: undefined,
+        fields: undefined,
+        data: undefined
       }
     },
     step4: { data: null },
