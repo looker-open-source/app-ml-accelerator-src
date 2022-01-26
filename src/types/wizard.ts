@@ -1,13 +1,16 @@
-import { Summary } from './summary'
+import { ResultsTableHeaderItem, RanQuery, ExploreData, SelectedFields, Summary} from '.'
+
 export type WizardState = {
   currentStep: number,
-  steps: {
-    step1: Step1State,
-    step2: Step2State,
-    step3: Step3State,
-    step4: Step4State,
-    step5: Step5State
-  }
+  steps: WizardSteps
+}
+
+export type WizardSteps = {
+  step1: Step1State,
+  step2: Step2State,
+  step3: Step3State,
+  step4: Step4State,
+  step5: Step5State
 }
 
 export type Step1State = {
@@ -17,7 +20,13 @@ export type Step1State = {
 export type Step2State = {
   exploreName: string | undefined,
   modelName: string | undefined,
-  exploreLabel: string | undefined
+  exploreLabel: string | undefined,
+  exploreData: ExploreData | undefined,
+  limit: string | undefined,
+  selectedFields: SelectedFields,
+  sorts: string[],
+  tableHeaders: ResultsTableHeaderItem[] | undefined,
+  ranQuery: RanQuery | undefined
 }
 
 export type Step3State = {
@@ -34,3 +43,5 @@ export type Step4State = {
 export type Step5State = {
   data: any
 }
+
+export type GenericStepState = Step1State | Step2State | Step3State | Step4State | Step5State

@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import { buildHeaders, toggleSelectedField } from '../../services/summary'
-import { Field, DataTableHeaderItem } from '../../types'
+import { SummaryField, SummaryTableHeaderItem } from '../../types'
 import { Checkbox } from "@looker/components"
 import { SummaryTableRows } from './SummaryTableRows'
 
 type SummaryParams = {
-  fields?: Field[] | undefined,
+  fields?: SummaryField[] | undefined,
   summaryData: any[] | undefined,
   selectedFields: string[],
   updateSelectedFields: (selectedFields) =>  void
@@ -15,7 +15,7 @@ export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selected
   console.log({fields})
   console.log({summaryData})
   const [allChecked, setAllChecked] = useState(summaryData.length === selectedFields.length)
-  const headers: DataTableHeaderItem[] = buildHeaders(fields)
+  const headers: SummaryTableHeaderItem[] = buildHeaders(fields)
 
 
   const checkboxChange = (fieldName): void => {

@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
+import { GenericStepState, WizardSteps } from '../../types'
 
 type WizardStepProps = {
-  isStepComplete: () => void,
-  stepName: number
+  isStepComplete: (stepData: GenericStepState) => boolean,
+  stepNumber: number
 }
 
-export const withWizardStep = ({isStepComplete, stepNumber}) =>
-  WrappedComponent => {
-    return (props) => {
+type WizardStepWrapper = (WrappedComponent: any) => React.FC
+
+export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): WizardStepWrapper => {
+  return (WrappedComponent: React.FC): React.FC => {
+    return (props: any): any => {
       const { state, dispatch } = useStore()
       const [ stepComplete, setStepComplete ] = useState(false)
-      const stepData = state.wizard.steps[`step${stepNumber}`]
-      const nextStep = state.wizard.currentStep === stepNumber
+      const stepName: keyof WizardSteps = "step" + stepNumber
+      const stepData: GenericStepState = state.wizard.steps[stepName]
+      const nextStep: number = state.wizard.currentStep === stepNumber
         ? state.wizard.currentStep + 1
         : state.wizard.currentStep
 
@@ -30,3 +34,4 @@ export const withWizardStep = ({isStepComplete, stepNumber}) =>
       return <WrappedComponent stepComplete={stepComplete} {...props} />
     }
   }
+}

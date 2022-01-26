@@ -1,0 +1,122 @@
+.results-table-container {
+  background: #FCFCFF;
+  color: #7F889B;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font-size: 20px;
+  font-weight: 100;
+  height: calc(100vh - 165px); // top logo bar + filters
+  margin-top: 20px;
+  position: relative;
+  opacity: 1;
+}
+
+.results-table {
+  display: flex;
+  font-family: "Source Sans Pro", sans-serif;
+  overflow-x: auto;
+  width: 100%;
+
+  .results-table-loading {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: rgba(255, 255, 255, .5);
+  }
+
+  // looker table styles
+  table {
+    color: #696969;
+    font-family: "Open Sans", "Noto Sans JP", Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    width: 100%;
+    border-spacing: 0px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+    border-collapse: collapse;
+  }
+
+  th {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    line-height: 18px;
+    padding: 2px;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  th .rotate-up,
+  th .rotate-down {
+    position: relative;
+    top: 2px;
+  }
+
+  th,
+  th.dimension {
+    background-color: #ccd8e4;
+  }
+  th.measure {
+    background-color: #e4d0bd;
+  }
+  th.calculation {
+    background-color: #c9dfc5;
+  }
+  tr:nth-child(2) th,
+  tr:nth-child(2) th.dimension {
+    background-color: #e4ecf3;
+  }
+  tr:nth-child(2) th.measure {
+    background-color: #ede0d4;
+  }
+  tr:nth-child(2) th.calculation {
+    background-color: #c9dfc5;
+  }
+  th:not(.placeholder) {
+    cursor: pointer;
+  }
+  th.rowNumber,
+  td.rowNumber {
+    width: 1%;
+    min-width: 1%;
+    color: #c2c2c2;
+  }
+  tr:nth-child(even) td {
+    background-color: #f6f8fa;
+  }
+  tr:nth-child(even) td.calculation {
+    background-color: #eef7ee;
+  }
+  tr:nth-child(even) td.measure {
+    background-color: #f7f2ee;
+  }
+  td {
+    line-height: 18px;
+    padding: 2px;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  // our additions to the looker styles
+  th, td {
+    text-align: left;
+  }
+
+  th,
+  td.string {
+    text-align: left;
+    padding-left: 10px;
+  }
+  td.number {
+    text-align: right;
+    padding-right: 10px;
+  }
+  td.rowNumber {
+    text-align: right;
+    padding-right: 3px;
+  }
+  td:last-of-type {
+    padding-right: 10px;
+  }
+}

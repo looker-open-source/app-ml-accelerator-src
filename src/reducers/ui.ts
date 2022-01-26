@@ -1,0 +1,30 @@
+import { UIState } from '../types'
+
+type Action = {type: 'isLoading', value: boolean} |
+  {type: 'setFiltersOpen', value: boolean} |
+  {type: 'setDataOpen', value: boolean}
+
+const uiInitialState = {
+  isLoading: false,
+  filtersOpen: false,
+  dataOpen: true
+}
+
+function uiReducer(state: UIState, action: Action): any {
+  switch (action.type) {
+    case 'isLoading': {
+      return {...state, isLoading: action.value}
+    }
+    case 'setFiltersOpen': {
+      return {...state, filtersOpen: action.value}
+    }
+    case 'setDataOpen': {
+      return {...state, dataOpen: action.value}
+    }
+    default: {
+      return {...state}
+    }
+  }
+}
+
+export { uiReducer, uiInitialState }

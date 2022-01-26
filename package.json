@@ -22,6 +22,7 @@
     "@looker/embed-sdk": "^1.6.0",
     "@looker/extension-sdk": "^21.4.5",
     "@looker/extension-sdk-react": "^21.4.5",
+    "@looker/filter-components": "^0.10.14",
     "@looker/icons": "1.1.5",
     "@looker/sdk": "^21.4.3",
     "@looker/sdk-rtl": "^21.0.12",

@@ -44,6 +44,25 @@ body,
     padding: 0;
     margin: 0;
   }
+
+  .rotate-down {
+    transform: rotate(90deg);
+    transition: transform 0.25s ease-out;
+  }
+  .rotate-right {
+    transform: rotate(0deg);
+    transition: transform 0.25s ease-out;
+  }
+  .rotate-up {
+    transform: rotate(-90deg);
+    transition: transform 0.25s ease-out;
+  }
+
+  .center {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .wizard-card {

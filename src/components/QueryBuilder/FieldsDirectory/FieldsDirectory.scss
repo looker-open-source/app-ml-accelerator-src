@@ -1,0 +1,17 @@
+#panel-fields {
+  overflow-y: auto;
+  padding-bottom: 250px;
+}
+
+.field-directory {
+  border-bottom: none;
+
+  p {
+    padding-top: 1rem;
+    padding-bottom: 0.25rem;
+  }
+
+  > li > ul {
+    margin-top: -14px;
+  }
+}

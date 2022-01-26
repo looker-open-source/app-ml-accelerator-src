@@ -1,0 +1,21 @@
+.current-explore {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  padding: 4px 20px;
+
+  .back-btn {
+    margin-left: -5px;
+    margin-right: 15px;
+  }
+
+  .explore-label {
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 20px;
+  }
+}
+
+.fields-tabs .spinner {
+  margin-top: 36px;
+}

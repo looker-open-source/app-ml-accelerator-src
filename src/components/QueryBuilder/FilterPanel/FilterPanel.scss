@@ -1,0 +1,42 @@
+.filter-container {
+  width: 100%;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin-top: 8px;
+
+  .filter-label, .filter, .filter-remove {
+    display: inline-block
+  }
+
+  .filter-select {
+    display: flex;
+    width: 180px;
+    margin: 0 40px 0 20px;
+  }
+
+  .filter-label {
+    display: flex;
+    flex-direction: column;
+    width: 140px;
+    margin: 0 60px 0 20px;
+
+    strong {
+      font-weight: 700;
+    }
+  }
+
+  .filter-remove {
+    margin-left: 10px;
+  }
+
+  .filter {
+    button {
+      display: none;
+    }
+  }
+
+  .filter [role="combobox"] + [class^="Flex"] {
+    align-items: flex-end;
+  }
+}

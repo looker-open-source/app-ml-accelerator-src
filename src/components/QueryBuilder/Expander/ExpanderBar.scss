@@ -1,0 +1,44 @@
+.ExpanderBarContents__container {
+  .expander--open {
+    height: 100%;
+  }
+
+  .expander-body {
+    cursor: pointer;
+    width: 100%;
+    height: 28px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    align-items: center;
+    padding: 10px 20px 10px 20px;
+    border-radius: 4px;
+    color: dimgray;
+    background-color: #f6f6f7;
+    transition: 0.1s;
+
+    .expander-label__text {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      padding-right: 5px;
+    }
+    .chevronIcon {
+      margin: 1.5px 3px 0 5px;
+    }
+  }
+
+  .expander-body_open {
+    transition: 0.5s;
+    color: whitesmoke;
+    background-color: rgb(38, 45, 51);
+  }
+
+  .expander-children {
+    display: none;
+  }
+  .expander-children__visible {
+    display: block;
+  }
+}
