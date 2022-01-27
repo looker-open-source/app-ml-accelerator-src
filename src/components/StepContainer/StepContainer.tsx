@@ -7,10 +7,11 @@ type StepContainerParams = {
   stepComplete?: boolean
   customClass?: string
   stepNumber: number
-  children: any
+  children: any,
+  stepText?: string
 }
 
-export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepComplete, customClass, stepNumber, children }) => {
+export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepComplete, customClass, stepNumber, children, stepText }) => {
   const loadingClass = isLoading ? 'loading' : ''
 
   return (
@@ -27,10 +28,13 @@ export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepCo
         )
       }
       { children }
-      <StepComplete
-        isStepComplete={stepComplete}
-        stepNumber={stepNumber}
-      />
+      <div className="wizard-footer-bar">
+        <StepComplete
+          stepText={stepText}
+          isStepComplete={stepComplete}
+          stepNumber={stepNumber}
+        />
+      </div>
     </section>
   )
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { GenericStepState, WizardSteps } from '../../types'
+import { WIZARD_KEYS } from '../../constants'
 
 type WizardStepProps = {
   isStepComplete: (stepData: GenericStepState) => boolean,
@@ -14,8 +15,8 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
     return (props: any): any => {
       const { state, dispatch } = useStore()
       const [ stepComplete, setStepComplete ] = useState(false)
-      const stepName: keyof WizardSteps = "step" + stepNumber
-      const stepData: GenericStepState = state.wizard.steps[stepName]
+      const stepKey: keyof WizardSteps = WIZARD_KEYS[stepNumber]
+      const stepData: GenericStepState = state.wizard.steps[stepKey]
       const nextStep: number = state.wizard.currentStep === stepNumber
         ? state.wizard.currentStep + 1
         : state.wizard.currentStep
