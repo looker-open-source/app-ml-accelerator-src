@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"
 import { useStore } from "../../../contexts/StoreProvider"
-import { ExtensionContext } from "@looker/extension-sdk-react"
+import { ExtensionContext2 } from "@looker/extension-sdk-react"
 import { fetchExplore, mapAPIExploreToClientExplore } from "../../../services/explores"
 import { CurrentExplore } from './CurrentExplore'
 import FieldsDirectory from '../FieldsDirectory'
@@ -8,14 +8,14 @@ import Spinner from '../../Spinner'
 import "./FieldsSelect.scss"
 
 export const FieldsSelect: React.FC = () => {
-  const { core40SDK } = useContext(ExtensionContext)
+  const { coreSDK } = useContext(ExtensionContext2)
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const { exploreName, modelName, exploreData } = state.wizard.steps.step2
 
   useEffect(() => {
     if (!modelName || !exploreName) { return }
-    fetchExplore(core40SDK, modelName, exploreName).then((results) => {
+    fetchExplore(coreSDK, modelName, exploreName).then((results) => {
       if (results?.ok && results?.value) {
         // convert raw JSON response to just the subset and shape of data we want
         const newExploreData = mapAPIExploreToClientExplore(results.value)

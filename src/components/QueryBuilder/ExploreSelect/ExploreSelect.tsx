@@ -4,14 +4,14 @@ import { Search } from "@styled-icons/material"
 import ModelExploreList from "../ModelExploreList"
 import Spinner from "../../Spinner"
 import { filterExplores, fetchSortedModelsAndExplores } from "../../../services/explores"
-import { ExtensionContext } from "@looker/extension-sdk-react"
+import { ExtensionContext2 } from "@looker/extension-sdk-react"
 import { ILookmlModel } from "@looker/sdk/lib/4.0/models"
 import "./ExploreSelect.scss"
 import { useStore } from "../../../contexts/StoreProvider"
 
 
 export const ExploreSelect: React.FC = () => {
-  const { extensionSDK, core40SDK } = useContext(ExtensionContext);
+  const { extensionSDK, coreSDK } = useContext(ExtensionContext2);
   const { dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const [textInput, setTextInput] = useState("")
@@ -19,7 +19,7 @@ export const ExploreSelect: React.FC = () => {
   const [filteredExplores, setFilteredExplores] = useState<ILookmlModel[]>([])
 
   useEffect(() => {
-    fetchSortedModelsAndExplores(extensionSDK, core40SDK)
+    fetchSortedModelsAndExplores(extensionSDK, coreSDK)
       .then((modelExplores: ILookmlModel[]) => {
         setExploreArr(modelExplores)
         setFilteredExplores(modelExplores)

@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import { ExtensionContext } from "@looker/extension-sdk-react"
+import { ExtensionContext2 } from "@looker/extension-sdk-react"
 import { FieldText, Select } from "@looker/components"
 import './Step3.scss'
 import withWizardStep from '../WizardStepHOC'
@@ -10,7 +10,7 @@ import { getSummaryData, hasSummaryData, renameSummaryDataKeys, buildFieldSelect
 import Summary from '../Summary'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { core40SDK: sdk } = useContext(ExtensionContext);
+  const { coreSDK: sdk } = useContext(ExtensionContext2);
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2

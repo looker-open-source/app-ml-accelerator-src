@@ -19,18 +19,18 @@
 */
 import React from 'react'
 import { ComponentsProvider } from '@looker/components'
-import { ExtensionProvider } from '@looker/extension-sdk-react'
+import { ExtensionProvider2 } from '@looker/extension-sdk-react'
+import { Looker40SDK } from '@looker/sdk'
 import { StoreProvider } from '../contexts/StoreProvider'
 import { hot } from 'react-hot-loader/root'
 import { ExtensionApp } from './ExtensionApp'
 
-
 export const App = hot(() => (
-  <ExtensionProvider>
+  <ExtensionProvider2 type={Looker40SDK}>
     <ComponentsProvider>
       <StoreProvider>
         <ExtensionApp />
       </StoreProvider>
     </ComponentsProvider>
-  </ExtensionProvider>
+  </ExtensionProvider2>
 ))

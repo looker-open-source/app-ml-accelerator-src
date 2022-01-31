@@ -9,7 +9,12 @@
     "bigquery_connection_name": {
       "label": "BigQuery Connection Name",
       "type": "string",
-      "default_value": "4mile_bigquery"
+      "default_value": ""
+    },
+    "google_client_id": {
+      "label": "Google Client ID",
+      "type": "string",
+      "default_value": ""
     }
   }
 }

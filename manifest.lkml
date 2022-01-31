@@ -10,6 +10,9 @@ application: looker-bqml-app {
     use_form_submit:  yes
     scoped_user_attributes: [
       "bigquery_connection_name",
+      "google_client_id"
     ]
+    external_api_urls: ["https://bigquery.googleapis.com/bigquery/v2/projects"]
+    oauth2_urls: ["https://accounts.google.com/o/oauth2/v2/auth"]
   }
 }
