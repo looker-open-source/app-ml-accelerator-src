@@ -32,7 +32,7 @@ const wizardInitialState: WizardState = {
       tableHeaders: []
     },
     step3: {
-      bqModelName: undefined,
+      bqModelName: '',
       targetField: undefined,
       selectedFields: [],
       summary: {

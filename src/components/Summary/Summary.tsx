@@ -5,26 +5,23 @@ import { Checkbox } from "@looker/components"
 import { SummaryTableRows } from './SummaryTableRows'
 
 type SummaryParams = {
-  fields?: SummaryField[] | undefined,
-  summaryData: any[] | undefined,
+  fields: SummaryField[],
+  summaryData: any[],
   selectedFields: string[],
-  updateSelectedFields: (selectedFields) =>  void
+  updateSelectedFields: (selectedFields: string[]) =>  void
 }
 
 export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selectedFields, updateSelectedFields }) => {
-  console.log({fields})
-  console.log({summaryData})
   const [allChecked, setAllChecked] = useState(summaryData.length === selectedFields.length)
   const headers: SummaryTableHeaderItem[] = buildHeaders(fields)
 
-
-  const checkboxChange = (fieldName): void => {
+  const checkboxChange = (fieldName: string): void => {
     const newSelectedFields = toggleSelectedField(selectedFields, fieldName)
     updateSelectedFields(newSelectedFields)
     setAllChecked(summaryData.length === newSelectedFields.length)
   }
 
-  const toggleAllFields = (evt): void => {
+  const toggleAllFields = (evt: any): void => {
     const checked: boolean = evt.currentTarget.checked
     const selectedFields = checked ? summaryData.map((d) => d["column_name"]) : []
     updateSelectedFields(selectedFields)

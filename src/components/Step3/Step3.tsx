@@ -6,20 +6,26 @@ import './Step3.scss'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { getSummaryData, hasSummaryData, renameSummaryDataKeys } from '../../services/summary'
+import { getSummaryData, hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '../../services/summary'
 import Summary from '../Summary'
-
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { core40SDK: sdk } = useContext(ExtensionContext);
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
-  const [textInput, setTextInput] = useState("")
-  const { exploreName, modelName } = state.wizard.steps.step2
-  const { summary, selectedFields } = state.wizard.steps.step3
+  const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
+  const { summary, selectedFields, targetField, bqModelName } = state.wizard.steps.step3
+  const targetFieldOptions = buildFieldSelectOptions(
+    exploreData?.fieldDetails,
+    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])]
+  )
+  if (!exploreName || !modelName) {
+    dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
+    return null
+  }
 
   useEffect(() => {
-    if (hasSummaryData(summary, exploreName, modelName)) {
+    if (!targetField || hasSummaryData(summary, exploreName, modelName, targetField)) {
       setIsLoading(false)
       return
     }
@@ -29,17 +35,14 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         if (results?.ok && results?.value) {
           const fields = (results.value.fields || {})
           const summaryData = renameSummaryDataKeys(results.value.data)
-          dispatch({
-            type: 'addToStepData',
-            step: 'step3',
-            data: {
-              selectedFields: summaryData.map((d) => d["column_name"]),
-              summary: {
-                exploreName,
-                modelName,
-                data: summaryData,
-                fields: [...fields.dimensions, ...fields.measures]
-              }
+          updateStepData({
+            selectedFields: summaryData.map((d: any) => d["column_name"]),
+            summary: {
+              exploreName,
+              modelName,
+              target: targetField,
+              data: summaryData,
+              fields: [...fields.dimensions, ...fields.measures]
             }
           })
         } else {
@@ -48,7 +51,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       }).catch((err: string) => {
         setError(err)
       }).finally(() => setIsLoading(false))
-  }, [exploreName])
+  }, [exploreName, targetField])
 
   const setError = (err?: string) => {
     const errString = "Failed to fetch summary data."
@@ -58,19 +61,24 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     })
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const newTextValue = e.target.value
-    setTextInput(newTextValue)
-  }
-
-  const updateSelectedFields = (selectedFields) => {
+  const updateStepData = (data: any) => {
     dispatch({
       type: 'addToStepData',
       step: 'step3',
-      data: {
-        selectedFields
-      }
+      data
     })
+  }
+
+  const handleModelNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    updateStepData({ bqModelName: e.target.value })
+  }
+
+  const handleTargetChange = (targetField: string) => {
+    updateStepData({ targetField })
+  }
+
+  const updateSelectedFields = (selectedFields: string[]) => {
+    updateStepData({ selectedFields })
   }
 
   return (
@@ -80,8 +88,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <h2>Name your model</h2>
           <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
           <FieldText
-            onChange={handleChange}
-            value={textInput}
+            onChange={handleModelNameChange}
+            value={bqModelName}
             placeholder="Model_Name"
           />
         </div>
@@ -89,8 +97,9 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <h2>Select your target</h2>
           <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
           <Select
-            options={[{value: "hi", label: "Hi"}]}
+            options={targetFieldOptions}
             placeholder="Target"
+            onChange={handleTargetChange}
           />
         </div>
         <div className="wizard-card">
@@ -102,8 +111,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         { summary.data &&
           (<Summary
             summaryData={summary.data}
-            fields={summary.fields}
-            selectedFields={selectedFields}
+            fields={summary.fields || []}
+            selectedFields={selectedFields || []}
             updateSelectedFields={updateSelectedFields} />)
         }
       </div>
