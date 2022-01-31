@@ -1,5 +1,5 @@
 import { Looker40SDK } from '@looker/sdk'
-import { reduce } from 'lodash'
+import { keyBy } from 'lodash'
 import { Field, Summary, SummaryField, SummaryTableHeaderItem } from '../types'
 import { fetchExplore } from './explores'
 import { titilize } from './string'
@@ -74,20 +74,16 @@ export const toggleSelectedField = (selectedFields: string[], fieldName: string)
 
 export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[]) => {
   const fields = [...fieldDetails.dimensions, ...fieldDetails.measures]
-  const indexedFields: { [key: string]: Field } = reduce(fields, (agg: any, field: Field) => {
-    agg[field.name] = field
-    return agg
-  }, {})
+  const indexedFields: { [key: string]: Field } = keyBy(fields, 'name')
 
   return fieldNames.map((name: string) => {
     const field = indexedFields[name]
     if (!field) { return null }
-    console.log({field})
     let formattedLabel
     if (field.label) {
       formattedLabel = field.label
         titilize(field.name).replace(".", " ")
-        .trim(); // remove the view name and then title format string
+        .trim();
     }
     return {
       // each field in the view gets mapped to an option
