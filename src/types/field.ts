@@ -10,6 +10,7 @@ export type SummaryField = {
 
 export type Field = {
   id?: number
+  category: string
   dataType: string
   fieldLabel: string
   isHidden: boolean

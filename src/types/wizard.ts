@@ -30,7 +30,7 @@ export type Step2State = {
 }
 
 export type Step3State = {
-  bqModelName: string | undefined,
+  bqModelName: string,
   targetField: string | undefined,
   selectedFields: string[] | undefined,
   summary: Summary

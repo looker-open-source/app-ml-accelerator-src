@@ -9,8 +9,8 @@ export type ResultsTableHeaderItem = {
 }
 
 export type RanQuery = {
-  dimensions: Field[],
-  measures: Field[],
+  dimensions: string[],
+  measures: string[],
   data: any[],
   sql: string,
   exploreUrl: string
