@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 import React, { createContext, useContext, useState } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
+import { useStore } from './StoreProvider'
 
 type IOauthContext = {
   loggingIn?: boolean
@@ -36,30 +36,10 @@ export const OauthContext = createContext<IOauthContext>({})
 
 const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
 
-/**
- * Default push state handler.
- * props object has one or two properties
- * state - always present and represents current state
- * token - only present for login and logout
- *       - login - valid token
- *       - logout - always undefined
- * Push state handler gets called on three occassions
- * 1. to get the current token - no token so get from state
- * 2. to login - token property present so add token to state
- * 3. to logout - token property present but undefined - remove from state.
- */
-const defaultPushStateHandler = (props: any) => {
-  const { token, state } = props
-  return Object.prototype.hasOwnProperty.call(props, 'token') ? token : state
-}
-
 type OauthProviderProps = {
   children: any,
   clientId?: string | null,
-  scopes: string,
-  pushStateHandler?: (props: any) => any,
-  loggedInRoute?: string,
-  loggedOutRoute?: string
+  scopes: string
 }
 
 /**
@@ -69,17 +49,12 @@ type OauthProviderProps = {
 export const OauthProvider = ({
   children,
   clientId,
-  scopes,
-  pushStateHandler = defaultPushStateHandler,
-  loggedInRoute = '/',
-  loggedOutRoute = '/',
+  scopes
 }: OauthProviderProps) => {
   const { extensionSDK } = useContext(ExtensionContext2)
+  const { dispatch } = useStore()
   const [loggingIn, setLoggingIn] = useState(false)
-  const history = useHistory()
-  const { state } = useLocation()
   const [ token, setToken ] = useState<string>()
-  // const token = pushStateHandler({ state })
 
   /**
    * OAUTH2 authentication.
@@ -95,13 +70,12 @@ export const OauthProvider = ({
       })
       const { access_token } = response
       setToken(access_token)
-      // history.push(
-      //   loggedInRoute,
-      //   pushStateHandler({ state, token: access_token })
-      // )
       return true
     } catch (error) {
-      console.error(error)
+      dispatch({
+        type: 'addError',
+        error: 'Failed to sign in to Oauth.  Please reload.'
+      })
       return false
     } finally {
       setLoggingIn(false)
@@ -114,7 +88,7 @@ export const OauthProvider = ({
    * still active if it has not already expired.
    */
   const signOut = () => {
-    history.push(loggedOutRoute, pushStateHandler({ state, token: undefined }))
+    setToken(undefined)
   }
 
   return (
