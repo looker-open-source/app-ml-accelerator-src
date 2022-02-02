@@ -2,6 +2,7 @@ import React from 'react'
 import { Switch, Route, Redirect, withRouter, useRouteMatch } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import { SummaryProvider } from '../../contexts/SummaryProvider'
+import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
 import './MLWizard.scss'
 import NavBar from '../NavBar'
 import Step1 from '../Step1'
@@ -31,7 +32,9 @@ export const _MLWizard: React.FC = () => {
             path={`${path}/${WIZARD_STEPS.step2}`}
             enforcementPath={enforcementPath}
             redirect={currentStep < 2}>
-              <Step2 />
+              <QueryBuilderProvider>
+                <Step2 />
+              </QueryBuilderProvider>
           </WizardRoute>
           <WizardRoute
             path={`${path}/${WIZARD_STEPS.step3}`}

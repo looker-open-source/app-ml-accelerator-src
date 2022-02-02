@@ -3,38 +3,32 @@ import { FieldText } from "@looker/components"
 import { Search } from "@styled-icons/material"
 import ModelExploreList from "../ModelExploreList"
 import Spinner from "../../Spinner"
-import { filterExplores, fetchSortedModelsAndExplores } from "../../../services/explores"
-import { ExtensionContext2 } from "@looker/extension-sdk-react"
+import { filterExplores } from "../../../services/explores"
+import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 import { ILookmlModel } from "@looker/sdk/lib/4.0/models"
 import "./ExploreSelect.scss"
-import { useStore } from "../../../contexts/StoreProvider"
+
 
 
 export const ExploreSelect: React.FC = () => {
-  const { extensionSDK, coreSDK } = useContext(ExtensionContext2);
-  const { dispatch } = useStore()
+  const { fetchSortedModelsAndExplores } = useContext(QueryBuilderContext);
   const [isLoading, setIsLoading] = useState(true)
   const [textInput, setTextInput] = useState("")
   const [exploreArr, setExploreArr] = useState<ILookmlModel[]>([])
   const [filteredExplores, setFilteredExplores] = useState<ILookmlModel[]>([])
 
   useEffect(() => {
-    fetchSortedModelsAndExplores(extensionSDK, coreSDK)
-      .then((modelExplores: ILookmlModel[]) => {
-        setExploreArr(modelExplores)
-        setFilteredExplores(modelExplores)
-      })
-      .catch((err: any) => {
-        dispatch({
-          type: 'addError',
-          error: 'Failed to fetch Models and Explores.  Please reload the page.'
-        })
-        console.error(err)
-      })
+    fetch()
       .finally(() => setIsLoading(false))
   }, [])
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>): void {
+  const fetch = async () => {
+    const modelExplores: ILookmlModel[] = await fetchSortedModelsAndExplores?.()
+    setExploreArr(modelExplores)
+    setFilteredExplores(modelExplores)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newTextValue = e.target.value
     const filteredExplores = filterExplores(newTextValue, exploreArr)
 

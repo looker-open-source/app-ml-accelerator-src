@@ -27,7 +27,6 @@ import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
 
 type IBQMLContext = {
-  error?: boolean
   expired?: boolean
   queryJob?: (sql: string) => Promise<any>
 }
@@ -42,7 +41,6 @@ export const BQMLProvider = ({ children }: any) => {
   const { token } = useContext(OauthContext)
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
-  const [error, setError] = useState(false)
   const { extensionSDK } = useContext(ExtensionContext2)
   const { gcpProject } = state.userAttributes
 
@@ -70,21 +68,17 @@ export const BQMLProvider = ({ children }: any) => {
             },
           }
 
-      setError(false)
       setExpired(false)
       const { ok, status, body } = await extensionSDK.fetchProxy(
         `https://bigquery.googleapis.com/bigquery/v2/${pathname}`,
         init
       )
-      setError(!ok)
       if (status === 401) {
         setExpired(true)
         dispatch({ type: 'addError', error: 'Unauthorized request to google api' })
       }
       return { ok, body, status }
     } catch (error) {
-      console.error(error)
-      setError(true)
       dispatch({ type: 'addError', error })
       return { ok: false }
     }
@@ -107,7 +101,6 @@ export const BQMLProvider = ({ children }: any) => {
   return (
     <BQMLContext.Provider
       value={{
-        error,
         expired,
         queryJob
       }}

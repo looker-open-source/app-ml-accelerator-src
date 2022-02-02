@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-  import React, { createContext, useContext, useState } from 'react'
+  import React, { createContext, useContext } from 'react'
   import { ExtensionContext2 } from '@looker/extension-sdk-react'
   import { BQMLContext } from './BQMLProvider'
   import { useStore } from './StoreProvider'
@@ -54,9 +54,13 @@
       querySql: string | undefined,
       bqModelName: string | undefined
     ) => {
+      if (!lookerTempDatasetName) {
+        throw new Error("User Attribute 'looker_temp_dataset_name' must be defined")
+      }
+
       const sql = formBQViewSQL(querySql, lookerTempDatasetName, bqModelName)
       if (!sql) {
-        return { ok: false }
+        throw new Error("Failed to create BigQuery View SQL statement")
       }
 
       const { ok, body } = await queryJob?.(sql)
@@ -67,6 +71,7 @@
       if (!body.jobComplete) {
         // try again loop
         console.log('incomplete job');
+        throw new Error("Failed to  finish creating bigQuery view")
       }
     }
 

@@ -1,49 +1,41 @@
 import React, { useEffect, useContext } from "react"
-import { ExtensionContext2 } from "@looker/extension-sdk-react"
 import { useStore } from "../../contexts/StoreProvider"
 import NoExplorePlaceHolder from './NoExplorePlaceHolder'
 import ExploreSelect from './ExploreSelect'
 import FieldsSelect from './FieldsSelect'
 import QueryPane from './QueryPane'
-import { hasOrphanedSorts, createAndRunQuery } from '../../services/resultsTable'
+import { hasOrphanedSorts } from '../../services/resultsTable'
+import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void
 }
 
 export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => {
-  const { coreSDK: sdk } = useContext(ExtensionContext2);
+  const { createAndRunQuery } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
   const { step2 } = state.wizard.steps
 
   // re-run the query when a sort is applied
   useEffect(() => {
     if (!step2.ranQuery?.data) { return }
+    setIsLoading(true)
     runQuery()
+      .finally(() => setIsLoading(false))
   }, [step2.sorts])
 
   const runQuery = async() => {
-    setIsLoading(true)
-    try {
-      if (
-        step2.tableHeaders &&
-        hasOrphanedSorts(step2.tableHeaders, step2.sorts || [])
-      ) {
-        // case when a sort is applied to a column that no longer exists in the query
-        // clearing the sorts will trigger another runQuery execution in the useEffect above
-        dispatch({type: 'addToStepData', step: 'step2', data: { sorts: [] }})
-        return
-      }
-      const {results, exploreUrl} = await createAndRunQuery(sdk, step2)
-      saveQueryToState(results, exploreUrl)
-    } catch (err) {
-      dispatch({
-        type: 'addError',
-        error: 'Failed to retrieve query - ' + err
-      })
-    } finally {
-      setIsLoading(false)
+    if (
+      step2.tableHeaders &&
+      hasOrphanedSorts(step2.tableHeaders, step2.sorts || [])
+    ) {
+      // case when a sort is applied to a column that no longer exists in the query
+      // clearing the sorts will trigger another runQuery execution in the useEffect above
+      dispatch({type: 'addToStepData', step: 'step2', data: { sorts: [] }})
+      return
     }
+    const {results, exploreUrl} = await createAndRunQuery?.(step2)
+    saveQueryToState(results, exploreUrl)
   }
 
   const saveQueryToState = (results: any, exploreUrl: string | undefined) => {
