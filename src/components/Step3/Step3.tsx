@@ -1,6 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react'
 import { useStore } from "../../contexts/StoreProvider"
 import { ExtensionContext2 } from "@looker/extension-sdk-react"
+import { BQMLContext } from '../../contexts/BQMLProvider'
 import { FieldText, Select } from "@looker/components"
 import './Step3.scss'
 import withWizardStep from '../WizardStepHOC'
@@ -11,6 +12,7 @@ import Summary from '../Summary'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { coreSDK: sdk } = useContext(ExtensionContext2);
+  const { queryJob } = useContext<any>(BQMLContext)
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
@@ -30,8 +32,9 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       return
     }
     setIsLoading(true)
-    getSummaryData(sdk)
+    getSummaryData(sdk, queryJob, ranQuery?.sql, state.userAttributes, bqModelName)
       .then((results) => {
+        debugger;
         if (results?.ok && results?.value) {
           const fields = (results.value.fields || {})
           const summaryData = renameSummaryDataKeys(results.value.data)
@@ -70,6 +73,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const handleModelNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+
     updateStepData({ bqModelName: e.target.value })
   }
 
@@ -79,6 +83,13 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const updateSelectedFields = (selectedFields: string[]) => {
     updateStepData({ selectedFields })
+  }
+
+  const alphaNumericOnly = (e: any) => {
+    const re = /[0-9a-zA-Z ]+/g;
+    if (!re.test(e.key)) {
+      e.preventDefault();
+    }
   }
 
   return (
@@ -91,6 +102,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             onChange={handleModelNameChange}
             value={bqModelName}
             placeholder="Model_Name"
+            onKeyPress={alphaNumericOnly}
           />
         </div>
         <div className="wizard-card">

@@ -15,6 +15,16 @@
       "label": "Google Client ID",
       "type": "string",
       "default_value": ""
+    },
+    "looker_temp_dataset_name": {
+      "label": "Looker Temp Dataset Name",
+      "type": "string",
+      "default_value": ""
+    },
+    "gcp_project": {
+      "label": "GCP Project Name",
+      "type": "string",
+      "default_value": ""
     }
   }
 }

@@ -1,18 +1,40 @@
 import { Looker40SDK } from '@looker/sdk'
 import { keyBy } from 'lodash'
-import { Field, Summary, SummaryField, SummaryTableHeaderItem } from '../types'
+import { Field, Summary, SummaryField, SummaryTableHeaderItem, UserAttributesState } from '../types'
 import { fetchExplore } from './explores'
 import { titilize } from './string'
 
-export const getSummaryData = async(sdk: Looker40SDK): Promise<any> => {
+const formBQViewSQL = (
+  sql: string | undefined,
+  lookerTempDatasetName: string | undefined,
+  bqModelName: string | undefined
+) => {
+  if (!sql || !lookerTempDatasetName || !bqModelName) { return false }
+  return `CREATE OR REPLACE VIEW ${lookerTempDatasetName}.${bqModelName}_input_data AS ${sql}`
+}
+
+export const getSummaryData = async(
+  sdk: Looker40SDK,
+  jobQuery: any,
+  ranQuerySql: string | undefined,
+  userAttributes: UserAttributesState,
+  bqModelName: string
+): Promise<any> => {
+  const sql = formBQViewSQL(ranQuerySql, userAttributes.lookerTempDatasetName, bqModelName)
+  if (!sql) { return { ok: false } }
+  const result = await jobQuery(sql)
+  debugger;
+  if (!result.ok) {
+    throw new Error("Failed to create bigQuery view")
+  }
+
   const { value: explore } = await fetchExplore(sdk, 'selection_summary', 'selection_summary')
   const { value: query } = await sdk.create_query({
     model:  'selection_summary',
     view: 'selection_summary',
     fields: explore.fields.dimensions.map((d: any) => d.name),
     filters: {
-      "selection_summary.schema_name": 'test',
-      "selection_summary.table_name": 'davidb^_automl^_model^_test^_1'
+      "selection_summary.model_name_input_data": `${bqModelName}_input_data`
     }
   })
   const results = await sdk.run_query({

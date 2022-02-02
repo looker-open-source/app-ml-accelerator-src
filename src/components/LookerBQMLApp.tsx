@@ -5,13 +5,19 @@ import './ExtensionApp.scss'
 import ErrorBar from './ErrorBar'
 import TitleBar from './TitleBar'
 import MLWizard from './MLWizard'
+import { BQMLContext } from '../contexts/BQMLProvider'
 
 export const _LookerBQMLApp: React.FC = () => {
-  const { loggingIn, token, signIn } = useContext(OauthContext)
+  const { loggingIn, token, signIn, signOut } = useContext(OauthContext)
+  const { expired } = useContext(BQMLContext)
 
   useEffect(() => {
-    if (!loggingIn && !token && signIn) {
+    if (signOut && expired) {
+      signOut()
+    }
+    if (signIn && !loggingIn && !token) {
       signIn()
+      return
     }
   })
 

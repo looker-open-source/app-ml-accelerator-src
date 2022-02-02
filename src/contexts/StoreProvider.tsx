@@ -1,12 +1,13 @@
 import * as React from 'react'
 import useCombinedReducers from 'use-combined-reducers';
 import { reducers, initialStates } from '../reducers'
-import { UIState, WizardState } from '../types'
+import { UIState, UserAttributesState, WizardState } from '../types'
 
 type StoreProviderProps = {children: React.ReactNode}
 type StoreState = {
   errors: [object],
   ui: UIState,
+  userAttributes: UserAttributesState,
   wizard: WizardState
 }
 
@@ -18,6 +19,7 @@ function StoreProvider({children}: StoreProviderProps) {
   const [state, dispatch] = useCombinedReducers<any, any>({
     errors: React.useReducer(reducers.errorsReducer, initialStates.errorsInitialState),
     ui: React.useReducer(reducers.uiReducer, initialStates.uiInitialState),
+    userAttributes: React.useReducer(reducers.userAttributesReducer, initialStates.userAttributesInitialState),
     wizard: React.useReducer(reducers.wizardReducer, initialStates.wizardInitialState)
   })
 
