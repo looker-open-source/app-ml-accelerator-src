@@ -7,12 +7,13 @@ import './Step3.scss'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { getSummaryData, hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '../../services/summary'
+import { hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '../../services/summary'
+import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
+import ResultsTable from '../QueryBuilder/ResultsTable'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { coreSDK: sdk } = useContext(ExtensionContext2);
-  const { queryJob } = useContext<any>(BQMLContext)
+  const { getSummaryData } = useContext(SummaryContext)
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
@@ -27,32 +28,16 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   useEffect(() => {
-    if (!targetField || hasSummaryData(summary, exploreName, modelName, targetField)) {
+    if (
+      !targetField ||
+      !bqModelName ||
+      hasSummaryData(summary, exploreName, modelName, targetField)
+    ) {
       setIsLoading(false)
       return
     }
     setIsLoading(true)
-    getSummaryData(sdk, queryJob, ranQuery?.sql, state.userAttributes, bqModelName)
-      .then((results) => {
-        if (results?.ok && results?.value) {
-          const fields = (results.value.fields || {})
-          const summaryData = renameSummaryDataKeys(results.value.data)
-          updateStepData({
-            selectedFields: summaryData.map((d: any) => d["column_name"]),
-            summary: {
-              exploreName,
-              modelName,
-              target: targetField,
-              data: summaryData,
-              fields: [...fields.dimensions, ...fields.measures]
-            }
-          })
-        } else {
-          setError()
-        }
-      }).catch((err: string) => {
-        setError(err)
-      }).finally(() => setIsLoading(false))
+    fetchSummary().finally(() => setIsLoading(false))
   }, [exploreName, targetField])
 
   const setError = (err?: string) => {
@@ -60,6 +45,26 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     dispatch({
       type: 'addError',
       error: err ? `"${err}" - ${errString}` : errString
+    })
+  }
+
+  const fetchSummary = async () => {
+    const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName)
+    if (!ok || !value) {
+      setError()
+    }
+
+    const fields = (value.fields || {})
+    const summaryData = renameSummaryDataKeys(value.data)
+    updateStepData({
+      selectedFields: summaryData.map((d: any) => d["column_name"]),
+      summary: {
+        exploreName,
+        modelName,
+        target: targetField,
+        data: summaryData,
+        fields: [...fields.dimensions, ...fields.measures]
+      }
     })
   }
 
@@ -72,7 +77,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const handleModelNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-
     updateStepData({ bqModelName: e.target.value })
   }
 

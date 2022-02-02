@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 import React, { createContext, useContext, useState } from 'react'
-import PropTypes from 'prop-types'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
@@ -116,8 +115,4 @@ export const BQMLProvider = ({ children }: any) => {
       {children}
     </BQMLContext.Provider>
   )
-}
-
-BQMLProvider.propTypes = {
-  children: PropTypes.object,
 }

@@ -1,6 +1,7 @@
 import React from 'react'
-import { Switch, Route, Redirect, withRouter, useRouteMatch, useHistory, useLocation } from 'react-router-dom'
+import { Switch, Route, Redirect, withRouter, useRouteMatch } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
+import { SummaryProvider } from '../../contexts/SummaryProvider'
 import './MLWizard.scss'
 import NavBar from '../NavBar'
 import Step1 from '../Step1'
@@ -10,22 +11,13 @@ import { WIZARD_STEPS } from "../../constants"
 
 export const _MLWizard: React.FC = () => {
   let { path, url } = useRouteMatch();
-  const { state, dispatch } = useStore()
+  const { state } = useStore()
   const { currentStep } = state.wizard  // the step the user is allowed to view
   const currentStepName = WIZARD_STEPS[`step${currentStep}`];
   const enforcementPath = `${path}/${currentStepName}`
 
-
-  // const increaseWizardStep = () => {
-    // dispatch({
-    //   type: 'setCurrentStep',
-    //   step: currentStep + 1
-    // })
-  // }
-
   return (
     <div>
-      {/* <button onClick={increaseWizardStep}>Increase</button> {currentStep} */}
       <NavBar url={url} currentStep={currentStep}></NavBar>
       <div className="mlwizard-page-contents">
         <Switch>
@@ -45,7 +37,9 @@ export const _MLWizard: React.FC = () => {
             path={`${path}/${WIZARD_STEPS.step3}`}
             enforcementPath={enforcementPath}
             redirect={currentStep < 3}>
-              <Step3 />
+              <SummaryProvider>
+                <Step3 />
+              </SummaryProvider>
           </WizardRoute>
           <WizardRoute
             path={`${path}/${WIZARD_STEPS.step4}`}

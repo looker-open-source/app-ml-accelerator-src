@@ -1,15 +1,15 @@
 export const MODEL_TYPES = {
-  AUTOML_REGRESSOR: {
+  BOOSTED_TREE_REGRESSOR: {
     label: 'Regression',
-    value: 'AUTOML_REGRESSOR',
-    detail: 'AUTOML_REGRESSOR',
-    description: 'Create a regression model using AutoML Tables.'
+    value: 'BOOSTED_TREE_REGRESSOR',
+    detail: 'BOOSTED_TREE_REGRESSOR',
+    description: 'Create a Boosted Tree Regressor model using the XGBoost library'
   },
-  AUTOML_CLASSIFIER: {
+  BOOSTED_TREE_CLASSIFIER: {
     label: 'Classification',
-    value: 'AUTOML_CLASSIFIER',
-    detail: 'AUTOML_CLASSIFIER',
-    description: 'Create a classification model using AutoML Tables.'
+    value: 'BOOSTED_TREE_CLASSIFIER',
+    detail: 'BOOSTED_TREE_CLASSIFIER',
+    description: 'Create a Boosted Tree Classifier model using the XGBoost library.'
   },
   ARIMA_PLUS: {
     label: 'Time series forecasting',
