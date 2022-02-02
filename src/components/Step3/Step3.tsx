@@ -1,7 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import { ExtensionContext2 } from "@looker/extension-sdk-react"
-import { BQMLContext } from '../../contexts/BQMLProvider'
 import { FieldText, Select } from "@looker/components"
 import './Step3.scss'
 import withWizardStep from '../WizardStepHOC'
@@ -10,7 +8,6 @@ import { getWizardStepCompleteCallback } from '../../services/wizard'
 import { hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
-import ResultsTable from '../QueryBuilder/ResultsTable'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { getSummaryData } = useContext(SummaryContext)
@@ -22,6 +19,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     exploreData?.fieldDetails,
     [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])]
   )
+
   if (!exploreName || !modelName) {
     dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
     return null
@@ -40,18 +38,11 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     fetchSummary().finally(() => setIsLoading(false))
   }, [exploreName, targetField])
 
-  const setError = (err?: string) => {
-    const errString = "Failed to fetch summary data."
-    dispatch({
-      type: 'addError',
-      error: err ? `"${err}" - ${errString}` : errString
-    })
-  }
-
   const fetchSummary = async () => {
     const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName)
     if (!ok || !value) {
-      setError()
+      dispatch({ type: 'addError', error: "Failed to fetch summary data." })
+      return
     }
 
     const fields = (value.fields || {})

@@ -1,7 +1,5 @@
-import { Looker40SDK } from '@looker/sdk'
 import { keyBy } from 'lodash'
 import { Field, Summary, SummaryField, SummaryTableHeaderItem, UserAttributesState } from '../types'
-import { fetchExplore } from './explores'
 import { titilize } from './string'
 
 export const formBQViewSQL = (
@@ -9,7 +7,13 @@ export const formBQViewSQL = (
   lookerTempDatasetName: string | undefined,
   bqModelName: string | undefined
 ) => {
-  if (!sql || !lookerTempDatasetName || !bqModelName) { return false }
+  if (
+    !sql ||
+    !lookerTempDatasetName ||
+    !bqModelName
+  ) {
+    return false
+  }
   return `CREATE OR REPLACE VIEW ${lookerTempDatasetName}.${bqModelName}_input_data AS ${sql}`
 }
 
