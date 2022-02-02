@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { ExtensionContext } from "@looker/extension-sdk-react"
+import { ExtensionContext2 } from "@looker/extension-sdk-react"
 import { findFieldDetail } from '../../../services/common'
 import { useStore } from '../../../contexts/StoreProvider'
 import { Filter, useSuggestable } from '@looker/filter-components'
@@ -21,10 +21,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const { state } = useStore()
   const { step2 } = state.wizard.steps
 
-  const exploreData = step2.exploreData
-  if (!exploreData) { return null }
-
-  const fieldDetails = exploreData.fieldDetails
+  if (!step2.exploreData || !step2.modelName) { return null }
+  const fieldDetails = step2.exploreData.fieldDetails
   if (!fieldDetails) { return null }
 
   const filterItem = (filter: string, field: any, expression?: string) => (
@@ -81,7 +79,7 @@ type FilterItemProps = {
 const FilterItem: React.FC<FilterItemProps> = ({
   filter, field, modelName, onChange, expression
 }) => {
-  const { core40SDK: sdk } = useContext(ExtensionContext);
+  const { coreSDK: sdk } = useContext(ExtensionContext2);
 
   const getSuggestableProps = (field: any) => {
     const { errorMessage, suggestableProps } = useSuggestable({

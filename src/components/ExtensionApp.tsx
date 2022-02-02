@@ -1,29 +1,37 @@
-import React from 'react'
-import { Switch, Route, Link, withRouter } from 'react-router-dom'
+import React, { useEffect, useState, useContext } from 'react'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
+import { OauthProvider } from '../contexts/OauthProvider'
+import { GOOGLE_SCOPES } from '../constants'
+import { getGoogleClientID, getAllUserAttributes } from '../services/userAttributes'
+import { LookerBQMLApp } from './LookerBQMLApp'
 import './ExtensionApp.scss'
-import ErrorBar from './ErrorBar'
-import TitleBar from './TitleBar'
-import MLWizard from './MLWizard'
+import { useStore } from '../contexts/StoreProvider'
+import { BQMLProvider } from '../contexts/BQMLProvider'
 
-export const _ExtensionApp: React.FC = () => {
+export const ExtensionApp: React.FC = () => {
+  const { extensionSDK } = useContext(ExtensionContext2)
+  const { dispatch } = useStore()
+  const [clientId, setClientId] = useState<string | null>()
+
+  useEffect(() => {
+    const getUserAttributes = async () => {
+      try {
+        const userAttributes = await getAllUserAttributes(extensionSDK)
+        dispatch({ type: "setAllAttributes", value: userAttributes })
+        setClientId(userAttributes.googleClientId)
+      } catch (err) {
+        dispatch({type: 'addError', error: 'Failed to retrieve User Attributes'})
+      }
+    }
+    if (clientId) { return }
+    getUserAttributes()
+  })
 
   return (
-    <div className="bqml-app">
-      <ErrorBar></ErrorBar>
-      <TitleBar></TitleBar>
-      <div className="bqml-app-container">
-        <Switch>
-          <Route exact path="/">
-            Home
-            <Link to="/ml">ML</Link>
-          </Route>
-          <Route path="/ml">
-            <MLWizard />
-          </Route>
-        </Switch>
-      </div>
-    </div>
+    <OauthProvider clientId={clientId} scopes={GOOGLE_SCOPES}>
+      <BQMLProvider>
+        { clientId ? (<LookerBQMLApp />) : <></> }
+      </BQMLProvider>
+    </OauthProvider>
   )
 }
-
-export const ExtensionApp = withRouter(_ExtensionApp)

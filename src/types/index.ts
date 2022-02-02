@@ -6,6 +6,7 @@ import { View } from './view'
 import { SelectedFields } from './selectedFields'
 import { UIState } from './uiState'
 import { ResultsTableHeaderItem, RanQuery } from './resultsTable'
+import { UserAttributesState } from './userAttributes'
 export type {
   WizardState,
   WizardSteps,
@@ -24,5 +25,6 @@ export type {
   ResultsTableHeaderItem,
   SelectedFields,
   UIState,
+  UserAttributesState,
   View
 }

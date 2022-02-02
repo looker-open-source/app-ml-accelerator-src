@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from "react"
-import { ExtensionContext } from "@looker/extension-sdk-react"
+import { ExtensionContext2 } from "@looker/extension-sdk-react"
 import { useStore } from "../../contexts/StoreProvider"
 import NoExplorePlaceHolder from './NoExplorePlaceHolder'
 import ExploreSelect from './ExploreSelect'
@@ -12,7 +12,7 @@ type QueryBuilderProps = {
 }
 
 export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => {
-  const { core40SDK: sdk } = useContext(ExtensionContext);
+  const { coreSDK: sdk } = useContext(ExtensionContext2);
   const { state, dispatch } = useStore()
   const { step2 } = state.wizard.steps
 

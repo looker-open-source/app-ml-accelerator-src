@@ -16,7 +16,11 @@ export const WIZARD_KEYS: {[key: number]: keyof WizardSteps} = {
   5: 'step5',
 }
 
+export const DESC_STRING = "desc"
+export const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/bigquery'
+
 // user attribute keys from marketplace.json
 export const BIGQUERY_CONN = "bigquery_connection_name"
-
-export const DESC_STRING = "desc"
+export const GOOGLE_CLIENT_ID = "google_client_id"
+export const LOOKER_TEMP_DATASET_NAME = "looker_temp_dataset_name"
+export const GCP_PROJECT = "gcp_project"
