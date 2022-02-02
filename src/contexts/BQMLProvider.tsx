@@ -97,7 +97,10 @@ export const BQMLProvider = ({ children }: any) => {
   const queryJob = async (sql: string) => {
     const result = await invokeBQApi(
       `projects/${gcpProject}/queries`,
-      { query: sql }
+      {
+        query: sql,
+        useLegacySql: false
+      }
     )
     return result
   }

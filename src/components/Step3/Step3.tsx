@@ -34,7 +34,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     setIsLoading(true)
     getSummaryData(sdk, queryJob, ranQuery?.sql, state.userAttributes, bqModelName)
       .then((results) => {
-        debugger;
         if (results?.ok && results?.value) {
           const fields = (results.value.fields || {})
           const summaryData = renameSummaryDataKeys(results.value.data)
