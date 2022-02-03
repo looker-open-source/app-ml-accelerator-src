@@ -1,5 +1,5 @@
 .results-table-container {
-  background: #FCFCFF;
+  background: #F7F7F7;
   color: #7F889B;
   display: flex;
   flex: 1;
@@ -84,6 +84,9 @@
   }
   tr:nth-child(even) td {
     background-color: #f6f8fa;
+  }
+  tr:nth-child(odd) td {
+    background-color: #FCFCFF
   }
   tr:nth-child(even) td.calculation {
     background-color: #eef7ee;

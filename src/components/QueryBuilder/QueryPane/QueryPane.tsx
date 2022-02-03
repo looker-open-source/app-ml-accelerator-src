@@ -6,11 +6,7 @@ import QueryLimitField from '../QueryLimitField'
 import ResultsTable from '../ResultsTable'
 import { useStore } from '../../../contexts/StoreProvider'
 
-type QueryPaneProps = {
-  runQuery: () => void
-}
-
-export const QueryPane: React.FC<QueryPaneProps> = ({ runQuery }) => {
+export const QueryPane: React.FC = () => {
   const { state, dispatch } = useStore()
   const { selectedFields, limit } = state.wizard.steps.step2
 
@@ -32,9 +28,6 @@ export const QueryPane: React.FC<QueryPaneProps> = ({ runQuery }) => {
 
   return (
     <div>
-      <div>
-        <button onClick={runQuery}>Run</button>
-      </div>
       <ExpanderBar
         title="Filters"
         expanderBodyClasses="filter-expander"

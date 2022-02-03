@@ -9,6 +9,7 @@ type Action = { type: 'setCurrentStep', step: number } |
   { type: 'setSelectedParameter', field: Field } |
   { type: 'setSelectedFilter', field: Field } |
   { type: 'setFilterValue', key: string, expression: string } |
+  { type: 'setExploreFilterText', filterText: string } |
   { type: 'clearExplore' }
 
 const wizardInitialState: WizardState = {
@@ -20,6 +21,7 @@ const wizardInitialState: WizardState = {
       modelName: undefined,
       exploreLabel: undefined,
       exploreData: undefined,
+      exploreFilterText: "",
       limit: "500",
       selectedFields: {
         dimensions: [],
@@ -39,7 +41,8 @@ const wizardInitialState: WizardState = {
         exploreName: undefined,
         modelName: undefined,
         fields: undefined,
-        data: undefined
+        data: undefined,
+        target: undefined
       }
     },
     step4: { data: null },
@@ -135,6 +138,11 @@ function wizardReducer(state: WizardState, action: Action): any {
         filters: newFilters
       }
       return newState;
+    }
+    case 'setExploreFilterText': {
+      const newState = getStepStateClone(state, 'step2')
+      newState.steps.step2.exploreFilterText = action.filterText
+      return newState
     }
     case 'clearExplore': {
       const newState = getStepStateClone(state, 'step2')

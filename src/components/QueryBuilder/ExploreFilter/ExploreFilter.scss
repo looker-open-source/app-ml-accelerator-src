@@ -1,0 +1,21 @@
+.explore-search-form {
+  margin-bottom: 34px;
+  width: 378px;
+}
+
+.current-explore {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  margin-bottom: 34px;
+
+  .back-btn {
+    margin-left: -5px;
+    margin-right: 15px;
+  }
+
+  .explore-label {
+    font-size: 18px;
+    font-weight: 400;
+  }
+}
