@@ -80,7 +80,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const alphaNumericOnly = (e: any) => {
-    const re = /[0-9a-zA-Z ]+/g;
+    const re = /[0-9a-zA-Z_]+/g;
     if (!re.test(e.key)) {
       e.preventDefault();
     }
@@ -104,6 +104,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
           <Select
             options={targetFieldOptions}
+            value={targetField}
             placeholder="Target"
             onChange={handleTargetChange}
           />

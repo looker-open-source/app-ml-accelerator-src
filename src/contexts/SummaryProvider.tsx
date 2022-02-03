@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-  import React, { createContext, useContext } from 'react'
+  import React, { createContext, useContext, useState } from 'react'
   import { ExtensionContext2 } from '@looker/extension-sdk-react'
   import { BQMLContext } from './BQMLProvider'
   import { useStore } from './StoreProvider'
@@ -46,6 +46,10 @@
     const { coreSDK: sdk } = useContext(ExtensionContext2)
     const { queryJob } = useContext(BQMLContext)
     const { lookerTempDatasetName } = state.userAttributes
+    const [ previousBQValues, setPreviousBQValues ] = useState<any>({
+      sql: null,
+      model: null
+    })
 
     /*
     * private method
@@ -85,7 +89,13 @@
       targetField: string | undefined
     ): Promise<any> => {
       try {
-        await createBQMLView(querySql, bqModelName)
+        // in an effort to limit the number of calls to BigQuery
+        // do not create the BQ view if its alrady been created for this sql and model name
+        if (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model) {
+          console.log('creating bq view')
+          setPreviousBQValues({ sql: querySql, model: bqModelName })
+          await createBQMLView(querySql, bqModelName)
+        }
 
         // fetch explore to retrieve all field names
         const { value: explore } = await sdk.lookml_model_explore(SUMMARY_MODEL, SUMMARY_EXPLORE)
@@ -96,7 +106,7 @@
           view: SUMMARY_EXPLORE,
           fields: explore.fields.dimensions.map((d: any) => d.name),
           filters: {
-            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${bqModelName}^_input^_data`,
+            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatSummaryFilter(bqModelName)}^_input^_data`,
             [`${SUMMARY_EXPLORE}.target_field_name`]: formatSummaryFilter(targetField || "")
           }
         })

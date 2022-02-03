@@ -13,12 +13,9 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, se
   if (!data) { return null }
 
   const tableRows = data.map((rowData, i) => {
-    const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => {
-      console.log({rowData})
-      return (
-        <td className={headers[col].align} key={j}>{ headers[col].converter(rowData) || "∅" }</td>
-      )
-    })
+    const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => (
+      <td className={headers[col].align} key={j}>{ headers[col].converter(rowData) || "∅" }</td>
+    ))
     return (
       <tr key={i}>
         <td className="checkbox">
