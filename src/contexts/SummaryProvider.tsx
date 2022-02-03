@@ -25,13 +25,14 @@
   import { ExtensionContext2 } from '@looker/extension-sdk-react'
   import { BQMLContext } from './BQMLProvider'
   import { useStore } from './StoreProvider'
-  import { formBQViewSQL } from '../services/summary'
+  import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
   import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
 
   type ISummaryContext = {
     getSummaryData?: (
       sql: string | undefined,
-      bqModelName: string | undefined
+      bqModelName: string | undefined,
+      targetField: string | undefined
     ) => Promise<any>
   }
 
@@ -80,7 +81,8 @@
      */
     const getSummaryData = async(
       querySql: string | undefined,
-      bqModelName: string | undefined
+      bqModelName: string | undefined,
+      targetField: string | undefined
     ): Promise<any> => {
       try {
         await createBQMLView(querySql, bqModelName)
@@ -94,7 +96,8 @@
           view: SUMMARY_EXPLORE,
           fields: explore.fields.dimensions.map((d: any) => d.name),
           filters: {
-            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${bqModelName}^_input^_data`
+            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${bqModelName}^_input^_data`,
+            [`${SUMMARY_EXPLORE}.target_field_name`]: formatSummaryFilter(targetField || "")
           }
         })
 

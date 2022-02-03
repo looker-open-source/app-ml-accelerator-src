@@ -39,7 +39,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }, [exploreName, targetField])
 
   const fetchSummary = async () => {
-    const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName)
+    const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
     if (!ok || !value) {
       dispatch({ type: 'addError', error: "Failed to fetch summary data." })
       return

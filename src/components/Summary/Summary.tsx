@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { buildHeaders, toggleSelectedField } from '../../services/summary'
-import { SummaryField, SummaryTableHeaderItem } from '../../types'
+import { toggleSelectedField, SUMMARY_TABLE_HEADERS } from '../../services/summary'
+import { SummaryField, SummaryTableHeaders } from '../../types'
 import { Checkbox } from "@looker/components"
 import { SummaryTableRows } from './SummaryTableRows'
 
@@ -13,7 +13,7 @@ type SummaryParams = {
 
 export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selectedFields, updateSelectedFields }) => {
   const [allChecked, setAllChecked] = useState(summaryData.length === selectedFields.length)
-  const headers: SummaryTableHeaderItem[] = buildHeaders(fields)
+  const headers: SummaryTableHeaders = SUMMARY_TABLE_HEADERS
 
   const checkboxChange = (fieldName: string): void => {
     const newSelectedFields = toggleSelectedField(selectedFields, fieldName)
@@ -40,8 +40,8 @@ export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selected
               />
             </th>
             {
-              headers.map((header, i) => (
-                <th key={i}>{header.title}</th>
+              Object.keys(headers).map((header: keyof SummaryTableHeaders, i) => (
+                <th key={i} className={headers[header].align}>{headers[header].label}</th>
               ))
             }
           </tr>

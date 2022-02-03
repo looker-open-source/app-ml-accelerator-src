@@ -14,11 +14,20 @@
     background-color: #E3EDFD;
     font-weight: 500;
     padding: 0 10px;
+    text-align: left;
+
+    &.right {
+      text-align: right;
+    }
   }
 
   td {
     font-weight: 400;
     padding: 10px 10px 5px 10px;
+
+    &.checkbox {
+      width: 40px;
+    }
   }
 
   td.right {
