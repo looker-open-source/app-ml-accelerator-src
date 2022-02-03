@@ -84,7 +84,7 @@ export const OauthProvider = ({
 
   /**
    * Simplistic sign out of the user.
-   * Removes the token from push state. Note that the token is
+   * Removes the token. Note that the token is
    * still active if it has not already expired.
    */
   const signOut = () => {

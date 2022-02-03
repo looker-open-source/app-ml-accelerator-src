@@ -1,6 +1,4 @@
-import { Looker40SDK } from "@looker/sdk"
-import { IQuery } from "@looker/sdk/lib/4.0/models"
-import { SelectedFields, ResultsTableHeaderItem, ExploreData, Step2State } from '../types'
+import { SelectedFields, ResultsTableHeaderItem, ExploreData } from '../types'
 import { find, some } from 'lodash'
 
 /*
@@ -56,40 +54,6 @@ export const findSortedHeader = (
       let sortName = name.split(" ")[0]
       return sortName === header.name
   })
-}
-
-async function createBaseQuery(
-  sdk: Looker40SDK,
-  stepData: Step2State
-): Promise<IQuery> {
-  const { dimensions, measures } = stepData.selectedFields
-  const fields = [...dimensions, ...measures]
-  const { value: baseQuery } = await sdk.create_query({
-    model: stepData.modelName || undefined,
-    view: stepData.exploreName || undefined,
-    fields,
-    filters: stepData.selectedFields.filters,
-    limit: stepData.limit || "500",
-    sorts: stepData.sorts || []
-  })
-  return baseQuery
-}
-
-export async function createAndRunQuery(
-  sdk: Looker40SDK,
-  stepData: Step2State,
-) {
-  const baseQuery = await createBaseQuery(sdk, stepData)
-  if (!baseQuery.client_id || !baseQuery.id || !stepData.modelName) {
-    throw "Missing Parameters"
-  }
-
-  const {value: results} = await sdk.run_query({
-    query_id: baseQuery.id,
-    limit: Number(stepData.limit) || 500,
-    result_format: "json_detail",
-  })
-  return { results, exploreUrl: baseQuery.share_url }
 }
 
 /*

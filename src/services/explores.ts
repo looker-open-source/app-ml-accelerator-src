@@ -1,43 +1,29 @@
 import { Looker40SDK as LookerSDK } from "@looker/sdk"
 import { ILookmlModel, ILookmlModelExploreField } from "@looker/sdk/lib/4.0/models"
 import { compact } from 'lodash'
-import { getBigQueryConnectionName } from './userAttributes'
 
-/*
-* Fetch all explores and associated models and sort them
-*/
-export async function fetchSortedModelsAndExplores(extensionSDK: any, sdk: LookerSDK): Promise<any[]> {
-  try {
-    const connectionName = await getBigQueryConnectionName(extensionSDK)
-    const { value: result } = await sdk.all_lookml_models({})
-    const modelExplores = (result || [])
-      .filter(
-        (model: ILookmlModel) =>
-          model.explores?.length &&
-            model.label !== "System Activity" &&
-            model.allowed_db_connection_names.indexOf(connectionName) >= 0
+export const filterExploresByConn = (bigQueryConn: string) =>
+      (model: ILookmlModel) => (
+        model.explores?.length &&
+        model.label !== "System Activity" &&
+        model.allowed_db_connection_names &&
+        model.allowed_db_connection_names.indexOf(bigQueryConn) >= 0
       )
-      .sort(alphabeticSortByLabel)
-      .map((model: ILookmlModel) => ({
-        name: model.name,
-        label: model.label,
-        explores: compact((model.explores || [])
-          .map((view) => {
-            if (view.hidden) { return null }
-            return {
-              name: view.name,
-              label: view.label,
-            }
-          }))
-          .sort(alphabeticSortByLabel),
-      }))
-    return modelExplores
-  } catch (error) {
-      throw new Error(error)
-  }
-}
 
-function alphabeticSortByLabel(obj1: any, obj2: any) {
+export const mapExploresByModel = (model: ILookmlModel) => ({
+    name: model.name,
+    label: model.label,
+    explores: compact((model.explores || [])
+      .map((view) => {
+        if (view.hidden) { return null }
+        return {
+          name: view.name,
+          label: view.label,
+        }
+      })).sort(alphabeticSortByLabel),
+})
+
+export function alphabeticSortByLabel(obj1: any, obj2: any) {
   const label1 = obj1.label.toLowerCase()
   const label2 = obj2.label.toLowerCase()
   return label1 < label2 ? -1 : 1
@@ -46,7 +32,10 @@ function alphabeticSortByLabel(obj1: any, obj2: any) {
 /*
 * returns a filtered list of explores/models that contain textValue
 */
-export const filterExplores = (textValue: string | null, modelsArray: ILookmlModel[]): ILookmlModel[] => {
+export const filterExplores = (
+  textValue: string | null,
+  modelsArray: ILookmlModel[]
+): ILookmlModel[] => {
   if (!textValue) {
     return modelsArray
   }
@@ -84,21 +73,6 @@ export const filterExplores = (textValue: string | null, modelsArray: ILookmlMod
 
   return resultsArr;
 }
-
-export async function fetchExplore(sdk: LookerSDK, modelName: string, exploreName: string) {
-  let result;
-
-  try {
-    result = await sdk.lookml_model_explore(
-      modelName,
-      exploreName
-    );
-  } catch (error) {
-    throw new Error("Error loading explore " + error);
-  }
-
-  return result;
-};
 
 /**
  * Converts the raw JSON explore data into the subset of data that this app cares about.
