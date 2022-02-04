@@ -1,13 +1,13 @@
 import React, { useEffect, useContext, useState } from 'react'
 import { useStore } from "../../contexts/StoreProvider"
 import { FieldText, Select } from "@looker/components"
-import './Step3.scss'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
 import { hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
+import './Step3.scss'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { getSummaryData } = useContext(SummaryContext)
@@ -15,6 +15,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState(true)
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
   const { summary, selectedFields, targetField, bqModelName } = state.wizard.steps.step3
+  const columnCount = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []].length
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
     [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])]
@@ -39,7 +40,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }, [exploreName, targetField])
 
   const fetchSummary = async () => {
-    const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName)
+    const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
     if (!ok || !value) {
       dispatch({ type: 'addError', error: "Failed to fetch summary data." })
       return
@@ -80,7 +81,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const alphaNumericOnly = (e: any) => {
-    const re = /[0-9a-zA-Z ]+/g;
+    const re = /[0-9a-zA-Z_]+/g;
     if (!re.test(e.key)) {
       e.preventDefault();
     }
@@ -104,13 +105,19 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
           <Select
             options={targetFieldOptions}
+            value={targetField}
             placeholder="Target"
             onChange={handleTargetChange}
           />
         </div>
         <div className="wizard-card">
           <h2>Data Summary Statistics</h2>
-          <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
+          <div className="summary-factoid">
+            Columns: <span className="factoid-bold">{columnCount}</span>
+          </div>
+          <div className="summary-factoid">
+            Rows: <span className="factoid-bold">{ranQuery?.data?.length}</span>
+          </div>
         </div>
       </div>
       <div>

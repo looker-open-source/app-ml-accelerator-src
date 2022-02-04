@@ -8,10 +8,11 @@ export type Summary = {
   target: string | undefined
 }
 
-export type SummaryTableHeaderItem = {
-  type: string
-  title: string
-  name: string
-  fullName: string
-  align: string
+export type SummaryTableHeader = {
+  label: string,
+  converter: (row: any) => any,
+  align: string,
+  order: number
 }
+
+export type SummaryTableHeaders = { [key: string]: SummaryTableHeader }

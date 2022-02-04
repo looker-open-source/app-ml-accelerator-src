@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"
 import { useStore } from "../../../contexts/StoreProvider"
 import { mapAPIExploreToClientExplore } from "../../../services/explores"
-import { CurrentExplore } from './CurrentExplore'
 import FieldsDirectory from '../FieldsDirectory'
 import Spinner from '../../Spinner'
 import "./FieldsSelect.scss"
@@ -38,7 +37,6 @@ export const FieldsSelect: React.FC = () => {
 
   return (
     <div>
-      {!isLoading && <CurrentExplore />}
       <div className="fields-tabs">
         {isLoading ? (
           <div className="spinner center">

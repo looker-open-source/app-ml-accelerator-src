@@ -1,5 +1,5 @@
 import { keyBy } from 'lodash'
-import { Field, Summary, SummaryField, SummaryTableHeaderItem, UserAttributesState } from '../types'
+import { Field, Summary, SummaryTableHeaders } from '../types'
 import { titilize } from './string'
 
 export const formBQViewSQL = (
@@ -22,19 +22,9 @@ const splitFieldName = (fieldName: string) => {
   return names.length >= 1 ? names[1] : fieldName
 }
 
-// Transforms fields into table header objects
-export const buildHeaders = (fields: SummaryField[]): SummaryTableHeaderItem[] => {
-  return fields.map((field) => {
-    const colName = splitFieldName(field.name)
-    return {
-      title: field.label_short,
-      fullName: field.name,
-      name: colName,
-      type: field.category,
-      align: field.align
-    }
-  })
-}
+export const formatSummaryFilter = (fieldName: string) => (
+  fieldName.replace(/\.|_+/g, '^_')
+)
 
 // Removes the table name from the column keys
 // e.g. summary_table.pct_null => pct_null
@@ -87,4 +77,58 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[])
       color: field.category === "measure" ? "#C2772E" : "#262D33"
     };
   })
+}
+
+export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {
+  fieldName: {
+    label: "Field Name",
+    converter: (row) => titilize(row.column_name?.value),
+    align: "left",
+    order: 1
+  },
+  type: {
+    label: "Type",
+    converter: (row) => row.data_type?.value,
+    align: "left",
+    order: 2
+  },
+  missingPCT: {
+    label: "Missing % (Count)",
+    converter: (row) => `${row.pct_null?.value}% (${row.count_nulls?.value})`,
+    align: "right",
+    order: 3
+  },
+  distinctValues: {
+    label: "Distinct Values",
+    converter: (row) => row.count_distinct_values?.value,
+    align: "right",
+    order: 4
+  },
+  corrWithTarget: {
+    label: "Correlation w/target",
+    converter: (row) => {
+      const tCorr = row.target_correlation?.value
+      return isNaN(tCorr) ? null : tCorr * 100 + '%'
+    },
+    align: "right",
+    order: 5
+  },
+  max: {
+    label: "Max",
+    converter: (row) => row.data_type?.value !== "STRING" ? row._max_value?.value : "",
+    align: "right",
+    order: 6
+  },
+  min: {
+    label: "Min",
+    converter: (row) => row.data_type?.value !== "STRING" ? row._min_value?.value : "",
+    align: "right",
+    order: 7
+  },
+  avg: {
+    label: "Avg",
+    converter: (row) => row.data_type?.value !== "STRING" ? row._avg_value?.value : "",
+    align: "right",
+    order: 8
+  }
 }

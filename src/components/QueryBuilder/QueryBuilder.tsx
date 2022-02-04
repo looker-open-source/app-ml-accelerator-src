@@ -2,10 +2,12 @@ import React, { useEffect, useContext } from "react"
 import { useStore } from "../../contexts/StoreProvider"
 import NoExplorePlaceHolder from './NoExplorePlaceHolder'
 import ExploreSelect from './ExploreSelect'
+import ExploreFilter from "./ExploreFilter"
 import FieldsSelect from './FieldsSelect'
 import QueryPane from './QueryPane'
 import { hasOrphanedSorts } from '../../services/resultsTable'
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
+import { Button } from "@looker/components"
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void
@@ -34,8 +36,10 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
       dispatch({type: 'addToStepData', step: 'step2', data: { sorts: [] }})
       return
     }
+    setIsLoading(true)
     const {results, exploreUrl} = await createAndRunQuery?.(step2)
     saveQueryToState(results, exploreUrl)
+    setIsLoading(false)
   }
 
   const saveQueryToState = (results: any, exploreUrl: string | undefined) => {
@@ -58,15 +62,30 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     (<FieldsSelect/>) : (<ExploreSelect />)
 
   const queryPaneContents = step2.exploreName && step2.exploreData ?
-    (<QueryPane runQuery={runQuery}/>) : (<NoExplorePlaceHolder />)
+    (<QueryPane/>) : (<NoExplorePlaceHolder />)
 
   return (
-    <div className="default-layout">
-      <div className="pane directory-pane">
-        {directoryPaneContents}
+    <div>
+      <div className="query-header">
+        <div className="explore-filter">
+          <ExploreFilter />
+        </div>
+        {
+          step2.exploreData &&
+          (<Button
+            onClick={runQuery}
+            className="run-query-button">
+              Run
+          </Button>)
+        }
       </div>
-      <div className="pane query-pane">
-        {queryPaneContents}
+      <div className="default-layout">
+        <div className="pane directory-pane">
+          {directoryPaneContents}
+        </div>
+        <div className="pane query-pane">
+          {queryPaneContents}
+        </div>
       </div>
     </div>
   )

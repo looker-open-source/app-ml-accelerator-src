@@ -22,6 +22,7 @@ export type Step2State = {
   modelName: string | undefined,
   exploreLabel: string | undefined,
   exploreData: ExploreData | undefined,
+  exploreFilterText: string,
   limit: string | undefined,
   selectedFields: SelectedFields,
   sorts: string[],

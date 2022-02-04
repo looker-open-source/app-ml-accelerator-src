@@ -1,6 +1,6 @@
 import { WizardState, Step1State, Step2State, Step3State, Step4State, Step5State, GenericStepState, WizardSteps} from './wizard'
 import { Field, SummaryField } from './field'
-import { Summary, SummaryTableHeaderItem } from './summary'
+import { Summary, SummaryTableHeaders } from './summary'
 import { ExploreData } from './explore'
 import { View } from './view'
 import { SelectedFields } from './selectedFields'
@@ -20,7 +20,7 @@ export type {
   RanQuery,
   SummaryField,
   Summary,
-  SummaryTableHeaderItem,
+  SummaryTableHeaders,
   ExploreData,
   ResultsTableHeaderItem,
   SelectedFields,

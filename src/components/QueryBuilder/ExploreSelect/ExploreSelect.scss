@@ -1,17 +1,9 @@
 .explore-select {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 
   .spinner {
     margin-top: 36px;
   }
-}
-
-.text-field {
-  width: 240px;
-}
-
-.search-form {
-  padding: 12px 12px 0;
 }

@@ -3,3 +3,17 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   grid-gap: 30px;
 }
+
+.summary-factoid {
+  padding-top: 6px;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.2px;
+  font-weight: 400;
+  color: #5F6368;
+
+  .factoid-bold {
+    font-weight: 700;
+    margin-left: 2px;
+  }
+}

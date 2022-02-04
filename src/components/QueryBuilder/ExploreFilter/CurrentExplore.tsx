@@ -1,7 +1,7 @@
 import React from "react"
 import { useStore } from "../../../contexts/StoreProvider"
 import { ButtonOutline } from "@looker/components"
-import "./FieldsSelect.scss"
+import "./ExploreFilter.scss"
 
 export const CurrentExplore: React.FC = () => {
   const { state, dispatch } = useStore()
