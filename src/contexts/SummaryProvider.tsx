@@ -106,7 +106,7 @@
           view: SUMMARY_EXPLORE,
           fields: explore.fields.dimensions.map((d: any) => d.name),
           filters: {
-            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatSummaryFilter(bqModelName)}^_input^_data`,
+            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatSummaryFilter(bqModelName || "")}^_input^_data`,
             [`${SUMMARY_EXPLORE}.target_field_name`]: formatSummaryFilter(targetField || "")
           }
         })
@@ -116,7 +116,7 @@
           result_format: "json_detail",
         })
       } catch(error) {
-        dispatch({type: 'addError', error})
+        dispatch({type: 'addError', error: "Failed to fetch summary.  Please try again."})
         return { ok: false }
       }
     }
