@@ -8,10 +8,21 @@ type StepContainerParams = {
   customClass?: string
   stepNumber: number
   children: any,
-  stepText?: string
+  stepText?: string,
+  buttonText?: string,
+  handleCompleteClick?: () => void
 }
 
-export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepComplete, customClass, stepNumber, children, stepText }) => {
+export const StepContainer: React.FC<StepContainerParams> = ({
+  isLoading,
+  stepComplete,
+  customClass,
+  stepNumber,
+  children,
+  stepText,
+  buttonText,
+  handleCompleteClick
+}) => {
   const loadingClass = isLoading ? 'loading' : ''
 
   return (
@@ -33,6 +44,8 @@ export const StepContainer: React.FC<StepContainerParams> = ({ isLoading, stepCo
           stepText={stepText}
           isStepComplete={stepComplete}
           stepNumber={stepNumber}
+          buttonText={buttonText}
+          handleCompleteClick={handleCompleteClick}
         />
       </div>
     </section>

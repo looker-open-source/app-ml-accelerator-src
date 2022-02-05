@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import { FieldText, Select } from "@looker/components"
+import { FieldText, Select, Button } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
@@ -8,13 +8,17 @@ import { hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
 import './Step3.scss'
+import { wizardInitialState } from '../../reducers/wizard'
+import { MODEL_TYPE_CREATE_METHOD } from '../../services/modelTypes'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { getSummaryData } = useContext(SummaryContext)
+  const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
+  const { objective } = state.wizard.steps.step1
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
   const { summary, selectedFields, targetField, bqModelName } = state.wizard.steps.step3
+  const { gcpProject, lookerTempDatasetName } = state.userAttributes
   const columnCount = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []].length
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
@@ -69,7 +73,11 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const handleModelNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    updateStepData({ bqModelName: e.target.value })
+    updateStepData({
+      bqModelName: e.target.value,
+      targetField: '',
+      summary: wizardInitialState.steps.step3.summary
+    })
   }
 
   const handleTargetChange = (targetField: string) => {
@@ -87,8 +95,26 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     }
   }
 
+  const handleCompleteClick = () => {
+    async function createModel() {
+      await createBQMLModel?.(
+        objective,
+        bqModelName,
+        targetField,
+      )
+    }
+    createModel()
+    return
+  }
+
   return (
-    <StepContainer isLoading={isLoading} stepComplete={stepComplete} stepNumber={3}>
+    <StepContainer
+      isLoading={isLoading}
+      stepComplete={stepComplete}
+      stepNumber={3}
+      buttonText="Create Model"
+      handleCompleteClick={handleCompleteClick}
+    >
       <div className="model-blocks">
         <div className="wizard-card">
           <h2>Name your model</h2>
@@ -120,15 +146,15 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           </div>
         </div>
       </div>
-      <div>
-        { summary.data &&
-          (<Summary
+      { summary.data &&
+        (
+          <Summary
             summaryData={summary.data}
             fields={summary.fields || []}
             selectedFields={selectedFields || []}
-            updateSelectedFields={updateSelectedFields} />)
-        }
-      </div>
+            updateSelectedFields={updateSelectedFields} />
+        )
+      }
     </StepContainer>
   )
 }

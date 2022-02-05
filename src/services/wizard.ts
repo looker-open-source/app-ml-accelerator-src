@@ -26,11 +26,15 @@ const step2Validation = (stepData: Step2State) => (
   hasNoEmptyValues(stepData.ranQuery)
 )
 
+const step3Validation = (stepData: Step3State) => (
+  hasNoEmptyValues(stepData.summary)
+)
+
 export const getWizardStepCompleteCallback = (stepName: keyof WizardSteps): any => {
   const callbacks: any = {
     step1: hasNoEmptyValues,
     step2: step2Validation,
-    step3: hasNoEmptyValues,
+    step3: step3Validation,
     step4: hasNoEmptyValues,
     step5: hasNoEmptyValues
   }

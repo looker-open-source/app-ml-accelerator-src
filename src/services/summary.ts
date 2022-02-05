@@ -61,7 +61,7 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[])
   const fields = [...fieldDetails.dimensions, ...fieldDetails.measures]
   const indexedFields: { [key: string]: Field } = keyBy(fields, 'name')
 
-  return fieldNames.map((name: string) => {
+  const options = fieldNames.map((name: string) => {
     const field = indexedFields[name]
     if (!field) { return null }
     let formattedLabel
@@ -77,6 +77,8 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[])
       color: field.category === "measure" ? "#C2772E" : "#262D33"
     };
   })
+
+  return [{ label: 'Select a Target Field', value: undefined }, ...options]
 }
 
 export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {

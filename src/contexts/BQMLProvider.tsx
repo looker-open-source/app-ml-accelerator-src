@@ -28,7 +28,8 @@ import { useStore } from './StoreProvider'
 
 type IBQMLContext = {
   expired?: boolean
-  queryJob?: (sql: string) => Promise<any>
+  queryJob?: (sql: string) => Promise<any>,
+  getJob?: () => Promise<any>
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
@@ -98,14 +99,59 @@ export const BQMLProvider = ({ children }: any) => {
     return result
   }
 
+  /**
+   * Fetch a job
+   */
+  const getJob = async () => {
+    const job_id = "script_job_39ee6148fccb4e20979709b1e99a68b1_0"
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/jobs/${job_id}`
+    )
+    return result
+  }
+
   return (
     <BQMLContext.Provider
       value={{
         expired,
-        queryJob
+        queryJob,
+        getJob
       }}
     >
       {children}
     </BQMLContext.Provider>
   )
 }
+
+
+// CREATE MODEL looker_scratch.david_boosted_tree_classifier
+// OPTIONS(MODEL_TYPE='BOOSTED_TREE_CLASSIFIER',
+//         BOOSTER_TYPE = 'GBTREE',
+//         INPUT_LABEL_COLS = ['input_label_col'])
+// AS SELECT * FROM `project.dataset.input_data_view`;
+
+
+// CREATE OR REPLACE MODEL looker_scratch.david_boosted_tree_classifier
+// OPTIONS(MODEL_TYPE='BOOSTED_TREE_REGRESSOR',
+//         BOOSTER_TYPE = 'GBTREE',
+//         INPUT_LABEL_COLS = ['input_label_col'])
+// AS SELECT * FROM `project.dataset.input_data_view`;
+
+
+// CREATE OR REPLACE MODEL dataset.model_name
+//                   OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
+//                     , time_series_timestamp_col = 'user_selected_time_column'
+//                     , time_series_data_col = 'user_selected_data_column'
+
+//                     {% if arima_hyper_params.set_horizon._parameter_value == 1000 %}
+//                     {% else %}
+//                       , HORIZON = {% parameter arima_hyper_params.set_horizon %}
+//                     {% endif %}
+
+//                     {% if arima_hyper_params.set_holiday_region._parameter_value == 'none' %}
+//                     {% else %}
+//                     , HOLIDAY_REGION = '{% parameter arima_hyper_params.set_holiday_region %}'
+//                     {% endif %}
+
+//                     , AUTO_ARIMA = TRUE)
+//                   AS (SELECT * FROM `project.dataset.input_data_view`) ;

@@ -27,10 +27,17 @@
   import { useStore } from './StoreProvider'
   import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
   import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
+import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 
   type ISummaryContext = {
     getSummaryData?: (
       sql: string | undefined,
+      bqModelName: string | undefined,
+      targetField: string | undefined
+    ) => Promise<any>,
+    createJob?: (sql: string) => Promise<any>,
+    createBQMLModel?: (
+      objective: string | undefined,
       bqModelName: string | undefined,
       targetField: string | undefined
     ) => Promise<any>
@@ -45,7 +52,7 @@
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
     const { queryJob } = useContext(BQMLContext)
-    const { lookerTempDatasetName } = state.userAttributes
+    const { gcpProject, lookerTempDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
       sql: null,
       model: null
@@ -67,7 +74,10 @@
       if (!sql) {
         throw new Error("Failed to create BigQuery View SQL statement")
       }
+      createJob(sql)
+    }
 
+    const createJob = async (sql: string) => {
       const { ok, body } = await queryJob?.(sql)
       if (!ok) {
         throw new Error("Failed to create or replace bigQuery view")
@@ -121,10 +131,46 @@
       }
     }
 
+    const createBQMLModel = async (
+      objective: string | undefined,
+      bqModelName: string | undefined,
+      target: string | undefined
+    ) => {
+      try {
+        if (
+          !objective ||
+          !gcpProject ||
+          !lookerTempDatasetName ||
+          !target ||
+          !bqModelName
+        ) { return }
+
+        const sql = MODEL_TYPE_CREATE_METHOD[objective]({
+          gcpProject,
+          lookerTempDatasetName,
+          bqModelName,
+          target,
+        })
+        if (!sql) {
+          throw "Failed to create BigQuery Model SQL statement"
+        }
+
+        const results = await createJob?.(sql)
+        // debugger;
+        return results
+      } catch (error) {
+        console.error(error)
+        dispatch({type: 'addError', error: "Failed to create model."})
+        return { ok: false }
+      }
+    }
+
     return (
       <SummaryContext.Provider
         value={{
-          getSummaryData
+          getSummaryData,
+          createJob,
+          createBQMLModel
         }}
       >
         {children}
