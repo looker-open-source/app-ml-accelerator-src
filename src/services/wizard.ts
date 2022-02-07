@@ -15,10 +15,9 @@ import { isArima } from "./modelTypes"
 //   return currentStep
 // }
 
-export const hasNoEmptyValues = (obj: any, excludes: string[] = []) => {
+export const hasNoEmptyValues = (obj: any) => {
   if (!obj) { return false }
   for (const key in obj) {
-    if (excludes.indexOf(key) >= 0) { continue }
     if (!obj[key]) { return false }
   }
   return true
@@ -30,9 +29,9 @@ const step2Validation = (stepData: Step2State) => (
 
 const step3Validation = (stepData: Step3State, objective: string) => {
   if (isArima(objective)) {
-    return hasNoEmptyValues(stepData.summary)
+    return hasNoEmptyValues(stepData.summary) && stepData.arimaTimeColumn
   }
-  return hasNoEmptyValues(stepData.summary, ['arimaTimeColumn'])
+  return hasNoEmptyValues(stepData.summary)
 }
 
 export const getWizardStepCompleteCallback = (stepName: keyof WizardSteps): any => {

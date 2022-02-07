@@ -43,8 +43,7 @@ const wizardInitialState: WizardState = {
         modelName: undefined,
         fields: undefined,
         data: undefined,
-        target: undefined,
-        arimaTimeColumn: undefined
+        target: undefined
       }
     },
     step4: { data: null },

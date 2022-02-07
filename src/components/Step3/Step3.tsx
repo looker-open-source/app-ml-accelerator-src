@@ -69,7 +69,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         exploreName,
         modelName,
         target: targetField,
-        arimaTimeColumn,
         data: summaryData,
         fields: [...fields.dimensions, ...fields.measures]
       }
