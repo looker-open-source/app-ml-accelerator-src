@@ -51,7 +51,7 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
   export const SummaryProvider = ({ children }: any) => {
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
-    const { queryJob } = useContext(BQMLContext)
+    const { queryJob, getJob } = useContext(BQMLContext)
     const { gcpProject, lookerTempDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
       sql: null,
@@ -154,9 +154,10 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
         if (!sql) {
           throw "Failed to create BigQuery Model SQL statement"
         }
-
-        const results = await createJob?.(sql)
+        const results = await getJob?.()
+        // const results = await createJob?.(sql)
         // debugger;
+        console.log({ results })
         return results
       } catch (error) {
         console.error(error)

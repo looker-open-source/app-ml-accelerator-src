@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import { FieldText, Select, Button } from "@looker/components"
+import { FieldText, Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
@@ -9,7 +9,7 @@ import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
 import './Step3.scss'
 import { wizardInitialState } from '../../reducers/wizard'
-import { MODEL_TYPE_CREATE_METHOD } from '../../services/modelTypes'
+import { isArima } from '../../services/modelTypes'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
@@ -17,13 +17,24 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState(true)
   const { objective } = state.wizard.steps.step1
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
-  const { summary, selectedFields, targetField, bqModelName } = state.wizard.steps.step3
-  const { gcpProject, lookerTempDatasetName } = state.userAttributes
+  const {
+    summary,
+    selectedFields,
+    targetField,
+    bqModelName,
+    arimaTimeColumn
+  } = state.wizard.steps.step3
+  const arima = isArima(objective || "")
   const columnCount = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []].length
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
     [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])]
   )
+  const timeColumnFieldOptions = arima ? buildFieldSelectOptions(
+    exploreData?.fieldDetails,
+    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])],
+    'date'
+  ) : null
 
   if (!exploreName || !modelName) {
     dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
@@ -58,6 +69,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         exploreName,
         modelName,
         target: targetField,
+        arimaTimeColumn,
         data: summaryData,
         fields: [...fields.dimensions, ...fields.measures]
       }
@@ -82,6 +94,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const handleTargetChange = (targetField: string) => {
     updateStepData({ targetField })
+  }
+
+  const handleTimeColumnChange = (arimaTimeColumn: string) => {
+    updateStepData({ arimaTimeColumn })
   }
 
   const updateSelectedFields = (selectedFields: string[]) => {
@@ -136,6 +152,21 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             onChange={handleTargetChange}
           />
         </div>
+        {
+          arima &&
+            (
+              <div className="wizard-card">
+                <h2>Select your Time Column</h2>
+                <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
+                <Select
+                  options={timeColumnFieldOptions}
+                  value={arimaTimeColumn}
+                  placeholder="Time Column"
+                  onChange={handleTimeColumnChange}
+                />
+              </div>
+            )
+        }
         <div className="wizard-card">
           <h2>Data Summary Statistics</h2>
           <div className="summary-factoid">

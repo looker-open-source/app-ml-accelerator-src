@@ -6,6 +6,7 @@ export type Summary = {
   exploreName: string | undefined
   modelName: string | undefined
   target: string | undefined
+  arimaTimeColumn: string | undefined
 }
 
 export type SummaryTableHeader = {

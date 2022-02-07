@@ -74,7 +74,7 @@ export const BQMLProvider = ({ children }: any) => {
         `https://bigquery.googleapis.com/bigquery/v2/${pathname}`,
         init
       )
-      if (status === 401) {
+      if (status === 401 || status === 404) {
         setExpired(true)
         dispatch({ type: 'addError', error: 'Unauthorized request to google api' })
       }

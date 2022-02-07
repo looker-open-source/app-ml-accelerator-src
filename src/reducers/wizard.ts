@@ -36,13 +36,15 @@ const wizardInitialState: WizardState = {
     step3: {
       bqModelName: '',
       targetField: undefined,
+      arimaTimeColumn: undefined,
       selectedFields: [],
       summary: {
         exploreName: undefined,
         modelName: undefined,
         fields: undefined,
         data: undefined,
-        target: undefined
+        target: undefined,
+        arimaTimeColumn: undefined
       }
     },
     step4: { data: null },

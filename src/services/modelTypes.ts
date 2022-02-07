@@ -25,11 +25,16 @@ export const MODEL_TYPES = {
   },
 }
 
+export const isArima = (objective: string): boolean => (
+  objective === MODEL_TYPES.ARIMA_PLUS.value
+)
+
 type IFormSQLProps = {
   gcpProject: string,
   lookerTempDatasetName: string,
   bqModelName: string,
   target: string,
+  arimaTimeColumn?: string
 }
 
 interface IFormBoostedTreeTypeSQLProps extends IFormSQLProps {
@@ -64,7 +69,8 @@ const formArimaSQL = ({
   gcpProject,
   lookerTempDatasetName,
   bqModelName,
-  target
+  target,
+  arimaTimeColumn
 }: IFormSQLProps) => {
   // ******
   // TODO: What is 'user_selected_time_column'??????
@@ -72,7 +78,7 @@ const formArimaSQL = ({
   return `
     CREATE OR REPLACE MODEL ${lookerTempDatasetName}.${bqModelName}_arima
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
-      , time_series_timestamp_col = 'user_selected_time_column'
+      , time_series_timestamp_col = '${arimaTimeColumn}'
       , time_series_data_col = '${target}'
       , HORIZON = 1000
       , HOLIDAY_REGION = 'none'
