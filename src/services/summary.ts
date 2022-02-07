@@ -62,7 +62,10 @@ const fieldIsType = (field: any, dataType?: string) => {
   if (dataType === 'date') {
     return field.type.indexOf(dataType) >= 0
   }
-  return field === dataType
+  if(dataType === 'numeric') {
+    return field.is_numeric
+  }
+  return field.type === dataType
 }
 
 export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[], filteredDataType?: string) => {

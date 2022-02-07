@@ -39,6 +39,8 @@ export type Step3State = {
 }
 
 export type Step4State = {
+  jobStatus: string | undefined,
+  job: any,
   data: any
 }
 

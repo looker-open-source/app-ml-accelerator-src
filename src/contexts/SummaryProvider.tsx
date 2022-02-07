@@ -27,7 +27,7 @@
   import { useStore } from './StoreProvider'
   import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
   import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
-import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
+import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 
   type ISummaryContext = {
     getSummaryData?: (
@@ -39,7 +39,8 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
     createBQMLModel?: (
       objective: string | undefined,
       bqModelName: string | undefined,
-      targetField: string | undefined
+      targetField: string | undefined,
+      arimaTimeColumn:  string | undefined
     ) => Promise<any>
   }
 
@@ -74,7 +75,12 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
       if (!sql) {
         throw new Error("Failed to create BigQuery View SQL statement")
       }
-      createJob(sql)
+      const { body } = await createJob(sql)
+      if (!body.jobComplete) {
+        // try again loop
+        console.log('incomplete job');
+        throw new Error("Failed to  finish creating bigQuery view")
+      }
     }
 
     const createJob = async (sql: string) => {
@@ -82,12 +88,7 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
       if (!ok) {
         throw new Error("Failed to create or replace bigQuery view")
       }
-
-      if (!body.jobComplete) {
-        // try again loop
-        console.log('incomplete job');
-        throw new Error("Failed to  finish creating bigQuery view")
-      }
+      return { ok, body }
     }
 
     /**
@@ -134,7 +135,8 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
     const createBQMLModel = async (
       objective: string | undefined,
       bqModelName: string | undefined,
-      target: string | undefined
+      target: string | undefined,
+      arimaTimeColumn: string | undefined
     ) => {
       try {
         if (
@@ -142,7 +144,8 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
           !gcpProject ||
           !lookerTempDatasetName ||
           !target ||
-          !bqModelName
+          !bqModelName ||
+          (isArima(objective) && !arimaTimeColumn)
         ) { return }
 
         const sql = MODEL_TYPE_CREATE_METHOD[objective]({
@@ -150,17 +153,16 @@ import { MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
           lookerTempDatasetName,
           bqModelName,
           target,
+          arimaTimeColumn
         })
         if (!sql) {
           throw "Failed to create BigQuery Model SQL statement"
         }
-        const results = await getJob?.()
-        // const results = await createJob?.(sql)
-        // debugger;
-        console.log({ results })
+        // const results = await getJob?.()
+        const results = await createJob?.(sql)
         return results
       } catch (error) {
-        console.error(error)
+        console.log({error})
         dispatch({type: 'addError', error: "Failed to create model."})
         return { ok: false }
       }

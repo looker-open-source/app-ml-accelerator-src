@@ -9,7 +9,8 @@ import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
 import './Step3.scss'
 import { wizardInitialState } from '../../reducers/wizard'
-import { isArima } from '../../services/modelTypes'
+import { isArima, MODEL_TYPES } from '../../services/modelTypes'
+import { JOB_STATUSES } from '../../constants'
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
@@ -28,7 +29,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const columnCount = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []].length
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
-    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])]
+    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])],
+    objective ? MODEL_TYPES[objective].targetDataType : null
   )
   const timeColumnFieldOptions = arima ? buildFieldSelectOptions(
     exploreData?.fieldDetails,
@@ -110,16 +112,26 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     }
   }
 
+  async function createModel() {
+    const { ok, body } = await createBQMLModel?.(
+      objective,
+      bqModelName,
+      targetField,
+      arimaTimeColumn
+    )
+
+    dispatch({
+      type: 'addToStepData',
+      step: 'step4',
+      data: {
+        jobStatus: ok ? JOB_STATUSES.pending : "FAILED",
+        job: ok ? body.jobReference : null
+      }
+    })
+  }
+
   const handleCompleteClick = () => {
-    async function createModel() {
-      await createBQMLModel?.(
-        objective,
-        bqModelName,
-        targetField,
-      )
-    }
     createModel()
-    return
   }
 
   return (
