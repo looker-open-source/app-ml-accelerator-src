@@ -33,11 +33,14 @@ export type Step2State = {
 export type Step3State = {
   bqModelName: string,
   targetField: string | undefined,
+  arimaTimeColumn: string | undefined,
   selectedFields: string[] | undefined,
   summary: Summary
 }
 
 export type Step4State = {
+  jobStatus: string | undefined,
+  job: any,
   data: any
 }
 

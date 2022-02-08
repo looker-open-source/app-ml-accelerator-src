@@ -21,18 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-  import React, { createContext, useContext, useState } from 'react'
-  import { ExtensionContext2 } from '@looker/extension-sdk-react'
-  import { BQMLContext } from './BQMLProvider'
-  import { useStore } from './StoreProvider'
-  import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
-  import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
+import React, { createContext, useContext, useState } from 'react'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
+import { BQMLContext } from './BQMLProvider'
+import { useStore } from './StoreProvider'
+import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
+import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
+import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 
   type ISummaryContext = {
     getSummaryData?: (
       sql: string | undefined,
       bqModelName: string | undefined,
       targetField: string | undefined
+    ) => Promise<any>,
+    createJob?: (sql: string) => Promise<any>,
+    createBQMLModel?: (
+      objective: string | undefined,
+      bqModelName: string | undefined,
+      targetField: string | undefined,
+      arimaTimeColumn:  string | undefined
     ) => Promise<any>
   }
 
@@ -44,8 +52,8 @@
   export const SummaryProvider = ({ children }: any) => {
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
-    const { queryJob } = useContext(BQMLContext)
-    const { lookerTempDatasetName } = state.userAttributes
+    const { queryJob, getJob, pollJobStatus } = useContext(BQMLContext)
+    const { gcpProject, lookerTempDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
       sql: null,
       model: null
@@ -67,17 +75,27 @@
       if (!sql) {
         throw new Error("Failed to create BigQuery View SQL statement")
       }
+      const { body } = await createJob(sql)
+      if (!body.jobComplete) {
+        // Give it another 10s to get the job status in case BQ is taking a while to create the view
+        if (!pollJobStatus) {
+          throw new Error("Failed to  finish creating bigQuery view")
+        }
+        const { promise } = pollJobStatus(
+          body.jobReference.jobId,
+          3300,
+          3
+        )
+        await promise
+      }
+    }
 
+    const createJob = async (sql: string) => {
       const { ok, body } = await queryJob?.(sql)
       if (!ok) {
         throw new Error("Failed to create or replace bigQuery view")
       }
-
-      if (!body.jobComplete) {
-        // try again loop
-        console.log('incomplete job');
-        throw new Error("Failed to  finish creating bigQuery view")
-      }
+      return { ok, body }
     }
 
     /**
@@ -121,10 +139,48 @@
       }
     }
 
+    const createBQMLModel = async (
+      objective: string | undefined,
+      bqModelName: string | undefined,
+      target: string | undefined,
+      arimaTimeColumn: string | undefined
+    ) => {
+      try {
+        if (
+          !objective ||
+          !gcpProject ||
+          !lookerTempDatasetName ||
+          !target ||
+          !bqModelName ||
+          (isArima(objective) && !arimaTimeColumn)
+        ) { return }
+
+        const sql = MODEL_TYPE_CREATE_METHOD[objective]({
+          gcpProject,
+          lookerTempDatasetName,
+          bqModelName,
+          target,
+          arimaTimeColumn
+        })
+        if (!sql) {
+          throw "Failed to create BigQuery Model SQL statement"
+        }
+        // const results = await getJob?.()
+        const results = await createJob?.(sql)
+        return results
+      } catch (error) {
+        console.log({error})
+        dispatch({type: 'addError', error: "Failed to create model."})
+        return { ok: false }
+      }
+    }
+
     return (
       <SummaryContext.Provider
         value={{
-          getSummaryData
+          getSummaryData,
+          createJob,
+          createBQMLModel
         }}
       >
         {children}

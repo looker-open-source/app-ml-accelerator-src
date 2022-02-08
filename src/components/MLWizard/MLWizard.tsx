@@ -3,11 +3,13 @@ import { Switch, Route, Redirect, withRouter, useRouteMatch } from 'react-router
 import { useStore } from "../../contexts/StoreProvider"
 import { SummaryProvider } from '../../contexts/SummaryProvider'
 import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
+import { ModelProvider } from '../../contexts/ModelProvider'
 import './MLWizard.scss'
 import NavBar from '../NavBar'
 import Step1 from '../Step1'
 import Step2 from '../Step2'
 import Step3 from '../Step3'
+import Step4 from '../Step4'
 import { WIZARD_STEPS } from "../../constants"
 
 export const _MLWizard: React.FC = () => {
@@ -48,7 +50,9 @@ export const _MLWizard: React.FC = () => {
             path={`${path}/${WIZARD_STEPS.step4}`}
             enforcementPath={enforcementPath}
             redirect={currentStep < 4}>
-              review
+              <ModelProvider>
+                <Step4 />
+              </ModelProvider>
           </WizardRoute>
           <WizardRoute
             path={`${path}/${WIZARD_STEPS.step5}`}

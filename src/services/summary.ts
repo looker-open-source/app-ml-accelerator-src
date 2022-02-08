@@ -1,4 +1,4 @@
-import { keyBy } from 'lodash'
+import { keyBy, compact } from 'lodash'
 import { Field, Summary, SummaryTableHeaders } from '../types'
 import { titilize } from './string'
 
@@ -57,13 +57,26 @@ export const toggleSelectedField = (selectedFields: string[], fieldName: string)
   return selectedFields
 }
 
-export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[]) => {
+const fieldIsType = (field: any, dataType?: string) => {
+  if (!dataType) { return true }
+  if (dataType === 'date') {
+    return field.type.indexOf(dataType) >= 0
+  }
+  if(dataType === 'numeric') {
+    return field.is_numeric
+  }
+  return field.type === dataType
+}
+
+export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[], filteredDataType?: string) => {
   const fields = [...fieldDetails.dimensions, ...fieldDetails.measures]
   const indexedFields: { [key: string]: Field } = keyBy(fields, 'name')
 
-  return fieldNames.map((name: string) => {
+  const options = compact(fieldNames.map((name: string) => {
     const field = indexedFields[name]
     if (!field) { return null }
+    // remove all fields that arent of the desired type
+    if (!fieldIsType(field, filteredDataType)) { return null }
     let formattedLabel
     if (field.label) {
       formattedLabel = field.label
@@ -76,7 +89,9 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[])
       value: field.name,
       color: field.category === "measure" ? "#C2772E" : "#262D33"
     };
-  })
+  }))
+
+  return [{ label: 'Select a Target Field', value: undefined }, ...options]
 }
 
 export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {

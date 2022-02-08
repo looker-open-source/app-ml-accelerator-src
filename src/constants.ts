@@ -16,6 +16,12 @@ export const WIZARD_KEYS: {[key: number]: keyof WizardSteps} = {
   5: 'step5',
 }
 
+export const JOB_STATUSES: {[key: string]: string} = {
+  pending: 'PENDING',
+  running: 'RUNNING',
+  done: 'DONE'
+}
+
 export const DESC_STRING = "desc"
 export const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/bigquery'
 

@@ -25,10 +25,21 @@ import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
+import { poll } from '../services/common'
+import { JOB_STATUSES } from '../constants'
 
 type IBQMLContext = {
   expired?: boolean
-  queryJob?: (sql: string) => Promise<any>
+  queryJob?: (sql: string) => Promise<any>,
+  getJob?: (props: any) => Promise<any>,
+  pollJobStatus?: (
+    jobId: string,
+    interval: number,
+    maxAttempts?: number
+  ) => {
+    promise: Promise<any>,
+    cancel: () => void
+  }
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
@@ -73,12 +84,13 @@ export const BQMLProvider = ({ children }: any) => {
         `https://bigquery.googleapis.com/bigquery/v2/${pathname}`,
         init
       )
-      if (status === 401) {
+      if (status === 401 || status === 404) {
         setExpired(true)
         dispatch({ type: 'addError', error: 'Unauthorized request to google api' })
       }
       return { ok, body, status }
     } catch (error) {
+      setExpired(true)
       dispatch({ type: 'addError', error: "Failed to connect to BigQuery. Please refresh and try again." })
       return { ok: false }
     }
@@ -98,14 +110,76 @@ export const BQMLProvider = ({ children }: any) => {
     return result
   }
 
+  /**
+   * Fetch a job
+   */
+  const getJob = async ({ jobId }: { jobId: string }) => {
+    if (!jobId) {
+      throw "Failed fetch job because jobId was not provided"
+    }
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/jobs/${jobId}`
+    )
+    return result
+  }
+
+  const pollJobStatus = (jobId: string, interval: number, maxAttempts?: number) => {
+    if (!getJob || !jobId) {
+      throw "Failed to fetch job"
+    }
+    const { promise, cancel } = poll({
+      fn: getJob,
+      props: { jobId },
+      validate: ({ok, body}) => (ok && body.status.state === JOB_STATUSES.done),
+      interval,
+      maxAttempts
+    })
+    return { promise, cancel }
+  }
+
   return (
     <BQMLContext.Provider
       value={{
         expired,
-        queryJob
+        queryJob,
+        getJob,
+        pollJobStatus
       }}
     >
       {children}
     </BQMLContext.Provider>
   )
 }
+
+
+// CREATE MODEL looker_scratch.david_boosted_tree_classifier
+// OPTIONS(MODEL_TYPE='BOOSTED_TREE_CLASSIFIER',
+//         BOOSTER_TYPE = 'GBTREE',
+//         INPUT_LABEL_COLS = ['input_label_col'])
+// AS SELECT * FROM `project.dataset.input_data_view`;
+
+
+// CREATE OR REPLACE MODEL looker_scratch.david_boosted_tree_classifier
+// OPTIONS(MODEL_TYPE='BOOSTED_TREE_REGRESSOR',
+//         BOOSTER_TYPE = 'GBTREE',
+//         INPUT_LABEL_COLS = ['input_label_col'])
+// AS SELECT * FROM `project.dataset.input_data_view`;
+
+
+// CREATE OR REPLACE MODEL dataset.model_name
+//                   OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
+//                     , time_series_timestamp_col = 'user_selected_time_column'
+//                     , time_series_data_col = 'user_selected_data_column'
+
+//                     {% if arima_hyper_params.set_horizon._parameter_value == 1000 %}
+//                     {% else %}
+//                       , HORIZON = {% parameter arima_hyper_params.set_horizon %}
+//                     {% endif %}
+
+//                     {% if arima_hyper_params.set_holiday_region._parameter_value == 'none' %}
+//                     {% else %}
+//                     , HOLIDAY_REGION = '{% parameter arima_hyper_params.set_holiday_region %}'
+//                     {% endif %}
+
+//                     , AUTO_ARIMA = TRUE)
+//                   AS (SELECT * FROM `project.dataset.input_data_view`) ;

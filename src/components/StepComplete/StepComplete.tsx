@@ -6,14 +6,23 @@ import { Button } from '@looker/components'
 type StepCompleteParams = {
   isStepComplete?: boolean
   stepNumber: number,
-  stepText?: string
+  stepText?: string,
+  buttonText?: string,
+  handleCompleteClick?: () => void
 }
 
-export const StepComplete: React.FC<StepCompleteParams> = ({ isStepComplete, stepNumber, stepText }) => {
+export const StepComplete: React.FC<StepCompleteParams> = ({
+  isStepComplete,
+  stepNumber,
+  stepText,
+  buttonText,
+  handleCompleteClick
+}) => {
   const history = useHistory()
 
   const handleClick = () => {
     if (!isStepComplete) { return }
+    handleCompleteClick?.()
     history.push(`${WIZARD_STEPS[`step${stepNumber + 1}`]}`)
   }
 
@@ -26,7 +35,7 @@ export const StepComplete: React.FC<StepCompleteParams> = ({ isStepComplete, ste
         className={`wizard-next-step-btn ${btnClass}`}
         onClick={handleClick}
       >
-        Continue
+        { buttonText || "Continue" }
       </Button>
     </>
   )
