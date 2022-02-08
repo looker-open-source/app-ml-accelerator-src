@@ -32,5 +32,5 @@ export const SUMMARY_EXPLORE="selection_summary"
 // user attribute keys from marketplace.json
 export const BIGQUERY_CONN = "bigquery_connection_name"
 export const GOOGLE_CLIENT_ID = "google_client_id"
-export const LOOKER_TEMP_DATASET_NAME = "looker_temp_dataset_name"
+export const BQML_MODEL_DATASET_NAME = "bqml_model_dataset_name"
 export const GCP_PROJECT = "gcp_project"

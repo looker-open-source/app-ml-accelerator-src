@@ -53,7 +53,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
     const { queryJob, getJob, pollJobStatus } = useContext(BQMLContext)
-    const { gcpProject, lookerTempDatasetName } = state.userAttributes
+    const { gcpProject, bqmlModelDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
       sql: null,
       model: null
@@ -67,11 +67,11 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
       querySql: string | undefined,
       bqModelName: string | undefined
     ) => {
-      if (!lookerTempDatasetName) {
+      if (!bqmlModelDatasetName) {
         throw new Error("User Attribute 'looker_temp_dataset_name' must be defined")
       }
 
-      const sql = formBQViewSQL(querySql, lookerTempDatasetName, bqModelName)
+      const sql = formBQViewSQL(querySql, bqmlModelDatasetName, bqModelName)
       if (!sql) {
         throw new Error("Failed to create BigQuery View SQL statement")
       }
@@ -149,7 +149,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
         if (
           !objective ||
           !gcpProject ||
-          !lookerTempDatasetName ||
+          !bqmlModelDatasetName ||
           !target ||
           !bqModelName ||
           (isArima(objective) && !arimaTimeColumn)
@@ -157,7 +157,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 
         const sql = MODEL_TYPE_CREATE_METHOD[objective]({
           gcpProject,
-          lookerTempDatasetName,
+          bqmlModelDatasetName,
           bqModelName,
           target,
           arimaTimeColumn

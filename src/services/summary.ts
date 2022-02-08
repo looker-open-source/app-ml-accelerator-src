@@ -4,17 +4,17 @@ import { titilize } from './string'
 
 export const formBQViewSQL = (
   sql: string | undefined,
-  lookerTempDatasetName: string | undefined,
+  bqmlModelDatasetName: string | undefined,
   bqModelName: string | undefined
 ) => {
   if (
     !sql ||
-    !lookerTempDatasetName ||
+    !bqmlModelDatasetName ||
     !bqModelName
   ) {
     return false
   }
-  return `CREATE OR REPLACE VIEW ${lookerTempDatasetName}.${bqModelName}_input_data AS ${sql}`
+  return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${sql}`
 }
 
 const splitFieldName = (fieldName: string) => {

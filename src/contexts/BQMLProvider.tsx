@@ -57,7 +57,7 @@ export const BQMLProvider = ({ children }: any) => {
 
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
-  const { gcpProject, lookerTempDatasetName } = state.userAttributes
+  const { gcpProject, bqmlModelDatasetName } = state.userAttributes
 
   /**
    * Low level invocation of the BigQuery API.
@@ -143,7 +143,7 @@ export const BQMLProvider = ({ children }: any) => {
 
   const createModelStateTable = () => {
     const sql = `
-      CREATE TABLE IF NOT EXISTS ${lookerTempDatasetName}.bqml_model_info
+      CREATE TABLE IF NOT EXISTS ${bqmlModelDatasetName}.bqml_model_info
                   (model_name     STRING,
                    state_json     STRING)
     `
@@ -156,7 +156,7 @@ export const BQMLProvider = ({ children }: any) => {
     const stateJson = JSON.stringify(generateModelState(state.wizard))
 
     const sql = `
-      MERGE ${lookerTempDatasetName}.bqml_model_info AS T
+      MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
                 USING (SELECT '${bqModelName}' AS model_name
                         , '${stateJson}' as state_json
                         , '${userEmail}' as created_by_email

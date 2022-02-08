@@ -5,7 +5,7 @@ type Action = {type: 'setAllAttributes', value: UserAttributesState}
 const userAttributesInitialState = {
   bigQueryConn: undefined,
   googleClientId: undefined,
-  lookerTempDatasetName: undefined,
+  bqmlModelDatasetName: undefined,
   gcpProject: undefined
 }
 
