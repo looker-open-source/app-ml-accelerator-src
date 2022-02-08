@@ -26,6 +26,7 @@ import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
 import { poll } from '../services/common'
+import { generateModelState } from '../services/modelState'
 import { JOB_STATUSES } from '../constants'
 
 type IBQMLContext = {
@@ -39,7 +40,9 @@ type IBQMLContext = {
   ) => {
     promise: Promise<any>,
     cancel: () => void
-  }
+  },
+  createModelStateTable?: () => Promise<any>,
+  insertOrUpdateModelState?: () => Promise<any>
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
@@ -50,10 +53,11 @@ export const BQMLContext = createContext<IBQMLContext>({})
  */
 export const BQMLProvider = ({ children }: any) => {
   const { token } = useContext(OauthContext)
+  const { extensionSDK } = useContext(ExtensionContext2)
+
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
-  const { extensionSDK } = useContext(ExtensionContext2)
-  const { gcpProject } = state.userAttributes
+  const { gcpProject, lookerTempDatasetName } = state.userAttributes
 
   /**
    * Low level invocation of the BigQuery API.
@@ -137,13 +141,45 @@ export const BQMLProvider = ({ children }: any) => {
     return { promise, cancel }
   }
 
+  const createModelStateTable = () => {
+    const sql = `
+      CREATE TABLE IF NOT EXISTS ${lookerTempDatasetName}.bqml_model_info
+                  (model_name     STRING,
+                   state_json     STRING)
+    `
+    return queryJob(sql)
+  }
+
+  const insertOrUpdateModelState = () => {
+    const  { bqModelName } = state.wizard.steps.step3
+    const { email: userEmail } = state.user
+    const stateJson = JSON.stringify(generateModelState(state.wizard))
+
+    const sql = `
+      MERGE ${lookerTempDatasetName}.bqml_model_info AS T
+                USING (SELECT '${bqModelName}' AS model_name
+                        , '${stateJson}' as state_json
+                        , '${userEmail}' as created_by_email
+                      ) AS S
+                ON T.model_name = S.model_name AND
+                WHEN MATCHED THEN
+                  UPDATE SET state_json=S.state_json
+                WHEN NOT MATCHED THEN
+                  INSERT (model_name, state_json, created_by_email)
+                  VALUES(model_name, state_json, created_by_email)
+    `
+    return queryJob(sql)
+  }
+
   return (
     <BQMLContext.Provider
       value={{
         expired,
         queryJob,
         getJob,
-        pollJobStatus
+        pollJobStatus,
+        createModelStateTable,
+        insertOrUpdateModelState
       }}
     >
       {children}

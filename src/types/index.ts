@@ -5,6 +5,7 @@ import { ExploreData } from './explore'
 import { View } from './view'
 import { SelectedFields } from './selectedFields'
 import { UIState } from './uiState'
+import { UserState } from './userState'
 import { ResultsTableHeaderItem, RanQuery } from './resultsTable'
 import { UserAttributesState } from './userAttributes'
 export type {
@@ -25,6 +26,7 @@ export type {
   ResultsTableHeaderItem,
   SelectedFields,
   UIState,
+  UserState,
   UserAttributesState,
   View
 }

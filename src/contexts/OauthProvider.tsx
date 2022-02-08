@@ -53,14 +53,18 @@ export const OauthProvider = ({
 }: OauthProviderProps) => {
   const { extensionSDK } = useContext(ExtensionContext2)
   const { dispatch } = useStore()
-  const [loggingIn, setLoggingIn] = useState(false)
+  const [ loggingIn, setLoggingIn ] = useState<boolean>(false)
   const [ token, setToken ] = useState<string>()
+  const [ attempts, setAttempts ] = useState<number>(0)
 
   /**
    * OAUTH2 authentication.
    */
   const signIn = async () => {
     if (!clientId) { return }
+    if (attempts > 3) {
+      throw "Attempted to login to Oauth too many times.  Please refresh your page."
+    }
     try {
       setLoggingIn(true)
       const response = await extensionSDK.oauth2Authenticate(authUrl, {
@@ -70,8 +74,10 @@ export const OauthProvider = ({
       })
       const { access_token } = response
       setToken(access_token)
+      setAttempts(0)
       return true
     } catch (error) {
+      setAttempts(attempts + 1)
       dispatch({
         type: 'addError',
         error: 'Failed to sign in to Oauth.  Please reload.'
