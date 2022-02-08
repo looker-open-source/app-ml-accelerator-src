@@ -117,7 +117,6 @@ export const BQMLProvider = ({ children }: any) => {
     if (!jobId) {
       throw "Failed fetch job because jobId was not provided"
     }
-    // const jobId = "script_job_39ee6148fccb4e20979709b1e99a68b1_0"
     const result = await invokeBQApi(
       `projects/${gcpProject}/jobs/${jobId}`
     )

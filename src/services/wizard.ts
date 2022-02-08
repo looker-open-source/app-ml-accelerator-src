@@ -28,13 +28,14 @@ const step2Validation = (stepData: Step2State) => (
 )
 
 const step3Validation = (stepData: Step3State, objective: string) => {
-  if (!stepData.selectedFields ||
-    stepData.selectedFields.length <= 0) {
-      return false
-  }
-  if (isArima(objective) && !stepData.arimaTimeColumn) {
+  if (
+    !stepData.selectedFields ||
+    stepData.selectedFields.length <= 0 ||
+    (isArima(objective) && !stepData.arimaTimeColumn)
+  ) {
     return false
   }
+
   return hasNoEmptyValues(stepData.summary)
 }
 
