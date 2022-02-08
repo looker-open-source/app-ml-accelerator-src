@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-  import React, { createContext, useContext, useState } from 'react'
-  import { ExtensionContext2 } from '@looker/extension-sdk-react'
-  import { BQMLContext } from './BQMLProvider'
-  import { useStore } from './StoreProvider'
-  import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
-  import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
+import React, { createContext, useContext, useState } from 'react'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
+import { BQMLContext } from './BQMLProvider'
+import { useStore } from './StoreProvider'
+import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
+import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
 import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 
   type ISummaryContext = {
@@ -52,7 +52,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
   export const SummaryProvider = ({ children }: any) => {
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
-    const { queryJob, getJob } = useContext(BQMLContext)
+    const { queryJob, getJob, pollJobStatus } = useContext(BQMLContext)
     const { gcpProject, lookerTempDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
       sql: null,
@@ -77,9 +77,16 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
       }
       const { body } = await createJob(sql)
       if (!body.jobComplete) {
-        // try again loop
-        console.log('incomplete job');
-        throw new Error("Failed to  finish creating bigQuery view")
+        // Give it another 10s to get the job status in case BQ is taking a while to create the view
+        if (!pollJobStatus) {
+          throw new Error("Failed to  finish creating bigQuery view")
+        }
+        const { promise } = pollJobStatus(
+          body.jobReference.jobId,
+          3300,
+          3
+        )
+        await promise
       }
     }
 

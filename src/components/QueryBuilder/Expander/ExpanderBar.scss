@@ -3,6 +3,10 @@
     height: 100%;
   }
 
+  &:first-child .expander-body {
+    margin-top: 0;
+  }
+
   .expander-body {
     cursor: pointer;
     width: 100%;

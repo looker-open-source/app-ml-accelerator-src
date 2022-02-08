@@ -25,11 +25,21 @@ import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
+import { poll } from '../services/common'
+import { JOB_STATUSES } from '../constants'
 
 type IBQMLContext = {
   expired?: boolean
   queryJob?: (sql: string) => Promise<any>,
-  getJob?: () => Promise<any>
+  getJob?: (props: any) => Promise<any>,
+  pollJobStatus?: (
+    jobId: string,
+    interval: number,
+    maxAttempts?: number
+  ) => {
+    promise: Promise<any>,
+    cancel: () => void
+  }
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
@@ -80,6 +90,7 @@ export const BQMLProvider = ({ children }: any) => {
       }
       return { ok, body, status }
     } catch (error) {
+      setExpired(true)
       dispatch({ type: 'addError', error: "Failed to connect to BigQuery. Please refresh and try again." })
       return { ok: false }
     }
@@ -102,12 +113,29 @@ export const BQMLProvider = ({ children }: any) => {
   /**
    * Fetch a job
    */
-  const getJob = async () => {
-    const job_id = "script_job_39ee6148fccb4e20979709b1e99a68b1_0"
+  const getJob = async ({ jobId }: { jobId: string }) => {
+    if (!jobId) {
+      throw "Failed fetch job because jobId was not provided"
+    }
+    // const jobId = "script_job_39ee6148fccb4e20979709b1e99a68b1_0"
     const result = await invokeBQApi(
-      `projects/${gcpProject}/jobs/${job_id}`
+      `projects/${gcpProject}/jobs/${jobId}`
     )
     return result
+  }
+
+  const pollJobStatus = (jobId: string, interval: number, maxAttempts?: number) => {
+    if (!getJob || !jobId) {
+      throw "Failed to fetch job"
+    }
+    const { promise, cancel } = poll({
+      fn: getJob,
+      props: { jobId },
+      validate: ({ok, body}) => (ok && body.status.state === JOB_STATUSES.done),
+      interval,
+      maxAttempts
+    })
+    return { promise, cancel }
   }
 
   return (
@@ -115,7 +143,8 @@ export const BQMLProvider = ({ children }: any) => {
       value={{
         expired,
         queryJob,
-        getJob
+        getJob,
+        pollJobStatus
       }}
     >
       {children}

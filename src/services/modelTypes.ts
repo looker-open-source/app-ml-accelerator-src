@@ -54,7 +54,7 @@ const formBoostedTreeSQL = ({
   // TODO: Replace Select * with Select ${feature_fields}
   // *******
   return `
-    CREATE MODEL ${lookerTempDatasetName}.${bqModelName}_boosted_tree_${boostedType.toLowerCase()}
+    CREATE OR REPLACE MODEL ${lookerTempDatasetName}.${bqModelName}_boosted_tree_${boostedType.toLowerCase()}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}',
           BOOSTER_TYPE = 'GBTREE',
           INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])

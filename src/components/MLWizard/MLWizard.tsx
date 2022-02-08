@@ -10,6 +10,7 @@ import Step2 from '../Step2'
 import Step3 from '../Step3'
 import Step4 from '../Step4'
 import { WIZARD_STEPS } from "../../constants"
+import { ModelProvider } from '../../contexts/ModelProvider'
 
 export const _MLWizard: React.FC = () => {
   let { path, url } = useRouteMatch();
@@ -49,7 +50,9 @@ export const _MLWizard: React.FC = () => {
             path={`${path}/${WIZARD_STEPS.step4}`}
             enforcementPath={enforcementPath}
             redirect={currentStep < 4}>
-              <Step4 />
+              <ModelProvider>
+                <Step4 />
+              </ModelProvider>
           </WizardRoute>
           <WizardRoute
             path={`${path}/${WIZARD_STEPS.step5}`}
