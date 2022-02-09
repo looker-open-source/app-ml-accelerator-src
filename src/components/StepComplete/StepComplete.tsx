@@ -1,6 +1,6 @@
 import React from 'react'
 import { WIZARD_STEPS } from "../../constants"
-import { useHistory} from 'react-router-dom'
+import { useHistory, useParams} from 'react-router-dom'
 import { Button } from '@looker/components'
 
 type StepCompleteParams = {
@@ -19,11 +19,16 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
   handleCompleteClick
 }) => {
   const history = useHistory()
+  const { bqModelName: bqModelNameParam } = useParams<{ bqModelName: string}>()
 
   const handleClick = () => {
     if (!isStepComplete) { return }
     handleCompleteClick?.()
-    history.push(`${WIZARD_STEPS[`step${stepNumber + 1}`]}`)
+    if (bqModelNameParam) {
+      history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}/${bqModelNameParam}`)
+    } else{
+      history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}`)
+    }
   }
 
   const btnClass = isStepComplete ? 'complete' : ''

@@ -20,8 +20,8 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, se
       <tr key={i}>
         <td className="checkbox">
           <Checkbox
-            checked={selectedFields?.indexOf(rowData["column_name"]) >= 0}
-            onChange={() => { checkboxChange(rowData["column_name"]) }}
+            checked={selectedFields?.indexOf(rowData["column_name"].value) >= 0}
+            onChange={() => { checkboxChange(rowData["column_name"].value) }}
           />
         </td>
         {tds}

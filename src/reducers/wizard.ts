@@ -3,6 +3,7 @@ import { toggleArrayEntry } from '../services/array'
 import { getStepStateClone } from '../services/wizard'
 
 type Action = { type: 'setCurrentStep', step: number } |
+  { type: 'setIsSaved' } |
   { type: 'addToStepData', step: keyof WizardSteps, data: any } |
   { type: 'setSelectedDimension', field: Field } |
   { type: 'setSelectedMeasure', field: Field } |
@@ -14,6 +15,7 @@ type Action = { type: 'setCurrentStep', step: number } |
 
 const wizardInitialState: WizardState = {
   currentStep: 1,
+  isSaved: false,
   steps: {
     step1: { objective: undefined },
     step2: {
@@ -59,6 +61,9 @@ function wizardReducer(state: WizardState, action: Action): any {
   switch (action.type) {
     case 'setCurrentStep': {
       return {...state, currentStep: action.step}
+    }
+    case 'setIsSaved': {
+      return {...state, isSaved: true}
     }
     case 'addToStepData': {
       return {

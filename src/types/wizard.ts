@@ -2,6 +2,7 @@ import { ResultsTableHeaderItem, RanQuery, ExploreData, SelectedFields, Summary}
 
 export type WizardState = {
   currentStep: number,
+  isSaved: boolean,
   steps: WizardSteps
 }
 

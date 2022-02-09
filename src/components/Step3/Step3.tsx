@@ -65,7 +65,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     const fields = (value.fields || {})
     const summaryData = renameSummaryDataKeys(value.data)
     updateStepData({
-      selectedFields: summaryData.map((d: any) => d["column_name"]),
+      selectedFields: summaryData.map((d: any) => d["column_name"].value),
       summary: {
         exploreName,
         modelName,

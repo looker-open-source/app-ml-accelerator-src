@@ -144,16 +144,18 @@ export const BQMLProvider = ({ children }: any) => {
   const createModelStateTable = () => {
     const sql = `
       CREATE TABLE IF NOT EXISTS ${bqmlModelDatasetName}.bqml_model_info
-                  (model_name     STRING,
-                   state_json     STRING)
+                  (model_name         STRING,
+                   state_json         STRING,
+                   created_by_email   STRING)
     `
+    debugger
     return queryJob(sql)
   }
 
   const insertOrUpdateModelState = () => {
     const  { bqModelName } = state.wizard.steps.step3
     const { email: userEmail } = state.user
-    const stateJson = JSON.stringify(generateModelState(state.wizard))
+    const stateJson = JSON.stringify(JSON.stringify(generateModelState(state.wizard)))
 
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
@@ -168,6 +170,7 @@ export const BQMLProvider = ({ children }: any) => {
                   INSERT (model_name, state_json, created_by_email)
                   VALUES(model_name, state_json, created_by_email)
     `
+    debugger
     return queryJob(sql)
   }
 

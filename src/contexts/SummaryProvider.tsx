@@ -52,7 +52,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
   export const SummaryProvider = ({ children }: any) => {
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
-    const { queryJob, getJob, pollJobStatus } = useContext(BQMLContext)
+    const { queryJob, pollJobStatus } = useContext(BQMLContext)
     const { gcpProject, bqmlModelDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
       sql: null,
@@ -110,7 +110,6 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
         // in an effort to limit the number of calls to BigQuery
         // do not create the BQ view if its alrady been created for this sql and model name
         if (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model) {
-          console.log('creating bq view')
           setPreviousBQValues({ sql: querySql, model: bqModelName })
           await createBQMLView(querySql, bqModelName)
         }
@@ -165,7 +164,6 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
         if (!sql) {
           throw "Failed to create BigQuery Model SQL statement"
         }
-        // const results = await getJob?.()
         const results = await createJob?.(sql)
         return results
       } catch (error) {

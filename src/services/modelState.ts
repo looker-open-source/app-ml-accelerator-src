@@ -15,10 +15,9 @@ export const generateModelState = (state: WizardState) => {
     },
     step3: {
       bqModelName: step3.bqModelName,
-      targetField: undefined,
-      arimaTimeColumn: undefined,
-      selectedFields: [],
-      summary: step3.summary,
+      targetField: step3.targetField,
+      arimaTimeColumn: step3.arimaTimeColumn,
+      selectedFields: step3.selectedFields,
     },
     step4: {
       job: step4.job

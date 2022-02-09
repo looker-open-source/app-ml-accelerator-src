@@ -1,6 +1,5 @@
 import React from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import { InputSearch } from "@looker/components"
 import './Step1.scss'
 import { MODEL_TYPES } from '../../services/modelTypes'
 import withWizardStep from '../WizardStepHOC'
@@ -21,7 +20,6 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const objective = state.wizard.steps.step1.objective
-  const searchValue = objective ? MODEL_TYPES[objective]?.label : ''
 
   return (
     <StepContainer stepComplete={stepComplete} stepNumber={1}>
@@ -52,7 +50,7 @@ type ModelTypeCardProps = {
   title: string,
   type: string,
   description: string,
-  handleSelect: (selection) => void
+  handleSelect: (selection: any) => void
 }
 
 export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, type, description, handleSelect }) => {

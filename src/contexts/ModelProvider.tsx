@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { JOB_STATUSES } from '../constants'
@@ -39,20 +38,30 @@ export const ModelContext = createContext<IModelContext>({})
  */
 export const ModelProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
-  const { coreSDK: sdk } = useContext(ExtensionContext2)
-  const { pollJobStatus } = useContext(BQMLContext)
+  const {
+    pollJobStatus,
+    createModelStateTable,
+    insertOrUpdateModelState
+  } = useContext(BQMLContext)
+  const { isSaved } = state.wizard
   const { jobStatus, job } = state.wizard.steps.step4
   const [ polling, setPolling ] = useState(false)
+  const [ saving, setSaving ] = useState(false)
   const [ hasError, setHasError ] = useState(false)
   const [ pollCancelers, setPollCancelers ] = useState<{[key: string]: () => void}>({})
 
   // if a job is pending or running,
   // continuously short poll the job until its status is DONE
   useEffect(() => {
-    if (!jobStatus || jobStatus === JOB_STATUSES.done || polling || hasError) {
+    if (!job || hasError) {
       return
     }
-    getJobStatus()
+    if (!isSaved && !saving) {
+      saveToModelStateTable()
+    }
+    if (jobStatus !== JOB_STATUSES.done && !polling) {
+      getJobStatus()
+    }
   })
 
   const cancelPoll = (jobId: string) => {
@@ -98,6 +107,33 @@ export const ModelProvider = ({ children }: any) => {
       dispatch({ type: 'addError', error: "An error occurred while fetching the job status: " + error})
       setPolling(false)
       setHasError(true)
+    }
+  }
+
+  const saveToModelStateTable = async (retry: boolean = false) => {
+    try {
+      setSaving(true)
+      {
+        const { ok, body } = await createModelStateTable?.()
+        debugger
+        if (!ok || !body.jobComplete) {
+          throw "Failed to create table"
+        }
+      }
+      const { ok, body } = await insertOrUpdateModelState?.()
+      debugger
+      if (!ok) {
+        throw "Failed to save your model"
+      }
+      dispatch({ type: 'setIsSaved' })
+      setSaving(false)
+    } catch (error) {
+      if (retry) {
+        console.error("Failed to save model to BQ model state")
+        return
+      }
+      // retry once
+      saveToModelStateTable(true)
     }
   }
 
