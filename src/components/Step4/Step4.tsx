@@ -6,6 +6,7 @@ import { useStore } from '../../contexts/StoreProvider'
 import { ModelContext } from '../../contexts/ModelProvider'
 import './Step4.scss'
 import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
+import { Prompt } from 'react-router-dom'
 
 
 
@@ -14,7 +15,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { state } = useStore()
   const { needsSaving } = state.wizard
-  const { jobStatus, job } = state.wizard.steps.step4
+  const { jobStatus } = state.wizard.steps.step4
   const jobComplete = jobStatus === JOB_STATUSES.done
 
   useEffect(() => {
@@ -27,14 +28,10 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     setIsLoading(false)
   }, [jobStatus])
 
-  useEffect(() => {
-    return () => {
-      // Clean up component,
-      // cancel job polling when component unmounts
-      if (!job || !job.jobId || jobComplete) { return }
-      stopPolling?.()
-    }
-  })
+  const onRouteChange = () => {
+    stopPolling?.()
+    return true
+  }
 
   return (
     <StepContainer
@@ -42,6 +39,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepComplete={stepComplete}
       stepNumber={4}
       customClass="step4-container">
+      <Prompt message={onRouteChange}/>
       { jobComplete && needsSaving && (
         <div className="minor-error">
           You have made changes that are not reflected in this model.  Return to the {WIZARD_STEPS['step3']} tab and `Update Model`.

@@ -2,7 +2,7 @@ import { Field, WizardState, WizardSteps } from '../types'
 import { toggleArrayEntry } from '../services/array'
 import { getStepStateClone } from '../services/wizard'
 
-type Action = { type: 'setCurrentStep', step: number } |
+type Action = { type: 'setUnlockedStep', step: number } |
   { type: 'setNeedsSaving', value: boolean } |
   { type: 'addToStepData', step: keyof WizardSteps, data: any } |
   { type: 'setSelectedDimension', field: Field } |
@@ -14,7 +14,7 @@ type Action = { type: 'setCurrentStep', step: number } |
   { type: 'clearExplore' }
 
 const wizardInitialState: WizardState = {
-  currentStep: 1,
+  unlockedStep: 1,
   needsSaving: true, // If parameters of an existing model are updated, model needs to be saved
   steps: {
     step1: { objective: undefined },
@@ -61,8 +61,8 @@ const needsSavingSteps = ['step1', 'step2', 'step3']
 
 function wizardReducer(state: WizardState, action: Action): any {
   switch (action.type) {
-    case 'setCurrentStep': {
-      return {...state, currentStep: action.step}
+    case 'setUnlockedStep': {
+      return {...state, unlockedStep: action.step}
     }
     case 'setNeedsSaving': {
       return {...state, needsSaving: action.value}

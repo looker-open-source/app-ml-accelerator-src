@@ -16,21 +16,21 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
     return (props: any): any => {
       const { state, dispatch } = useStore()
       const { modelNameParam } = useParams<{modelNameParam: string}>()
-      const { currentStep } = state.wizard
+      const { unlockedStep } = state.wizard
       const [ stepComplete, setStepComplete ] = useState(false)
       const stepKey: keyof WizardSteps = WIZARD_KEYS[stepNumber]
       const { objective } = state.wizard.steps.step1
       const stepData: GenericStepState = state.wizard.steps[stepKey]
-      const nextStep: number = currentStep === stepNumber
-        ? currentStep + 1
-        : currentStep
-      const enforceStep = currentStep < stepNumber
+      const nextStep: number = unlockedStep === stepNumber
+        ? unlockedStep + 1
+        : unlockedStep
+      const enforceStep = unlockedStep < stepNumber
 
       useEffect(() => {
         const stepComplete = isStepComplete(stepData, objective)
         if (stepComplete) {
           dispatch({
-            type: 'setCurrentStep',
+            type: 'setUnlockedStep',
             step: nextStep
           })
         }
@@ -39,8 +39,8 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
 
       if (enforceStep) {
         const enforcementPath = modelNameParam ?
-          `/ml/${WIZARD_STEPS[`step${currentStep}`]}/${modelNameParam}` :
-          `/ml/${WIZARD_STEPS[`step${currentStep}`]}`
+          `/ml/${WIZARD_STEPS[`step${unlockedStep}`]}/${modelNameParam}` :
+          `/ml/${WIZARD_STEPS[`step${unlockedStep}`]}`
 
         return (<Redirect to={enforcementPath} />)
       }

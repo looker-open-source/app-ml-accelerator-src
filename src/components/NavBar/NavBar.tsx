@@ -4,11 +4,11 @@ import { WIZARD_STEPS } from "../../constants"
 
 type NavBarProps = {
   url: string,
-  currentStep: number,
+  unlockedStep: number,
   urlParam?: string
 }
 
-export const NavBar : React.FC<NavBarProps> = ({ url, currentStep, urlParam }) => {
+export const NavBar : React.FC<NavBarProps> = ({ url, unlockedStep, urlParam }) => {
   const buildUrl = (to: string) => (
     `${to}${urlParam ? `/${urlParam}` : ''}`
   )
@@ -19,19 +19,19 @@ export const NavBar : React.FC<NavBarProps> = ({ url, currentStep, urlParam }) =
         title={WIZARD_STEPS.step1} />
       <WizardNavLink
         to={buildUrl(`${url}/${WIZARD_STEPS.step2}`)}
-        disabled={(currentStep < 2)}
+        disabled={(unlockedStep < 2)}
         title={WIZARD_STEPS.step2} />
       <WizardNavLink
         to={buildUrl(`${url}/${WIZARD_STEPS.step3}`)}
-        disabled={(currentStep < 3)}
+        disabled={(unlockedStep < 3)}
         title={WIZARD_STEPS.step3} />
       <WizardNavLink
         to={buildUrl(`${url}/${WIZARD_STEPS.step4}`)}
-        disabled={(currentStep < 4)}
+        disabled={(unlockedStep < 4)}
         title={WIZARD_STEPS.step4} />
       <WizardNavLink
         to={buildUrl(`${url}/${WIZARD_STEPS.step5}`)}
-        disabled={(currentStep < 5)}
+        disabled={(unlockedStep < 5)}
         title={WIZARD_STEPS.step5} />
     </nav>
   )
