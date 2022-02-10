@@ -19,6 +19,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
+  const { needsSaving } = state.wizard
   const { objective } = state.wizard.steps.step1
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
 
@@ -140,17 +141,26 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const handleCompleteClick = async (): Promise<boolean> => {
+    if (!needsSaving) { return true }
     setIsLoading(true)
     const { ok } = await createModel()
     return ok
   }
+
+  const stepCompleteButtonText = () => (
+    modelNameParam ?
+      needsSaving ?
+        "Update Model" :
+        "Continue" :
+      "CreateModel"
+  )
 
   return (
     <StepContainer
       isLoading={isLoading}
       stepComplete={stepComplete}
       stepNumber={3}
-      buttonText={modelNameParam ? "Update Model" : "Create Model"}
+      buttonText={stepCompleteButtonText()}
       handleCompleteClick={handleCompleteClick}
     >
       <div className="model-blocks">

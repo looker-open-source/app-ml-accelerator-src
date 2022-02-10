@@ -54,16 +54,15 @@ export const ModelProvider = ({ children }: any) => {
   const [ saving, setSaving ] = useState(false)
   const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
 
-  // if a job is pending or running,
-  // continuously short poll the job until its status is DONE
   useEffect(() => {
     if (!job) { return }
     if (needsSaving && !saving) {
-      console.log('saveToModelStateTable')
-      saveToModelStateTable()
+      persistWizardState()
     }
   })
 
+  // if a job is pending or running,
+  // continuously short poll the job until its status is DONE
   useEffect(() => {
     if (!job || polling || !modelNameParam) { return }
     if (jobStatus !== JOB_STATUSES.done) {
@@ -79,6 +78,8 @@ export const ModelProvider = ({ children }: any) => {
     setPolling(false)
   }
 
+  // Starts a short poll of the job status
+  // Ends when either the fetched job's status is "done" or is canceled with stopPolling method
   const getJobStatus = async () => {
     try {
       if (!job.jobId || !pollJobStatus) {
@@ -117,7 +118,9 @@ export const ModelProvider = ({ children }: any) => {
     }
   }
 
-  const saveToModelStateTable = async (retry: boolean = false) => {
+  // Save key information from the wizards state associated with the bqModelName
+  // into a BQ table so we can reload past models
+  const persistWizardState = async (retry: boolean = false) => {
     try {
       setSaving(true)
       {
@@ -142,7 +145,7 @@ export const ModelProvider = ({ children }: any) => {
         return
       }
       // retry once
-      saveToModelStateTable(true)
+      persistWizardState(true)
     }
   }
 
