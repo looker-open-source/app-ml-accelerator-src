@@ -9,13 +9,16 @@ import { BQMLContext } from '../contexts/BQMLProvider'
 
 export const _LookerBQMLApp: React.FC = () => {
   const { loggingIn, token, signIn, signOut } = useContext(OauthContext)
-  const { expired } = useContext(BQMLContext)
+  const { expired, setExpired } = useContext(BQMLContext)
 
   useEffect(() => {
     if (signOut && expired) {
+      debugger
+      setExpired?.(false)
       signOut()
     }
     if (signIn && !loggingIn && !token) {
+      debugger
       signIn()
       return
     }

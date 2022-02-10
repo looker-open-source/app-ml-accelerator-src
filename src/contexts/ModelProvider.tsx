@@ -22,13 +22,14 @@
  * THE SOFTWARE.
  */
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useHistory, useParams, useRouteMatch } from 'react-router-dom'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { JOB_STATUSES } from '../constants'
 
 type IModelContext = {
-  cancelPoll?: (jobId: string) => void,
-  cancelAllPolls?: () => void
+  saving?: boolean,
+  stopPolling?: () => void
 }
 
 export const ModelContext = createContext<IModelContext>({})
@@ -37,18 +38,22 @@ export const ModelContext = createContext<IModelContext>({})
  * Model provider
  */
 export const ModelProvider = ({ children }: any) => {
+  const history = useHistory()
+  const { url } = useRouteMatch()
+  const { modelNameParam } = useParams<{modelNameParam: string}>()
   const { state, dispatch } = useStore()
   const {
     pollJobStatus,
     createModelStateTable,
     insertOrUpdateModelState
   } = useContext(BQMLContext)
-  const { isSaved } = state.wizard
+  const { needsSaving } = state.wizard
+  const { bqModelName } = state.wizard.steps.step3
   const { jobStatus, job } = state.wizard.steps.step4
   const [ polling, setPolling ] = useState(false)
   const [ saving, setSaving ] = useState(false)
   const [ hasError, setHasError ] = useState(false)
-  const [ pollCancelers, setPollCancelers ] = useState<{[key: string]: () => void}>({})
+  const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
 
   // if a job is pending or running,
   // continuously short poll the job until its status is DONE
@@ -56,22 +61,30 @@ export const ModelProvider = ({ children }: any) => {
     if (!job || hasError) {
       return
     }
-    if (!isSaved && !saving) {
+    if (needsSaving && !saving) {
+      console.log('saveToModelStateTable')
       saveToModelStateTable()
     }
-    if (jobStatus !== JOB_STATUSES.done && !polling) {
-      getJobStatus()
-    }
+    // if (jobStatus !== JOB_STATUSES.done && !polling && modelNameParam) {
+    //   getJobStatus()
+    // }
   })
 
-  const cancelPoll = (jobId: string) => {
-    pollCancelers[jobId]?.()
-  }
-
-  const cancelAllPolls = () => {
-    for (const key in pollCancelers) {
-      pollCancelers[key]()
+  useEffect(() => {
+    if (!job || hasError || polling) {
+      return
     }
+    if (jobStatus !== JOB_STATUSES.done && modelNameParam) {
+      console.log('getJobStatus')
+      getJobStatus()
+    }
+  }, [modelNameParam])
+
+  const stopPolling = () => {
+    if (!pollCanceler) { return }
+    console.log('canceling poll')
+    pollCanceler.cancel()
+    setPolling(false)
   }
 
   const getJobStatus = async () => {
@@ -80,18 +93,23 @@ export const ModelProvider = ({ children }: any) => {
         throw "Missing jobid or failed instantiation of BQ"
       }
       setPolling(true)
-      const { promise, cancel } = pollJobStatus(job.jobId, 10000)
-      setPollCancelers({
-        [job.jobId]: cancel,
-        ...pollCancelers
-      })
+      pollCanceler?.cancel()
+      setPollCanceler(undefined)
 
+      const { promise, cancel } = pollJobStatus(job.jobId, 10000)
+      console.log('setting canceler')
+      setPollCanceler({ cancel })
+
+      // this will wait here until the polling is finished
+      // either the job status == done or polling has been canceled
       const { ok, body, canceled } = await promise
+
       if (canceled) { return }
       if (!ok) {
         throw "Failed to retrieve job status"
       }
       if (body.status.errorResult) {
+        dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
         throw body.status.errorResult.message
       }
       dispatch({
@@ -115,17 +133,19 @@ export const ModelProvider = ({ children }: any) => {
       setSaving(true)
       {
         const { ok, body } = await createModelStateTable?.()
-        debugger
         if (!ok || !body.jobComplete) {
           throw "Failed to create table"
         }
       }
       const { ok, body } = await insertOrUpdateModelState?.()
-      debugger
       if (!ok) {
         throw "Failed to save your model"
       }
-      dispatch({ type: 'setIsSaved' })
+
+      if (!modelNameParam) {
+        history.push(`${url}/${bqModelName}`)
+      }
+      dispatch({ type: 'setNeedsSaving', value: false })
       setSaving(false)
     } catch (error) {
       if (retry) {
@@ -141,8 +161,8 @@ export const ModelProvider = ({ children }: any) => {
   return (
     <ModelContext.Provider
       value={{
-        cancelPoll,
-        cancelAllPolls
+        saving,
+        stopPolling,
       }}
     >
       {children}

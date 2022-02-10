@@ -19,13 +19,13 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
   handleCompleteClick
 }) => {
   const history = useHistory()
-  const { bqModelName: bqModelNameParam } = useParams<{ bqModelName: string}>()
+  const { modelNameParam } = useParams<{modelNameParam: string}>()
 
   const handleClick = () => {
     if (!isStepComplete) { return }
     handleCompleteClick?.()
-    if (bqModelNameParam) {
-      history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}/${bqModelNameParam}`)
+    if (modelNameParam) {
+      history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}/${modelNameParam}`)
     } else{
       history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}`)
     }

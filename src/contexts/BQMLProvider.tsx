@@ -30,7 +30,8 @@ import { generateModelState } from '../services/modelState'
 import { JOB_STATUSES } from '../constants'
 
 type IBQMLContext = {
-  expired?: boolean
+  expired?: boolean,
+  setExpired?: (value: boolean) => void,
   queryJob?: (sql: string) => Promise<any>,
   getJob?: (props: any) => Promise<any>,
   pollJobStatus?: (
@@ -148,7 +149,6 @@ export const BQMLProvider = ({ children }: any) => {
                    state_json         STRING,
                    created_by_email   STRING)
     `
-    debugger
     return queryJob(sql)
   }
 
@@ -159,18 +159,17 @@ export const BQMLProvider = ({ children }: any) => {
 
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
-                USING (SELECT '${bqModelName}' AS model_name
-                        , '${stateJson}' as state_json
-                        , '${userEmail}' as created_by_email
-                      ) AS S
-                ON T.model_name = S.model_name AND
-                WHEN MATCHED THEN
-                  UPDATE SET state_json=S.state_json
-                WHEN NOT MATCHED THEN
-                  INSERT (model_name, state_json, created_by_email)
-                  VALUES(model_name, state_json, created_by_email)
+          USING (SELECT '${bqModelName}' AS model_name
+                  , '${stateJson}' as state_json
+                  , '${userEmail}' as created_by_email
+                ) AS S
+          ON T.model_name = S.model_name
+          WHEN MATCHED THEN
+            UPDATE SET state_json=S.state_json
+          WHEN NOT MATCHED THEN
+            INSERT (model_name, state_json, created_by_email)
+            VALUES(model_name, state_json, created_by_email)
     `
-    debugger
     return queryJob(sql)
   }
 
@@ -178,6 +177,7 @@ export const BQMLProvider = ({ children }: any) => {
     <BQMLContext.Provider
       value={{
         expired,
+        setExpired,
         queryJob,
         getJob,
         pollJobStatus,

@@ -15,7 +15,7 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
   return (WrappedComponent: React.FC): React.FC => {
     return (props: any): any => {
       const { state, dispatch } = useStore()
-      const { bqModelName: bqModelNameParam } = useParams<{bqModelName: string}>()
+      const { modelNameParam } = useParams<{modelNameParam: string}>()
       const { currentStep } = state.wizard
       const [ stepComplete, setStepComplete ] = useState(false)
       const stepKey: keyof WizardSteps = WIZARD_KEYS[stepNumber]
@@ -38,8 +38,8 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
       }, [stepData])
 
       if (enforceStep) {
-        const enforcementPath = bqModelNameParam ?
-          `/ml/${WIZARD_STEPS[`step${currentStep}`]}/${bqModelNameParam}` :
+        const enforcementPath = modelNameParam ?
+          `/ml/${WIZARD_STEPS[`step${currentStep}`]}/${modelNameParam}` :
           `/ml/${WIZARD_STEPS[`step${currentStep}`]}`
 
         return (<Redirect to={enforcementPath} />)

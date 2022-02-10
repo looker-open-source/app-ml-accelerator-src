@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import { FieldText, Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
@@ -12,12 +13,20 @@ import { wizardInitialState } from '../../reducers/wizard'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
 import { JOB_STATUSES } from '../../constants'
 
+
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
+  const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
   const { objective } = state.wizard.steps.step1
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
+
+  if (!exploreName || !modelName) {
+    dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
+    return null
+  }
+
   const {
     summary,
     selectedFields,
@@ -37,11 +46,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])],
     'date'
   ) : null
-
-  if (!exploreName || !modelName) {
-    dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
-    return null
-  }
 
   useEffect(() => {
     if (
@@ -138,7 +142,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       isLoading={isLoading}
       stepComplete={stepComplete}
       stepNumber={3}
-      buttonText="Create Model"
+      buttonText={modelNameParam ? "Update Model" : "Create Model"}
       handleCompleteClick={handleCompleteClick}
     >
       <div className="model-blocks">
@@ -150,6 +154,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             value={bqModelName}
             placeholder="Model_Name"
             onKeyPress={alphaNumericOnly}
+            disabled={!!modelNameParam}
           />
         </div>
         <div className="wizard-card">
