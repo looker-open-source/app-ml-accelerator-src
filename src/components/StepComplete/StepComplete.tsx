@@ -8,7 +8,7 @@ type StepCompleteParams = {
   stepNumber: number,
   stepText?: string,
   buttonText?: string,
-  handleCompleteClick?: () => void
+  handleCompleteClick?: () => Promise<boolean>
 }
 
 export const StepComplete: React.FC<StepCompleteParams> = ({
@@ -21,9 +21,12 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
   const history = useHistory()
   const { modelNameParam } = useParams<{modelNameParam: string}>()
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (!isStepComplete) { return }
-    handleCompleteClick?.()
+    if (handleCompleteClick) {
+      const complete = await handleCompleteClick()
+      if (!complete) { return }
+    }
     if (modelNameParam) {
       history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}/${modelNameParam}`)
     } else{

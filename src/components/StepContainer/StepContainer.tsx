@@ -10,7 +10,7 @@ type StepContainerParams = {
   children: any,
   stepText?: string,
   buttonText?: string,
-  handleCompleteClick?: () => void
+  handleCompleteClick?: () => Promise<boolean>
 }
 
 export const StepContainer: React.FC<StepContainerParams> = ({

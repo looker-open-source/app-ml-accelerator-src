@@ -52,7 +52,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
   export const SummaryProvider = ({ children }: any) => {
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
-    const { queryJob, pollJobStatus } = useContext(BQMLContext)
+    const { queryJob, pollJobStatus, getJob } = useContext(BQMLContext)
     const { gcpProject, bqmlModelDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
       sql: null,
@@ -68,18 +68,18 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
       bqModelName: string | undefined
     ) => {
       if (!bqmlModelDatasetName) {
-        throw new Error("User Attribute 'looker_temp_dataset_name' must be defined")
+        throw "User Attribute 'looker_temp_dataset_name' must be defined"
       }
 
       const sql = formBQViewSQL(querySql, bqmlModelDatasetName, bqModelName)
       if (!sql) {
-        throw new Error("Failed to create BigQuery View SQL statement")
+        throw "Failed to create BigQuery View SQL statement"
       }
       const { body } = await createJob(sql)
       if (!body.jobComplete) {
         // Give it another 10s to get the job status in case BQ is taking a while to create the view
         if (!pollJobStatus) {
-          throw new Error("Failed to  finish creating bigQuery view")
+          throw "Failed to  finish creating bigQuery view"
         }
         const { promise } = pollJobStatus(
           body.jobReference.jobId,
@@ -93,7 +93,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
     const createJob = async (sql: string) => {
       const { ok, body } = await queryJob?.(sql)
       if (!ok) {
-        throw new Error("Failed to create or replace bigQuery view")
+        throw "Failed to create or replace bigQuery view"
       }
       return { ok, body }
     }
@@ -164,12 +164,29 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
         if (!sql) {
           throw "Failed to create BigQuery Model SQL statement"
         }
-        const results = await createJob?.(sql)
-        return results
+        const { ok, body } = await createJob?.(sql)
+        if (!ok || !body.jobReference.jobId) {
+          throw "Something went wrong, please try again."
+        }
+        await checkCreateModelSuccess(body.jobReference.jobId)
+
+        return { ok, body }
       } catch (error) {
         console.log({error})
-        dispatch({type: 'addError', error: "Failed to create model."})
+        dispatch({type: 'addError', error: "Failed to create model: " + error})
         return { ok: false }
+      }
+    }
+
+    // fetch the Job by its id to ensure it was successful
+    // some failures only reveal themselves from querying the job
+    const checkCreateModelSuccess = async (jobId: string) => {
+      const { ok, body } = await getJob?.({ jobId })
+      if (body.status.errorResult) {
+        throw body.status.errorResult.message
+      }
+      if (!ok) {
+        throw "Something went wrong, please try again."
       }
     }
 

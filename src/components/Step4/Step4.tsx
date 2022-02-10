@@ -19,14 +19,14 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const jobComplete = jobStatus === JOB_STATUSES.done
 
   useEffect(() => {
-    if (!jobStatus || saving) {
+    if (saving) {
       console.log('set loading true')
       setIsLoading(true)
       return
     }
     console.log('set loading false')
     setIsLoading(false)
-  }, [jobStatus])
+  }, [saving])
 
   const onRouteChange = () => {
     stopPolling?.()

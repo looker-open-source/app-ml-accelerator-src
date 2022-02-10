@@ -115,7 +115,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     }
   }
 
-  async function createModel() {
+  const createModel = async () => {
     const { ok, body } = await createBQMLModel?.(
       objective,
       bqModelName,
@@ -123,18 +123,26 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       arimaTimeColumn
     )
 
+    if (!ok) {
+      setIsLoading(false)
+      return { ok }
+    }
+
     dispatch({
       type: 'addToStepData',
       step: 'step4',
       data: {
-        jobStatus: ok ? JOB_STATUSES.pending : "FAILED",
-        job: ok ? body.jobReference : null
+        jobStatus: JOB_STATUSES.pending,
+        job: body.jobReference
       }
     })
+    return { ok }
   }
 
-  const handleCompleteClick = () => {
-    createModel()
+  const handleCompleteClick = async (): Promise<boolean> => {
+    setIsLoading(true)
+    const { ok } = await createModel()
+    return ok
   }
 
   return (

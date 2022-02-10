@@ -30,6 +30,11 @@ export const poll = ({
     let attempts = 0
 
     const executePoll = async (resolve: any, reject: any) => {
+      if (canceled) {
+        console.log('resolving the cancelation')
+        return resolve({ canceled: true })
+      }
+
       console.log('Attempt #' + attempts)
       const result = await fn(props)
       attempts++
@@ -38,9 +43,6 @@ export const poll = ({
         return resolve(result)
       } else if (maxAttempts && attempts === maxAttempts) {
         return reject(new Error('Exceeded max attempts'))
-      } else if (canceled) {
-        console.log('resolving the cancelation')
-        return resolve({ canceled: true })
       } else {
         setTimeout(executePoll, interval, resolve, reject);
       }

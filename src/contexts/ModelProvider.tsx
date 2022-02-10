@@ -40,7 +40,7 @@ export const ModelContext = createContext<IModelContext>({})
 export const ModelProvider = ({ children }: any) => {
   const history = useHistory()
   const { url } = useRouteMatch()
-  const { modelNameParam } = useParams<{modelNameParam: string}>()
+  const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const {
     pollJobStatus,
@@ -52,29 +52,21 @@ export const ModelProvider = ({ children }: any) => {
   const { jobStatus, job } = state.wizard.steps.step4
   const [ polling, setPolling ] = useState(false)
   const [ saving, setSaving ] = useState(false)
-  const [ hasError, setHasError ] = useState(false)
   const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
 
   // if a job is pending or running,
   // continuously short poll the job until its status is DONE
   useEffect(() => {
-    if (!job || hasError) {
-      return
-    }
+    if (!job) { return }
     if (needsSaving && !saving) {
       console.log('saveToModelStateTable')
       saveToModelStateTable()
     }
-    // if (jobStatus !== JOB_STATUSES.done && !polling && modelNameParam) {
-    //   getJobStatus()
-    // }
   })
 
   useEffect(() => {
-    if (!job || hasError || polling) {
-      return
-    }
-    if (jobStatus !== JOB_STATUSES.done && modelNameParam) {
+    if (!job || polling || !modelNameParam) { return }
+    if (jobStatus !== JOB_STATUSES.done) {
       console.log('getJobStatus')
       getJobStatus()
     }
@@ -90,13 +82,11 @@ export const ModelProvider = ({ children }: any) => {
   const getJobStatus = async () => {
     try {
       if (!job.jobId || !pollJobStatus) {
-        throw "Missing jobid or failed instantiation of BQ"
+        throw "Missing jobid or failed instantiation of BQMLProvider"
       }
       setPolling(true)
       pollCanceler?.cancel()
-      setPollCanceler(undefined)
-
-      const { promise, cancel } = pollJobStatus(job.jobId, 10000)
+      const { promise, cancel } = pollJobStatus(job.jobId, 20000)
       console.log('setting canceler')
       setPollCanceler({ cancel })
 
@@ -120,11 +110,10 @@ export const ModelProvider = ({ children }: any) => {
           job: body.jobReference
         }
       })
-      setPolling(false)
     } catch (error: any) {
       dispatch({ type: 'addError', error: "An error occurred while fetching the job status: " + error})
+    } finally {
       setPolling(false)
-      setHasError(true)
     }
   }
 
