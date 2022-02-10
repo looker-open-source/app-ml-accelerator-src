@@ -28,12 +28,6 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
 
       useEffect(() => {
         const stepComplete = isStepComplete(stepData, objective)
-        if (stepComplete) {
-          dispatch({
-            type: 'setUnlockedStep',
-            step: nextStep
-          })
-        }
         setStepComplete(stepComplete)
       }, [stepData])
 

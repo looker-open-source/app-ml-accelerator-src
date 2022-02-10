@@ -2,6 +2,7 @@ import React from 'react'
 import { WIZARD_STEPS } from "../../constants"
 import { useHistory, useParams} from 'react-router-dom'
 import { Button } from '@looker/components'
+import { useStore } from '../../contexts/StoreProvider'
 
 type StepCompleteParams = {
   isStepComplete?: boolean
@@ -19,6 +20,7 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
   handleCompleteClick
 }) => {
   const history = useHistory()
+  const { state, dispatch } = useStore()
   const { modelNameParam } = useParams<{modelNameParam: string}>()
 
   const handleClick = async () => {
@@ -27,10 +29,19 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
       const complete = await handleCompleteClick()
       if (!complete) { return }
     }
+
+    const nextStep = stepNumber + 1
+    if (stepNumber == state.wizard.unlockedStep) {
+      dispatch({
+        type: 'setUnlockedStep',
+        step: nextStep
+      })
+    }
+
     if (modelNameParam) {
-      history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}/${modelNameParam}`)
+      history.push(`/ml/${WIZARD_STEPS[`step${nextStep}`]}/${modelNameParam}`)
     } else{
-      history.push(`/ml/${WIZARD_STEPS[`step${stepNumber + 1}`]}`)
+      history.push(`/ml/${WIZARD_STEPS[`step${nextStep}`]}`)
     }
   }
 

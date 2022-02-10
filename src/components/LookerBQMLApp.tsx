@@ -12,15 +12,15 @@ export const _LookerBQMLApp: React.FC = () => {
   const { expired, setExpired } = useContext(BQMLContext)
 
   useEffect(() => {
-    if (signOut && expired) {
+    if (signOut && expired && token) {
       debugger
-      setExpired?.(false)
       signOut()
+      setExpired?.(false)
     }
     if (signIn && !loggingIn && !token) {
       debugger
       signIn()
-      return
+      setExpired?.(false)
     }
   })
 
