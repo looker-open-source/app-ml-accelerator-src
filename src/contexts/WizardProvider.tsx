@@ -60,8 +60,10 @@ export const WizardProvider = ({ children }: any) => {
   const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
 
 
+  // on first load
   useEffect(() => {
     if (modelNameParam) {
+      // load model from saved state
       setLoadingModel(true)
       loadModel().finally(() =>
         setLoadingModel(false)
@@ -71,6 +73,8 @@ export const WizardProvider = ({ children }: any) => {
     }
   }, [])
 
+  // load a saved model
+  // fetch any data needed to fill out wizard state
   const loadModel = async () => {
     try {
       const modelState = await getSavedModelState?.(modelNameParam)

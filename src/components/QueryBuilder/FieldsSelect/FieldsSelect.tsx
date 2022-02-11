@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"
 import { useStore } from "../../../contexts/StoreProvider"
 import { WizardContext } from "../../../contexts/WizardProvider"
-import { mapAPIExploreToClientExplore } from "../../../services/explores"
 import FieldsDirectory from '../FieldsDirectory'
 import Spinner from '../../Spinner'
 import "./FieldsSelect.scss"

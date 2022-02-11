@@ -52,13 +52,12 @@ type IBQMLContext = {
 export const BQMLContext = createContext<IBQMLContext>({})
 
 /**
- * BQML provider that exposes a simple wrapper around the Google
+ * BQML provider that exposes a wrapper around the Google
  * BQML restful API.
  */
 export const BQMLProvider = ({ children }: any) => {
   const { token } = useContext(OauthContext)
   const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
-
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
   const { gcpProject, bqmlModelDatasetName } = state.userAttributes

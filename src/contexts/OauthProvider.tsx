@@ -62,7 +62,7 @@ export const OauthProvider = ({
    */
   const signIn = async () => {
     if (!clientId) { return }
-    if (attempts > 3) {
+    if (attempts > 2) {
       throw "Attempted to login to Oauth too many times.  Please refresh your page."
     }
     try {

@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useRef } from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import { FieldText, Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
@@ -14,7 +14,6 @@ import { isArima, MODEL_TYPES } from '../../services/modelTypes'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const history = useHistory()
   const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
