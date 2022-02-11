@@ -28,6 +28,7 @@ import { useStore } from './StoreProvider'
 import { formatSummaryFilter, formBQViewSQL } from '../services/summary'
 import { SUMMARY_MODEL, SUMMARY_EXPLORE } from '../constants'
 import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
+import { WizardContext } from './WizardProvider'
 
   type ISummaryContext = {
     getSummaryData?: (
@@ -51,7 +52,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
    */
   export const SummaryProvider = ({ children }: any) => {
     const { state, dispatch } = useStore()
-    const { coreSDK: sdk } = useContext(ExtensionContext2)
+    const { fetchSummary, saveSummary } = useContext(WizardContext)
     const { queryJob, pollJobStatus, getJob } = useContext(BQMLContext)
     const { gcpProject, bqmlModelDatasetName } = state.userAttributes
     const [ previousBQValues, setPreviousBQValues ] = useState<any>({
@@ -102,11 +103,14 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
      * Creates the Summary statistics table
      */
     const getSummaryData = async(
-      querySql: string | undefined,
-      bqModelName: string | undefined,
-      targetField: string | undefined
+      querySql?: string,
+      bqModelName?: string,
+      targetField?: string
     ): Promise<any> => {
       try {
+        if (!querySql || !bqModelName || !targetField) {
+          throw "Failed to fetch summary."
+        }
         // in an effort to limit the number of calls to BigQuery
         // do not create the BQ view if its alrady been created for this sql and model name
         if (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model) {
@@ -114,24 +118,30 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
           await createBQMLView(querySql, bqModelName)
         }
 
-        // fetch explore to retrieve all field names
-        const { value: explore } = await sdk.lookml_model_explore(SUMMARY_MODEL, SUMMARY_EXPLORE)
+        const { ok, value } = await fetchSummary?.(bqModelName, targetField)
+        if (!ok || !value) {
+          throw "Failed to fetch summary."
+        }
+        saveSummary?.(value, state.wizard)
+        return { ok, value }
+        // // fetch explore to retrieve all field names
+        // const { value: explore } = await sdk.lookml_model_explore(SUMMARY_MODEL, SUMMARY_EXPLORE)
 
-        // query the summary table filtering on our newly created BQML data
-        const { value: query } = await sdk.create_query({
-          model:  SUMMARY_MODEL,
-          view: SUMMARY_EXPLORE,
-          fields: explore.fields.dimensions.map((d: any) => d.name),
-          filters: {
-            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatSummaryFilter(bqModelName || "")}^_input^_data`,
-            [`${SUMMARY_EXPLORE}.target_field_name`]: formatSummaryFilter(targetField || "")
-          }
-        })
+        // // query the summary table filtering on our newly created BQML data
+        // const { value: query } = await sdk.create_query({
+        //   model:  SUMMARY_MODEL,
+        //   view: SUMMARY_EXPLORE,
+        //   fields: explore.fields.dimensions.map((d: any) => d.name),
+        //   filters: {
+        //     [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatSummaryFilter(bqModelName || "")}^_input^_data`,
+        //     [`${SUMMARY_EXPLORE}.target_field_name`]: formatSummaryFilter(targetField || "")
+        //   }
+        // })
 
-        return await sdk.run_query({
-          query_id: query.id,
-          result_format: "json_detail",
-        })
+        // return await sdk.run_query({
+        //   query_id: query.id,
+        //   result_format: "json_detail",
+        // })
       } catch(error) {
         dispatch({type: 'addError', error: "Failed to fetch summary.  Please try again."})
         return { ok: false }

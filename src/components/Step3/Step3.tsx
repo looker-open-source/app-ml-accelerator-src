@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react'
+import React, { useEffect, useContext, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import { FieldText, Select } from "@looker/components"
@@ -18,7 +18,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const { needsSaving } = state.wizard
   const { objective } = state.wizard.steps.step1
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
@@ -47,39 +47,27 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     sourceColumns,
     'date'
   ) : null
+  const firstUpdate = useRef(true)
 
   useEffect(() => {
+    // don't run on component mount
+    if(firstUpdate.current) {
+      firstUpdate.current = false
+      return
+    }
+
     if (
       !targetField ||
       !bqModelName ||
       hasSummaryData(summary, exploreName, modelName, targetField)
     ) {
-      setIsLoading(false)
       return
     }
+
     setIsLoading(true)
-    fetchSummary().finally(() => setIsLoading(false))
+    getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
+      .finally(() => setIsLoading(false))
   }, [exploreName, targetField])
-
-  const fetchSummary = async () => {
-    const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
-    if (!ok || !value) {
-      return
-    }
-
-    const fields = (value.fields || {})
-    const summaryData = renameSummaryDataKeys(value.data)
-    updateStepData({
-      selectedFields: summaryData.map((d: any) => d["column_name"].value),
-      summary: {
-        exploreName,
-        modelName,
-        target: targetField,
-        data: summaryData,
-        fields: [...fields.dimensions, ...fields.measures]
-      }
-    })
-  }
 
   const updateStepData = (data: any) => {
     dispatch({

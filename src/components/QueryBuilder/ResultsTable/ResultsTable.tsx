@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import { getHeaderColumns, findSortedHeader } from '../../../services/resultsTable'
 import { useStore } from '../../../contexts/StoreProvider'
 import { ResultsTableHeaderItem } from '../../../types'
@@ -12,8 +12,14 @@ import Spinner from '../../Spinner'
 export const ResultsTable: React.FC = () => {
   const { state, dispatch } = useStore()
   const { selectedFields, exploreData, ranQuery, sorts, tableHeaders } = state.wizard.steps.step2
+  const firstUpdate = useRef(true)
 
   useEffect(() => {
+    // don't run on component mount
+    if(firstUpdate.current) {
+      firstUpdate.current = false
+      return
+    }
     const headers = getHeaderColumns(
       selectedFields,
       ranQuery,

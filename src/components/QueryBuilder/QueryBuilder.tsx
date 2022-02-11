@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react"
+import React, { useEffect, useContext, useRef } from "react"
 import { useStore } from "../../contexts/StoreProvider"
 import NoExplorePlaceHolder from './NoExplorePlaceHolder'
 import ExploreSelect from './ExploreSelect'
@@ -6,7 +6,6 @@ import ExploreFilter from "./ExploreFilter"
 import FieldsSelect from './FieldsSelect'
 import QueryPane from './QueryPane'
 import { hasOrphanedSorts } from '../../services/resultsTable'
-import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
 
@@ -18,9 +17,15 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
   const { state, dispatch } = useStore()
   const { step2 } = state.wizard.steps
+  const firstUpdate = useRef(true)
 
   // re-run the query when a sort is applied
   useEffect(() => {
+    // don't run on component mount
+    if(firstUpdate.current) {
+      firstUpdate.current = false
+      return
+    }
     if (!step2.ranQuery?.data) { return }
     setIsLoading(true)
     runQuery()
@@ -39,7 +44,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     }
     setIsLoading(true)
     const {results, exploreUrl} = await createAndRunQuery?.(step2)
-    saveQueryToState?.(results, exploreUrl)
+    saveQueryToState?.(step2, results, exploreUrl)
     setIsLoading(false)
   }
 
