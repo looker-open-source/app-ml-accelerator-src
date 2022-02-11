@@ -129,14 +129,11 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return { ok }
   }
 
-  const handleCompleteClick = async (): Promise<boolean> => {
+  const handleCompleteClick = async (): Promise<any> => {
     if (!needsSaving) { return true }
     setIsLoading(true)
     const { ok } = await createModel()
-    if (ok) {
-      history.push(`/ml/${WIZARD_STEPS['step4']}/${bqModelName}`)
-    }
-    return false
+    return { ok, data: { bqModelName } }
   }
 
   const stepCompleteButtonText = () => (
@@ -144,7 +141,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       needsSaving ?
         "Update Model" :
         "Continue" :
-      "CreateModel"
+      "Create Model"
   )
 
   return (
