@@ -26,10 +26,13 @@ import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
 import { poll } from '../services/common'
-import { JOB_STATUSES } from '../constants'
+import { generateModelState } from '../services/modelState'
+import { JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
+import { WizardState } from '../types'
 
 type IBQMLContext = {
-  expired?: boolean
+  expired?: boolean,
+  setExpired?: (value: boolean) => void,
   queryJob?: (sql: string) => Promise<any>,
   getJob?: (props: any) => Promise<any>,
   pollJobStatus?: (
@@ -39,21 +42,25 @@ type IBQMLContext = {
   ) => {
     promise: Promise<any>,
     cancel: () => void
-  }
+  },
+  createModelStateTable?: () => Promise<any>,
+  insertOrUpdateModelState?: (wizardState: WizardState) => Promise<any>,
+  getAllSavedModels?: () => Promise<any>,
+  getSavedModelState?: (modelName: string) => Promise<any>
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
 
 /**
- * BQML provider that exposes a simple wrapper around the Google
+ * BQML provider that exposes a wrapper around the Google
  * BQML restful API.
  */
 export const BQMLProvider = ({ children }: any) => {
   const { token } = useContext(OauthContext)
+  const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
-  const { extensionSDK } = useContext(ExtensionContext2)
-  const { gcpProject } = state.userAttributes
+  const { gcpProject, bqmlModelDatasetName } = state.userAttributes
 
   /**
    * Low level invocation of the BigQuery API.
@@ -137,13 +144,111 @@ export const BQMLProvider = ({ children }: any) => {
     return { promise, cancel }
   }
 
+  const createModelStateTable = () => {
+    const sql = `
+      CREATE TABLE IF NOT EXISTS ${bqmlModelDatasetName}.bqml_model_info
+                  (model_name         STRING,
+                   state_json         STRING,
+                   created_by_email   STRING)
+    `
+    return queryJob(sql)
+  }
+
+  const insertOrUpdateModelState = (wizardState: WizardState) => {
+    const  { bqModelName } = wizardState.steps.step3
+    const { email: userEmail } = state.user
+    console.log({ 'saving_state': wizardState})
+    const stateJson = JSON.stringify(generateModelState(wizardState))
+
+    const sql = `
+      MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
+          USING (SELECT '${bqModelName}' AS model_name
+                  , '${stateJson}' as state_json
+                  , '${userEmail}' as created_by_email
+                ) AS S
+          ON T.model_name = S.model_name
+          WHEN MATCHED THEN
+            UPDATE SET state_json=S.state_json
+          WHEN NOT MATCHED THEN
+            INSERT (model_name, state_json, created_by_email)
+            VALUES(model_name, state_json, created_by_email)
+    `
+    return queryJob(sql)
+  }
+
+  const getSavedModels = async (
+    filters: {[key: string]: string},
+    fields?: string[]
+  ) => {
+    try {
+      const { value: query } = await coreSDK.create_query({
+        model:  'bqml_extension',
+        view: 'model_info',
+        fields: fields || Object.values(MODEL_STATE_TABLE_COLUMNS),
+        filters
+      })
+      const { ok, value } = await coreSDK.run_query({
+        query_id: query.id,
+        result_format: "json_detail",
+      })
+      if (!ok) {
+        throw "Please try refreshing the page."
+      }
+      if (value.errors && value.errors.length >= 1) {
+        throw value.errors[0].message
+      }
+      return { ok, value }
+    } catch (error) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to retrieves model(s): ' + error
+      })
+      return { ok: false }
+    }
+  }
+
+  const getAllSavedModels = async () => {
+    const { email: userEmail } = state.user
+    if (!userEmail) { return { ok: false } }
+    return await getSavedModels({
+      [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
+    }, [MODEL_STATE_TABLE_COLUMNS.modelName])
+  }
+
+  const getSavedModelState = async (modelName: string) => {
+    try {
+      if (!modelName) { return { ok: false } }
+
+      const { value } = await getSavedModels({
+        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
+      })
+      const savedData = value.data[0]
+      const stateJson = savedData ? savedData[MODEL_STATE_TABLE_COLUMNS.stateJson].value : null
+      if (!stateJson) {
+        throw "Please try again."
+      }
+      return JSON.parse(stateJson)
+    } catch (error) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to retrieve model: ' + error
+      })
+      return false
+    }
+  }
+
   return (
     <BQMLContext.Provider
       value={{
         expired,
+        setExpired,
         queryJob,
         getJob,
-        pollJobStatus
+        pollJobStatus,
+        createModelStateTable,
+        insertOrUpdateModelState,
+        getAllSavedModels,
+        getSavedModelState
       }}
     >
       {children}

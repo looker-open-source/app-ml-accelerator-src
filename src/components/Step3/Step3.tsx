@@ -1,23 +1,32 @@
-import React, { useEffect, useContext, useState } from 'react'
+import React, { useEffect, useContext, useState, useRef } from 'react'
+import { useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import { FieldText, Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '../../services/summary'
+import { hasSummaryData, buildFieldSelectOptions } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
 import './Step3.scss'
 import { wizardInitialState } from '../../reducers/wizard'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
-import { JOB_STATUSES } from '../../constants'
+
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
+  const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const { needsSaving } = state.wizard
   const { objective } = state.wizard.steps.step1
   const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
+
+  if (!exploreName || !modelName) {
+    dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
+    return null
+  }
+
   const {
     summary,
     selectedFields,
@@ -26,55 +35,38 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     arimaTimeColumn
   } = state.wizard.steps.step3
   const arima = isArima(objective || "")
-  const columnCount = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []].length
+  const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
-    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])],
+    sourceColumns,
     objective ? MODEL_TYPES[objective].targetDataType : null
   )
   const timeColumnFieldOptions = arima ? buildFieldSelectOptions(
     exploreData?.fieldDetails,
-    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])],
+    sourceColumns,
     'date'
   ) : null
-
-  if (!exploreName || !modelName) {
-    dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
-    return null
-  }
+  const firstUpdate = useRef(true)
 
   useEffect(() => {
+    // don't run on component mount
+    if(firstUpdate.current) {
+      firstUpdate.current = false
+      return
+    }
+
     if (
       !targetField ||
       !bqModelName ||
       hasSummaryData(summary, exploreName, modelName, targetField)
     ) {
-      setIsLoading(false)
       return
     }
+
     setIsLoading(true)
-    fetchSummary().finally(() => setIsLoading(false))
+    getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
+      .finally(() => setIsLoading(false))
   }, [exploreName, targetField])
-
-  const fetchSummary = async () => {
-    const { ok, value } = await getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
-    if (!ok || !value) {
-      return
-    }
-
-    const fields = (value.fields || {})
-    const summaryData = renameSummaryDataKeys(value.data)
-    updateStepData({
-      selectedFields: summaryData.map((d: any) => d["column_name"]),
-      summary: {
-        exploreName,
-        modelName,
-        target: targetField,
-        data: summaryData,
-        fields: [...fields.dimensions, ...fields.measures]
-      }
-    })
-  }
 
   const updateStepData = (data: any) => {
     dispatch({
@@ -88,7 +80,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     updateStepData({
       bqModelName: e.target.value,
       targetField: '',
-      summary: wizardInitialState.steps.step3.summary
+      summary: {...wizardInitialState.steps.step3.summary}
     })
   }
 
@@ -111,34 +103,38 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     }
   }
 
-  async function createModel() {
-    const { ok, body } = await createBQMLModel?.(
+  const createModel = async () => {
+    const { ok } = await createBQMLModel?.(
       objective,
       bqModelName,
       targetField,
       arimaTimeColumn
     )
-
-    dispatch({
-      type: 'addToStepData',
-      step: 'step4',
-      data: {
-        jobStatus: ok ? JOB_STATUSES.pending : "FAILED",
-        job: ok ? body.jobReference : null
-      }
-    })
+    setIsLoading(false)
+    return { ok }
   }
 
-  const handleCompleteClick = () => {
-    createModel()
+  const handleCompleteClick = async (): Promise<any> => {
+    if (!needsSaving) { return true }
+    setIsLoading(true)
+    const { ok } = await createModel()
+    return { ok, data: { bqModelName } }
   }
+
+  const stepCompleteButtonText = () => (
+    modelNameParam ?
+      needsSaving ?
+        "Update Model" :
+        "Continue" :
+      "Create Model"
+  )
 
   return (
     <StepContainer
       isLoading={isLoading}
       stepComplete={stepComplete}
       stepNumber={3}
-      buttonText="Create Model"
+      buttonText={stepCompleteButtonText()}
       handleCompleteClick={handleCompleteClick}
     >
       <div className="model-blocks">
@@ -150,6 +146,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             value={bqModelName}
             placeholder="Model_Name"
             onKeyPress={alphaNumericOnly}
+            disabled={!!modelNameParam}
           />
         </div>
         <div className="wizard-card">
@@ -180,10 +177,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         <div className="wizard-card">
           <h2>Data Summary Statistics</h2>
           <div className="summary-factoid">
-            Columns: <span className="factoid-bold">{columnCount}</span>
+            Columns: <span className="factoid-bold">{sourceColumns.length}</span>
           </div>
           <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{ranQuery?.data?.length}</span>
+            Rows: <span className="factoid-bold">{ranQuery?.rowCount || '???'}</span>
           </div>
         </div>
       </div>

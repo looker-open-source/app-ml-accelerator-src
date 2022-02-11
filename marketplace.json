@@ -16,8 +16,8 @@
       "type": "string",
       "default_value": ""
     },
-    "looker_temp_dataset_name": {
-      "label": "Looker Temp Dataset Name",
+    "bqml_model_dataset_name": {
+      "label": "BQML Model Dataset Name",
       "type": "string",
       "default_value": ""
     },

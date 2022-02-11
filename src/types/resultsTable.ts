@@ -12,6 +12,7 @@ export type RanQuery = {
   dimensions: string[],
   measures: string[],
   data: any[],
+  rowCount: number,
   sql: string,
   exploreUrl: string
 }

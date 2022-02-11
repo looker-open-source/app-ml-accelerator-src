@@ -1,13 +1,14 @@
 import React from "react"
 import { ButtonOutline } from "@looker/components"
+import { Link } from "react-router-dom"
 
 export const TitleBar : React.FC = () => {
   return (
     <div className="TitleBar_container">
       <div className="title-logo">
-        <div className="title-logo-text">
+        <Link to={'/'} className="title-logo-text">
           BigQuery ML<span>app</span>
-        </div>
+        </Link>
       </div>
       <div className="button_container">
         <ButtonOutline className="ToolBar-button">Model Admin</ButtonOutline>

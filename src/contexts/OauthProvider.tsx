@@ -29,7 +29,7 @@ type IOauthContext = {
   loggingIn?: boolean
   token?: string
   signIn?: () =>  Promise<boolean | undefined>
-  signOut?: () => void
+  signOut?: (expiredAttempt?: boolean) => void
 }
 
 export const OauthContext = createContext<IOauthContext>({})
@@ -53,14 +53,18 @@ export const OauthProvider = ({
 }: OauthProviderProps) => {
   const { extensionSDK } = useContext(ExtensionContext2)
   const { dispatch } = useStore()
-  const [loggingIn, setLoggingIn] = useState(false)
+  const [ loggingIn, setLoggingIn ] = useState<boolean>(false)
   const [ token, setToken ] = useState<string>()
+  const [ attempts, setAttempts ] = useState<number>(0)
 
   /**
    * OAUTH2 authentication.
    */
   const signIn = async () => {
     if (!clientId) { return }
+    if (attempts > 2) {
+      throw "Attempted to login to Oauth too many times.  Please refresh your page."
+    }
     try {
       setLoggingIn(true)
       const response = await extensionSDK.oauth2Authenticate(authUrl, {
@@ -70,8 +74,10 @@ export const OauthProvider = ({
       })
       const { access_token } = response
       setToken(access_token)
+      setAttempts(0)
       return true
     } catch (error) {
+      setAttempts(attempts + 1)
       dispatch({
         type: 'addError',
         error: 'Failed to sign in to Oauth.  Please reload.'
@@ -87,7 +93,10 @@ export const OauthProvider = ({
    * Removes the token. Note that the token is
    * still active if it has not already expired.
    */
-  const signOut = () => {
+  const signOut = (expiredAttempt: boolean = false) => {
+    if (expiredAttempt) {
+      setAttempts(attempts + 1)
+    }
     setToken(undefined)
   }
 

@@ -23,7 +23,7 @@ export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selected
 
   const toggleAllFields = (evt: any): void => {
     const checked: boolean = evt.currentTarget.checked
-    const selectedFields = checked ? summaryData.map((d) => d["column_name"]) : []
+    const selectedFields = checked ? summaryData.map((d) => d["column_name"].value) : []
     updateSelectedFields(selectedFields)
     setAllChecked(checked)
   }

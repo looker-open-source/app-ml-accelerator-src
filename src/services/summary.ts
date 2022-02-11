@@ -4,17 +4,17 @@ import { titilize } from './string'
 
 export const formBQViewSQL = (
   sql: string | undefined,
-  lookerTempDatasetName: string | undefined,
+  bqmlModelDatasetName: string | undefined,
   bqModelName: string | undefined
 ) => {
   if (
     !sql ||
-    !lookerTempDatasetName ||
+    !bqmlModelDatasetName ||
     !bqModelName
   ) {
     return false
   }
-  return `CREATE OR REPLACE VIEW ${lookerTempDatasetName}.${bqModelName}_input_data AS ${sql}`
+  return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${sql}`
 }
 
 const splitFieldName = (fieldName: string) => {
@@ -72,7 +72,7 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[],
   const fields = [...fieldDetails.dimensions, ...fieldDetails.measures]
   const indexedFields: { [key: string]: Field } = keyBy(fields, 'name')
 
-  const options = compact(fieldNames.map((name: string) => {
+  const options = fieldNames.map((name: string) => {
     const field = indexedFields[name]
     if (!field) { return null }
     // remove all fields that arent of the desired type
@@ -89,9 +89,9 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[],
       value: field.name,
       color: field.category === "measure" ? "#C2772E" : "#262D33"
     };
-  }))
+  })
 
-  return [{ label: 'Select a Target Field', value: undefined }, ...options]
+  return compact(options)
 }
 
 export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {

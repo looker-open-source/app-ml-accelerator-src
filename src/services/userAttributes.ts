@@ -1,5 +1,5 @@
 import { ExtensionSDK } from '@looker/extension-sdk'
-import { BIGQUERY_CONN, GOOGLE_CLIENT_ID, LOOKER_TEMP_DATASET_NAME, GCP_PROJECT } from '../constants'
+import { BIGQUERY_CONN, GOOGLE_CLIENT_ID, BQML_MODEL_DATASET_NAME, GCP_PROJECT } from '../constants'
 
 export async function getBigQueryConnectionName(extensionSDK: ExtensionSDK) {
   try {
@@ -29,14 +29,14 @@ export async function getGoogleClientID(extensionSDK: ExtensionSDK) {
   }
 }
 
-export async function getLookerTempDataSetName(extensionSDK: ExtensionSDK) {
+export async function getBqmlModelDatasetName(extensionSDK: ExtensionSDK) {
   try {
-    const lookerTempDatasetName = await extensionSDK.userAttributeGetItem(LOOKER_TEMP_DATASET_NAME)
-    return lookerTempDatasetName
+    const bqmlModelDatasetName = await extensionSDK.userAttributeGetItem(BQML_MODEL_DATASET_NAME)
+    return bqmlModelDatasetName
   } catch (error) {
     try {
       // Hardcoded value for when the extension has not been installed via the marketplace
-      return process.env.LOOKER_TEMP_DATASET_NAME
+      return process.env.BQML_MODEL_DATASET_NAME
     } catch (err) {
       throw new Error("A Looker Temp Dataset Name name must be provided.")
     }
@@ -61,11 +61,11 @@ export async function getAllUserAttributes(extensionSDK: ExtensionSDK) {
   const bigQueryConn = await getBigQueryConnectionName(extensionSDK)
   const googleClientId = await getGoogleClientID(extensionSDK)
   const gcpProject = await getGCPProject(extensionSDK)
-  const lookerTempDatasetName = await getLookerTempDataSetName(extensionSDK)
+  const bqmlModelDatasetName = await getBqmlModelDatasetName(extensionSDK)
   return {
     bigQueryConn,
     googleClientId,
     gcpProject,
-    lookerTempDatasetName
+    bqmlModelDatasetName
   }
 }

@@ -33,7 +33,7 @@ export const isArima = (objective: string): boolean => (
 
 type IFormSQLProps = {
   gcpProject: string,
-  lookerTempDatasetName: string,
+  bqmlModelDatasetName: string,
   bqModelName: string,
   target: string,
   arimaTimeColumn?: string
@@ -45,7 +45,7 @@ interface IFormBoostedTreeTypeSQLProps extends IFormSQLProps {
 
 const formBoostedTreeSQL = ({
   gcpProject,
-  lookerTempDatasetName,
+  bqmlModelDatasetName,
   bqModelName,
   target,
   boostedType
@@ -54,11 +54,11 @@ const formBoostedTreeSQL = ({
   // TODO: Replace Select * with Select ${feature_fields}
   // *******
   return `
-    CREATE OR REPLACE MODEL ${lookerTempDatasetName}.${bqModelName}_boosted_tree_${boostedType.toLowerCase()}
+    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}_boosted_tree_${boostedType.toLowerCase()}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}',
           BOOSTER_TYPE = 'GBTREE',
           INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])
-    AS SELECT * FROM \`${gcpProject}.${lookerTempDatasetName}.${bqModelName}_input_data\`;
+    AS SELECT * FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`;
   `
 }
 
@@ -72,20 +72,20 @@ const formBoostedTreeRegressorSQL = (props: IFormSQLProps): string => {
 
 const formArimaSQL = ({
   gcpProject,
-  lookerTempDatasetName,
+  bqmlModelDatasetName,
   bqModelName,
   target,
   arimaTimeColumn
 }: IFormSQLProps) => {
   return `
-    CREATE OR REPLACE MODEL ${lookerTempDatasetName}.${bqModelName}_arima
+    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}_arima
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
       , time_series_timestamp_col = '${arimaTimeColumn}'
       , time_series_data_col = '${target}'
       , HORIZON = 1000
       , HOLIDAY_REGION = 'none'
       , AUTO_ARIMA = TRUE)
-    AS (SELECT * FROM \`${gcpProject}.${lookerTempDatasetName}.${bqModelName}_input_data\`) ;
+    AS (SELECT * FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`) ;
   `
 }
 

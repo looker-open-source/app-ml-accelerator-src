@@ -22,14 +22,13 @@
  * THE SOFTWARE.
  */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { ExtensionContext2 } from '@looker/extension-sdk-react'
+import { useParams } from 'react-router-dom'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { JOB_STATUSES } from '../constants'
 
 type IModelContext = {
-  cancelPoll?: (jobId: string) => void,
-  cancelAllPolls?: () => void
+  stopPolling?: () => void
 }
 
 export const ModelContext = createContext<IModelContext>({})
@@ -38,51 +37,51 @@ export const ModelContext = createContext<IModelContext>({})
  * Model provider
  */
 export const ModelProvider = ({ children }: any) => {
+  const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
-  const { coreSDK: sdk } = useContext(ExtensionContext2)
   const { pollJobStatus } = useContext(BQMLContext)
   const { jobStatus, job } = state.wizard.steps.step4
   const [ polling, setPolling ] = useState(false)
-  const [ hasError, setHasError ] = useState(false)
-  const [ pollCancelers, setPollCancelers ] = useState<{[key: string]: () => void}>({})
+  const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
 
   // if a job is pending or running,
   // continuously short poll the job until its status is DONE
   useEffect(() => {
-    if (!jobStatus || jobStatus === JOB_STATUSES.done || polling || hasError) {
-      return
+    if (!job || polling || !modelNameParam) { return }
+    if (jobStatus !== JOB_STATUSES.done) {
+      getJobStatus()
     }
-    getJobStatus()
-  })
+  }, [])
 
-  const cancelPoll = (jobId: string) => {
-    pollCancelers[jobId]?.()
+  const stopPolling = () => {
+    if (!pollCanceler) { return }
+    pollCanceler.cancel()
+    setPolling(false)
   }
 
-  const cancelAllPolls = () => {
-    for (const key in pollCancelers) {
-      pollCancelers[key]()
-    }
-  }
-
+  // Starts a short poll of the job status
+  // Ends when either the fetched job's status is "done" or is canceled with stopPolling method
   const getJobStatus = async () => {
     try {
       if (!job.jobId || !pollJobStatus) {
-        throw "Missing jobid or failed instantiation of BQ"
+        throw "Missing jobid or failed instantiation of BQMLProvider"
       }
       setPolling(true)
-      const { promise, cancel } = pollJobStatus(job.jobId, 10000)
-      setPollCancelers({
-        [job.jobId]: cancel,
-        ...pollCancelers
-      })
+      pollCanceler?.cancel()
+      const { promise, cancel } = pollJobStatus(job.jobId, 20000)
+      console.log('setting canceler')
+      setPollCanceler({ cancel })
 
+      // this will wait here until the polling is finished
+      // either the job status == done or polling has been canceled
       const { ok, body, canceled } = await promise
+
       if (canceled) { return }
       if (!ok) {
         throw "Failed to retrieve job status"
       }
       if (body.status.errorResult) {
+        dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
         throw body.status.errorResult.message
       }
       dispatch({
@@ -93,20 +92,17 @@ export const ModelProvider = ({ children }: any) => {
           job: body.jobReference
         }
       })
-      setPolling(false)
     } catch (error: any) {
       dispatch({ type: 'addError', error: "An error occurred while fetching the job status: " + error})
+    } finally {
       setPolling(false)
-      setHasError(true)
     }
   }
-
 
   return (
     <ModelContext.Provider
       value={{
-        cancelPoll,
-        cancelAllPolls
+        stopPolling,
       }}
     >
       {children}
