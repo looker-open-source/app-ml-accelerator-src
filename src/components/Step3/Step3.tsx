@@ -36,15 +36,15 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     arimaTimeColumn
   } = state.wizard.steps.step3
   const arima = isArima(objective || "")
-  const columnCount = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []].length
+  const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
-    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])],
+    sourceColumns,
     objective ? MODEL_TYPES[objective].targetDataType : null
   )
   const timeColumnFieldOptions = arima ? buildFieldSelectOptions(
     exploreData?.fieldDetails,
-    [...(ranQuery?.dimensions || []), ...(ranQuery?.measures || [])],
+    sourceColumns,
     'date'
   ) : null
 
@@ -203,10 +203,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         <div className="wizard-card">
           <h2>Data Summary Statistics</h2>
           <div className="summary-factoid">
-            Columns: <span className="factoid-bold">{columnCount}</span>
+            Columns: <span className="factoid-bold">{sourceColumns.length}</span>
           </div>
           <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{ranQuery?.data?.length}</span>
+            Rows: <span className="factoid-bold">{ranQuery?.rowCount || '???'}</span>
           </div>
         </div>
       </div>

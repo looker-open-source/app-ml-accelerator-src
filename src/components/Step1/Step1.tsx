@@ -1,10 +1,10 @@
 import React from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import './Step1.scss'
 import { MODEL_TYPES } from '../../services/modelTypes'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
+import './Step1.scss'
 
 const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { state, dispatch } = useStore()

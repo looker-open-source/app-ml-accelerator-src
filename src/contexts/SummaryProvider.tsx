@@ -154,6 +154,11 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
           (isArima(objective) && !arimaTimeColumn)
         ) { return }
 
+        // TODO:
+        // CHECK THAT MODEL NAME IS NOT ALREADY TAKEN BY ANOTHER USER
+        // IF ITS THEIR OWN EXISTING MODEL & NO modelNameParam,
+        // PROMPT THE USER TO CONFIRM THEY WANT TO OVERWRITE THEIR OWN MODEL
+
         const sql = MODEL_TYPE_CREATE_METHOD[objective]({
           gcpProject,
           bqmlModelDatasetName,

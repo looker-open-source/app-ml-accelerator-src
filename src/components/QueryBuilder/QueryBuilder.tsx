@@ -8,13 +8,14 @@ import QueryPane from './QueryPane'
 import { hasOrphanedSorts } from '../../services/resultsTable'
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 import { Button } from "@looker/components"
+import { WizardContext } from "../../contexts/WizardProvider"
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void
 }
 
 export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => {
-  const { createAndRunQuery } = useContext(QueryBuilderContext)
+  const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
   const { state, dispatch } = useStore()
   const { step2 } = state.wizard.steps
 
@@ -38,24 +39,8 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     }
     setIsLoading(true)
     const {results, exploreUrl} = await createAndRunQuery?.(step2)
-    saveQueryToState(results, exploreUrl)
+    saveQueryToState?.(results, exploreUrl)
     setIsLoading(false)
-  }
-
-  const saveQueryToState = (results: any, exploreUrl: string | undefined) => {
-    dispatch({
-      type: 'addToStepData',
-      step: 'step2',
-      data: {
-        ranQuery: {
-          dimensions: step2.selectedFields.dimensions,
-          measures: step2.selectedFields.measures,
-          data: results.data,
-          sql: results.sql,
-          exploreUrl
-        }
-      }
-    })
   }
 
   const directoryPaneContents = step2.exploreName ?

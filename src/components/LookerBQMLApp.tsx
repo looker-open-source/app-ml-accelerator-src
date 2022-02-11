@@ -1,11 +1,13 @@
 import React, { useContext, useEffect } from 'react'
 import { OauthContext } from '../contexts/OauthProvider'
-import { Switch, Route, Link, withRouter } from 'react-router-dom'
-import './ExtensionApp.scss'
+import { Switch, Route, withRouter } from 'react-router-dom'
+import { BQMLContext } from '../contexts/BQMLProvider'
+import { WizardProvider } from '../contexts/WizardProvider'
 import ErrorBar from './ErrorBar'
 import TitleBar from './TitleBar'
 import MLWizard from './MLWizard'
-import { BQMLContext } from '../contexts/BQMLProvider'
+import HomeLanding from './HomeLanding'
+import './ExtensionApp.scss'
 
 export const _LookerBQMLApp: React.FC = () => {
   const { loggingIn, token, signIn, signOut } = useContext(OauthContext)
@@ -14,7 +16,7 @@ export const _LookerBQMLApp: React.FC = () => {
   useEffect(() => {
     if (signOut && expired && token) {
       debugger
-      signOut()
+      signOut(true)
       setExpired?.(false)
     }
     if (signIn && !loggingIn && !token) {
@@ -32,11 +34,12 @@ export const _LookerBQMLApp: React.FC = () => {
         { !loggingIn && token && (
           <Switch>
             <Route exact path="/">
-              Home
-              <Link to="/ml">ML</Link>
+              <HomeLanding />
             </Route>
             <Route path="/ml">
-              <MLWizard />
+              <WizardProvider>
+                <MLWizard />
+              </WizardProvider>
             </Route>
           </Switch>
         )}

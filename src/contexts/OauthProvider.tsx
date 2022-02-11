@@ -29,7 +29,7 @@ type IOauthContext = {
   loggingIn?: boolean
   token?: string
   signIn?: () =>  Promise<boolean | undefined>
-  signOut?: () => void
+  signOut?: (expiredAttempt?: boolean) => void
 }
 
 export const OauthContext = createContext<IOauthContext>({})
@@ -93,7 +93,10 @@ export const OauthProvider = ({
    * Removes the token. Note that the token is
    * still active if it has not already expired.
    */
-  const signOut = () => {
+  const signOut = (expiredAttempt: boolean = false) => {
+    if (expiredAttempt) {
+      setAttempts(attempts + 1)
+    }
     setToken(undefined)
   }
 

@@ -8,8 +8,6 @@ import './Step4.scss'
 import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
 import { Prompt } from 'react-router-dom'
 
-
-
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { stopPolling, saving } = useContext(ModelContext)
   const [isLoading, setIsLoading] = useState(false)

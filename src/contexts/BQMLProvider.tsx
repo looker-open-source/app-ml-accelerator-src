@@ -27,7 +27,7 @@ import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
 import { poll } from '../services/common'
 import { generateModelState } from '../services/modelState'
-import { JOB_STATUSES } from '../constants'
+import { JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
 
 type IBQMLContext = {
   expired?: boolean,
@@ -43,7 +43,9 @@ type IBQMLContext = {
     cancel: () => void
   },
   createModelStateTable?: () => Promise<any>,
-  insertOrUpdateModelState?: () => Promise<any>
+  insertOrUpdateModelState?: () => Promise<any>,
+  getAllSavedModels?: () => Promise<any>,
+  getSavedModelState?: (modelName: string) => Promise<any>
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
@@ -54,7 +56,7 @@ export const BQMLContext = createContext<IBQMLContext>({})
  */
 export const BQMLProvider = ({ children }: any) => {
   const { token } = useContext(OauthContext)
-  const { extensionSDK } = useContext(ExtensionContext2)
+  const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
 
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
@@ -155,7 +157,7 @@ export const BQMLProvider = ({ children }: any) => {
   const insertOrUpdateModelState = () => {
     const  { bqModelName } = state.wizard.steps.step3
     const { email: userEmail } = state.user
-    const stateJson = JSON.stringify(JSON.stringify(generateModelState(state.wizard)))
+    const stateJson = JSON.stringify(generateModelState(state.wizard))
 
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
@@ -173,6 +175,67 @@ export const BQMLProvider = ({ children }: any) => {
     return queryJob(sql)
   }
 
+  const getSavedModels = async (
+    filters: {[key: string]: string},
+    fields?: string[]
+  ) => {
+    try {
+      const { value: query } = await coreSDK.create_query({
+        model:  'bqml_extension',
+        view: 'model_info',
+        fields: fields || Object.values(MODEL_STATE_TABLE_COLUMNS),
+        filters
+      })
+      const { ok, value } = await coreSDK.run_query({
+        query_id: query.id,
+        result_format: "json_detail",
+      })
+      if (!ok) {
+        throw "Please try refreshing the page."
+      }
+      if (value.errors && value.errors.length >= 1) {
+        throw value.errors[0].message
+      }
+      return { ok, value }
+    } catch (error) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to retrieves model(s): ' + error
+      })
+      return { ok: false }
+    }
+  }
+
+  const getAllSavedModels = async () => {
+    const { email: userEmail } = state.user
+    if (!userEmail) { return { ok: false } }
+    return await getSavedModels({
+      [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
+    }, [MODEL_STATE_TABLE_COLUMNS.modelName])
+  }
+
+  const getSavedModelState = async (modelName: string) => {
+    try {
+      if (!modelName) { return { ok: false } }
+
+      const { value } = await getSavedModels({
+        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
+      })
+      const savedData = value.data[0]
+      const stateJson = savedData ? savedData[MODEL_STATE_TABLE_COLUMNS.stateJson].value : null
+      if (!stateJson) {
+        throw "Please try again."
+      }
+      return JSON.parse(stateJson)
+    } catch (error) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to retrieve model: ' + error
+      })
+      return false
+    }
+  }
+
   return (
     <BQMLContext.Provider
       value={{
@@ -182,7 +245,9 @@ export const BQMLProvider = ({ children }: any) => {
         getJob,
         pollJobStatus,
         createModelStateTable,
-        insertOrUpdateModelState
+        insertOrUpdateModelState,
+        getAllSavedModels,
+        getSavedModelState
       }}
     >
       {children}

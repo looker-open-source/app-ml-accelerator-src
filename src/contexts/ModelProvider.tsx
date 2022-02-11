@@ -59,7 +59,7 @@ export const ModelProvider = ({ children }: any) => {
     if (needsSaving && !saving) {
       persistWizardState()
     }
-  })
+  }, [])
 
   // if a job is pending or running,
   // continuously short poll the job until its status is DONE
