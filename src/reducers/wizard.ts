@@ -168,7 +168,7 @@ function wizardReducer(state: WizardState, action: Action): any {
     }
     case 'clearExplore': {
       const newState = getStepStateClone(state, 'step2', true)
-      newState.steps.step2 = wizardInitialState.steps.step2
+      newState.steps.step2 = {...wizardInitialState.steps.step2}
       return newState
     }
     default: {

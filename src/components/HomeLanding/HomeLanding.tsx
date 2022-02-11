@@ -4,7 +4,6 @@ import { Link, useHistory } from "react-router-dom"
 import { MODEL_STATE_TABLE_COLUMNS, WIZARD_STEPS } from "../../constants"
 import { BQMLContext } from "../../contexts/BQMLProvider"
 import { useStore } from "../../contexts/StoreProvider"
-import { buildWizardState } from "../../services/modelState"
 import './HomeLanding.scss'
 
 export const HomeLanding : React.FC = () => {

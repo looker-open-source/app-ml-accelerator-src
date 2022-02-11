@@ -62,11 +62,13 @@ export const buildWizardState = (modelState: SavedModelState): WizardState => {
       },
       step4: {
         job: step4.job
-      },
+      }
     }
   }
 
-  return merge(wizardInitialState, wizardState)
+  // @ts-ignore
+  const newWizardState: WizardState = {...wizardInitialState, ...wizardState}
+  return newWizardState
 }
 
 type SavedModelState = {

@@ -14,7 +14,6 @@ export const FieldsSelect: React.FC = () => {
   const { exploreName, modelName, exploreData } = state.wizard.steps.step2
 
   useEffect(() => {
-    console.log({ exploreData, exploreName })
     if (exploreName === exploreData?.exploreName) {
       setIsLoading(false)
       return

@@ -93,7 +93,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     updateStepData({
       bqModelName: e.target.value,
       targetField: '',
-      summary: wizardInitialState.steps.step3.summary
+      summary: {...wizardInitialState.steps.step3.summary}
     })
   }
 
