@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { GenericStepState, WizardSteps } from '../../types'
 import { WIZARD_KEYS, WIZARD_STEPS } from '../../constants'
 import { Redirect, useParams } from 'react-router-dom'
+import { WizardContext } from '../../contexts/WizardProvider'
 
 type WizardStepProps = {
   isStepComplete: (stepData: GenericStepState, objective?: string) => boolean,
@@ -14,6 +15,7 @@ type WizardStepWrapper = (WrappedComponent: any) => React.FC
 export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): WizardStepWrapper => {
   return (WrappedComponent: React.FC): React.FC => {
     return (props: any): any => {
+      const { loadingModel } = useContext(WizardContext)
       const { state } = useStore()
       const { modelNameParam } = useParams<{modelNameParam: string}>()
       const { unlockedStep } = state.wizard
@@ -28,7 +30,7 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
         setStepComplete(stepComplete)
       }, [stepData])
 
-      if (enforceStep) {
+      if (enforceStep && !loadingModel) {
         const enforcementPath = modelNameParam ?
           `/ml/${WIZARD_STEPS[`step${unlockedStep}`]}/${modelNameParam}` :
           `/ml/${WIZARD_STEPS[`step${unlockedStep}`]}`

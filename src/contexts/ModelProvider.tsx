@@ -22,13 +22,12 @@
  * THE SOFTWARE.
  */
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useHistory, useParams, useRouteMatch } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { JOB_STATUSES } from '../constants'
 
 type IModelContext = {
-  saving?: boolean,
   stopPolling?: () => void
 }
 
@@ -38,28 +37,12 @@ export const ModelContext = createContext<IModelContext>({})
  * Model provider
  */
 export const ModelProvider = ({ children }: any) => {
-  const history = useHistory()
-  const { url } = useRouteMatch()
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
-  const {
-    pollJobStatus,
-    createModelStateTable,
-    insertOrUpdateModelState
-  } = useContext(BQMLContext)
-  const { needsSaving } = state.wizard
-  const { bqModelName } = state.wizard.steps.step3
+  const { pollJobStatus } = useContext(BQMLContext)
   const { jobStatus, job } = state.wizard.steps.step4
   const [ polling, setPolling ] = useState(false)
-  const [ saving, setSaving ] = useState(false)
   const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
-
-  useEffect(() => {
-    if (!job) { return }
-    if (needsSaving && !saving) {
-      persistWizardState()
-    }
-  }, [])
 
   // if a job is pending or running,
   // continuously short poll the job until its status is DONE
@@ -118,42 +101,9 @@ export const ModelProvider = ({ children }: any) => {
     }
   }
 
-  // Save key information from the wizards state associated with the bqModelName
-  // into a BQ table so we can reload past models
-  const persistWizardState = async (retry: boolean = false) => {
-    try {
-      setSaving(true)
-      {
-        const { ok, body } = await createModelStateTable?.()
-        if (!ok || !body.jobComplete) {
-          throw "Failed to create table"
-        }
-      }
-      const { ok, body } = await insertOrUpdateModelState?.()
-      if (!ok) {
-        throw "Failed to save your model"
-      }
-
-      if (!modelNameParam) {
-        history.push(`${url}/${bqModelName}`)
-      }
-      dispatch({ type: 'setNeedsSaving', value: false })
-      setSaving(false)
-    } catch (error) {
-      if (retry) {
-        console.error("Failed to save model to BQ model state")
-        return
-      }
-      // retry once
-      persistWizardState(true)
-    }
-  }
-
-
   return (
     <ModelContext.Provider
       value={{
-        saving,
         stopPolling,
       }}
     >

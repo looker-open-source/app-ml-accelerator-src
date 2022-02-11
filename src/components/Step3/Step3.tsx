@@ -1,20 +1,21 @@
 import React, { useEffect, useContext, useState, useRef } from 'react'
-import { useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import { FieldText, Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { hasSummaryData, renameSummaryDataKeys, buildFieldSelectOptions } from '../../services/summary'
+import { hasSummaryData, buildFieldSelectOptions } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import Summary from '../Summary'
 import './Step3.scss'
 import { wizardInitialState } from '../../reducers/wizard'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
-import { JOB_STATUSES } from '../../constants'
+import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
+  const history = useHistory()
   const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
@@ -132,7 +133,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     if (!needsSaving) { return true }
     setIsLoading(true)
     const { ok } = await createModel()
-    return ok
+    if (ok) {
+      history.push(`/ml/${WIZARD_STEPS['step4']}/${bqModelName}`)
+    }
+    return false
   }
 
   const stepCompleteButtonText = () => (

@@ -21,7 +21,7 @@ export const _MLWizard: React.FC = () => {
   const match = matchPath<any>(pathname, '/ml/:page/:modelNameParam')
   const modelNameParam = match ? match?.params?.modelNameParam : undefined
   const { state } = useStore()
-  const { unlockedStep } = state.wizard  // the step the user is allowed to view
+  const { unlockedStep } = state.wizard
 
   if (loadingModel) {
     return (

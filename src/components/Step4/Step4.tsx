@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
@@ -9,22 +9,12 @@ import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
 import { Prompt } from 'react-router-dom'
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { stopPolling, saving } = useContext(ModelContext)
+  const { stopPolling } = useContext(ModelContext)
   const [isLoading, setIsLoading] = useState(false)
   const { state } = useStore()
   const { needsSaving } = state.wizard
   const { jobStatus } = state.wizard.steps.step4
   const jobComplete = jobStatus === JOB_STATUSES.done
-
-  useEffect(() => {
-    if (saving) {
-      console.log('set loading true')
-      setIsLoading(true)
-      return
-    }
-    console.log('set loading false')
-    setIsLoading(false)
-  }, [saving])
 
   const onRouteChange = () => {
     stopPolling?.()

@@ -54,10 +54,10 @@ export const WizardProvider = ({ children }: any) => {
   const { pathname } = useLocation()
   const match = matchPath<any>(pathname, '/ml/:page/:modelNameParam')
   const modelNameParam = match ? match?.params?.modelNameParam : undefined
-  const { state, dispatch } = useStore()
+  const { dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
   const { getSavedModelState } = useContext(BQMLContext)
-  const [ loadingModel, setLoadingModel ] = useState<boolean>(false)
+  const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
 
 
   useEffect(() => {
@@ -66,6 +66,8 @@ export const WizardProvider = ({ children }: any) => {
       loadModel().finally(() =>
         setLoadingModel(false)
       )
+    } else {
+      setLoadingModel(false)
     }
   }, [])
 
@@ -105,7 +107,7 @@ export const WizardProvider = ({ children }: any) => {
       if (step3.bqModelName && step3.targetField) {
         const { ok, value } = await fetchSummary(step3.bqModelName, step3.targetField)
         if (!ok || !value) { throw "Failed to load summmary" }
-        saveSummary(value, loadedWizardState)
+        saveSummary(value, loadedWizardState, step3.selectedFields)
       }
 
       dispatch({ type: 'setNeedsSaving', value: false })
@@ -232,7 +234,7 @@ export const WizardProvider = ({ children }: any) => {
     }
   }
 
-  const saveSummary = (rawSummary: any, wizardState: WizardState) => {
+  const saveSummary = (rawSummary: any, wizardState: WizardState, selectedFields?: string[]) => {
     const { step2, step3 } = wizardState.steps
     const fields = (rawSummary.fields || {})
     const summaryData = renameSummaryDataKeys(rawSummary.data)
@@ -240,7 +242,7 @@ export const WizardProvider = ({ children }: any) => {
       type: 'addToStepData',
       step: 'step3',
       data: {
-        selectedFields: summaryData.map((d: any) => d["column_name"].value),
+        selectedFields: selectedFields || summaryData.map((d: any) => d["column_name"].value),
         summary: {
           exploreName: step2.exploreName,
           modelName: step2.modelName,
