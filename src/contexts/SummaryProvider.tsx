@@ -27,6 +27,8 @@ import { useStore } from './StoreProvider'
 import { formBQViewSQL } from '../services/summary'
 import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
+import { JOB_STATUSES } from '../constants'
+import { WizardState } from '../types'
 
 type ISummaryContext = {
   getSummaryData?: (
@@ -170,7 +172,26 @@ export const SummaryProvider = ({ children }: any) => {
         throw "Something went wrong, please try again."
       }
       await checkCreateModelSuccess(body.jobReference.jobId)
-      await persistWizardState()
+
+      const jobState = {
+        jobStatus: JOB_STATUSES.pending,
+        job: body.jobReference
+      }
+      // create a copy of the wizard state with the job added
+      const { wizard } = state
+      const wizardState = {
+        ...wizard,
+        steps: {
+          ...wizard.steps,
+          step4: jobState
+        }
+      }
+      await persistWizardState(wizardState)
+      dispatch({
+        type: 'addToStepData',
+        step: 'step4',
+        data: jobState
+      })
       return { ok, body }
     } catch (error) {
       console.log({error})
@@ -181,7 +202,7 @@ export const SummaryProvider = ({ children }: any) => {
 
   // Save key information from the wizards state associated with the bqModelName
   // into a BQ table so we can reload past models
-  const persistWizardState = async (retry: boolean = false) => {
+  const persistWizardState = async (wizardState: WizardState, retry: boolean = false) => {
     try {
       {
         const { ok, body } = await createModelStateTable?.()
@@ -189,7 +210,7 @@ export const SummaryProvider = ({ children }: any) => {
           throw "Failed to create table"
         }
       }
-      const { ok, body } = await insertOrUpdateModelState?.()
+      const { ok, body } = await insertOrUpdateModelState?.(wizardState)
       if (!ok) {
         throw "Failed to save your model"
       }
@@ -200,7 +221,7 @@ export const SummaryProvider = ({ children }: any) => {
         return
       }
       // retry once
-      persistWizardState(true)
+      persistWizardState(wizardState, true)
     }
   }
 

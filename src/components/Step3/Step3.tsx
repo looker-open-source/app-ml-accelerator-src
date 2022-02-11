@@ -11,7 +11,6 @@ import Summary from '../Summary'
 import './Step3.scss'
 import { wizardInitialState } from '../../reducers/wizard'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
-import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -106,26 +105,13 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const createModel = async () => {
-    const { ok, body } = await createBQMLModel?.(
+    const { ok } = await createBQMLModel?.(
       objective,
       bqModelName,
       targetField,
       arimaTimeColumn
     )
-
-    if (!ok) {
-      setIsLoading(false)
-      return { ok }
-    }
-
-    dispatch({
-      type: 'addToStepData',
-      step: 'step4',
-      data: {
-        jobStatus: JOB_STATUSES.pending,
-        job: body.jobReference
-      }
-    })
+    setIsLoading(false)
     return { ok }
   }
 

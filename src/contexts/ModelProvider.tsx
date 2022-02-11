@@ -49,14 +49,12 @@ export const ModelProvider = ({ children }: any) => {
   useEffect(() => {
     if (!job || polling || !modelNameParam) { return }
     if (jobStatus !== JOB_STATUSES.done) {
-      console.log('getJobStatus')
       getJobStatus()
     }
-  }, [modelNameParam])
+  }, [])
 
   const stopPolling = () => {
     if (!pollCanceler) { return }
-    console.log('canceling poll')
     pollCanceler.cancel()
     setPolling(false)
   }

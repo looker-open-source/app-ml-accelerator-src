@@ -78,7 +78,6 @@ export const WizardProvider = ({ children }: any) => {
         history.push(`/ml/${WIZARD_STEPS['step1']}`)
         throw `Model does not exist: ${modelNameParam}`
       }
-
       const loadedWizardState = buildWizardState(modelState)
       console.log({ loadedWizardState })
       dispatch({

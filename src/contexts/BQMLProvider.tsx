@@ -28,6 +28,7 @@ import { useStore } from './StoreProvider'
 import { poll } from '../services/common'
 import { generateModelState } from '../services/modelState'
 import { JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
+import { WizardState } from '../types'
 
 type IBQMLContext = {
   expired?: boolean,
@@ -43,7 +44,7 @@ type IBQMLContext = {
     cancel: () => void
   },
   createModelStateTable?: () => Promise<any>,
-  insertOrUpdateModelState?: () => Promise<any>,
+  insertOrUpdateModelState?: (wizardState: WizardState) => Promise<any>,
   getAllSavedModels?: () => Promise<any>,
   getSavedModelState?: (modelName: string) => Promise<any>
 }
@@ -154,10 +155,11 @@ export const BQMLProvider = ({ children }: any) => {
     return queryJob(sql)
   }
 
-  const insertOrUpdateModelState = () => {
-    const  { bqModelName } = state.wizard.steps.step3
+  const insertOrUpdateModelState = (wizardState: WizardState) => {
+    const  { bqModelName } = wizardState.steps.step3
     const { email: userEmail } = state.user
-    const stateJson = JSON.stringify(generateModelState(state.wizard))
+    console.log({ 'saving_state': wizardState})
+    const stateJson = JSON.stringify(generateModelState(wizardState))
 
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T

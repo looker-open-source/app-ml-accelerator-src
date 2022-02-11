@@ -10,9 +10,10 @@ import { initialStates } from '../reducers'
 // previously created models, changing these keys will
 // make previously saved models unable to load
 export const generateModelState = (wizardState: WizardState): SavedModelState => {
+  const { unlockedStep } = wizardState
   const { step1, step2, step3, step4 } = wizardState.steps
   const modelStateToSave = {
-    unlockedStep: wizardState.unlockedStep,
+    unlockedStep: unlockedStep > 3 ? unlockedStep : 4,
     step1: step1,
     step2: {
       exploreName: step2.exploreName,
@@ -29,6 +30,7 @@ export const generateModelState = (wizardState: WizardState): SavedModelState =>
       selectedFields: step3.selectedFields,
     },
     step4: {
+      jobStatus: step4.jobStatus,
       job: step4.job
     },
     step5: {}
@@ -81,6 +83,7 @@ const buildWizardStep3 = (modelStep3: any, wizardStep3: Step3State): Step3State 
 
 const buildWizardStep4 = (modelStep4: any, wizardStep4: Step4State): Step4State => {
   const mappedModelState = {
+    jobStatus: modelStep4.jobStatus,
     job: modelStep4.job
   }
   return {...wizardStep4, ...mappedModelState}
