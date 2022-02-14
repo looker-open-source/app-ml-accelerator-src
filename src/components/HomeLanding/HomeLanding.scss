@@ -1,0 +1,41 @@
+h1 {
+  font-weight: 100;
+
+  &.no-margin-top {
+    margin-top: 0;
+  }
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.home-landing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 44px;
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+}
+
+.grid-item-large-left {
+  grid-column: 1 / 3;
+}
+
+.grid-item-large-right {
+  grid-column: 2 / 4;
+}
+
+.grid-item-small-left {
+  grid-column: 1 / 2;
+}
+
+.grid-item-small-right {
+  grid-column: 3 / 4;
+}

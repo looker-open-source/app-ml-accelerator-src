@@ -4,7 +4,8 @@ type Action = {type: 'setUser', user: UserState}
 
 const userInitialState = {
   id: undefined,
-  email: undefined
+  email: undefined,
+  firstName: undefined
 }
 
 function userReducer(state: UserState, action: Action): any {
