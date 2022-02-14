@@ -19,8 +19,9 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(false)
   const { needsSaving } = state.wizard
-  const { objective } = state.wizard.steps.step1
-  const { exploreData, exploreName, modelName, ranQuery } = state.wizard.steps.step2
+  const { step1, step2, step3 } = state.wizard.steps
+  const { objective } = step1
+  const { exploreData, exploreName, modelName, ranQuery } = step2
 
   if (!exploreName || !modelName) {
     dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
@@ -29,13 +30,14 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const {
     summary,
-    selectedFields,
+    selectedFeatures,
     targetField,
     bqModelName,
     arimaTimeColumn
-  } = state.wizard.steps.step3
+  } = step3
   const arima = isArima(objective || "")
   const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
+  const sourceColumnFormatted = sourceColumns.map((col) => col.replace(/\./g, '_')).sort()
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
     sourceColumns,
@@ -47,12 +49,16 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     'date'
   ) : null
 
+  const canGenerateSummary = (): boolean => (
+    Boolean(
+      targetField &&
+      bqModelName &&
+      !hasSummaryData(step3, exploreName, modelName, targetField, sourceColumnFormatted)
+    )
+  )
+
   const generateSummary = () => {
-    if (
-      !targetField ||
-      !bqModelName ||
-      hasSummaryData(summary, exploreName, modelName, targetField)
-    ) {
+    if (!canGenerateSummary()) {
       return
     }
 
@@ -85,8 +91,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     updateStepData({ arimaTimeColumn })
   }
 
-  const updateSelectedFields = (selectedFields: string[]) => {
-    updateStepData({ selectedFields })
+  const updateSelectedFeatures = (selectedFeatures: string[]) => {
+    updateStepData({ selectedFeatures })
   }
 
   const alphaNumericOnly = (e: any) => {
@@ -101,6 +107,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       objective,
       bqModelName,
       targetField,
+      selectedFeatures,
       arimaTimeColumn
     )
     setIsLoading(false)
@@ -179,7 +186,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <Button
             className="action-button summary-generate"
             onClick={generateSummary}
-            disabled={!bqModelName || !targetField}
+            disabled={!canGenerateSummary()}
           >
             Generate Summary
           </Button>
@@ -190,8 +197,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <Summary
             summaryData={summary.data}
             fields={summary.fields || []}
-            selectedFields={selectedFields || []}
-            updateSelectedFields={updateSelectedFields} />
+            selectedFeatures={selectedFeatures || []}
+            updateSelectedFeatures={updateSelectedFeatures} />
         )
       }
     </StepContainer>

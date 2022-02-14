@@ -5,11 +5,11 @@ import { Checkbox } from "@looker/components"
 type SummaryTableRows = {
   data: any[] | undefined
   headers: SummaryTableHeaders
-  selectedFields: string[]
+  selectedFeatures: string[]
   checkboxChange: (fieldName: string) => void
 }
 
-export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, selectedFields, checkboxChange }) => {
+export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, selectedFeatures, checkboxChange }) => {
   if (!data) { return null }
 
   const tableRows = data.map((rowData, i) => {
@@ -20,7 +20,7 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, se
       <tr key={i}>
         <td className="checkbox">
           <Checkbox
-            checked={selectedFields?.indexOf(rowData["column_name"].value) >= 0}
+            checked={selectedFeatures?.indexOf(rowData["column_name"].value) >= 0}
             onChange={() => { checkboxChange(rowData["column_name"].value) }}
           />
         </td>

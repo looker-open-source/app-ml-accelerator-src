@@ -35,7 +35,8 @@ export type Step3State = {
   bqModelName: string,
   targetField: string | undefined,
   arimaTimeColumn: string | undefined,
-  selectedFields: string[] | undefined,
+  allFeatures: string[] | undefined,
+  selectedFeatures: string[] | undefined,
   summary: Summary
 }
 

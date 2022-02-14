@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { toggleSelectedField, SUMMARY_TABLE_HEADERS } from '../../services/summary'
+import { toggleSelectedFeature, SUMMARY_TABLE_HEADERS } from '../../services/summary'
 import { SummaryField, SummaryTableHeaders } from '../../types'
 import { Checkbox } from "@looker/components"
 import { SummaryTableRows } from './SummaryTableRows'
@@ -7,24 +7,24 @@ import { SummaryTableRows } from './SummaryTableRows'
 type SummaryParams = {
   fields: SummaryField[],
   summaryData: any[],
-  selectedFields: string[],
-  updateSelectedFields: (selectedFields: string[]) =>  void
+  selectedFeatures: string[],
+  updateSelectedFeatures: (selectedFeatures: string[]) =>  void
 }
 
-export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selectedFields, updateSelectedFields }) => {
-  const [allChecked, setAllChecked] = useState(summaryData.length === selectedFields.length)
+export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selectedFeatures, updateSelectedFeatures }) => {
+  const [allChecked, setAllChecked] = useState(summaryData.length === selectedFeatures.length)
   const headers: SummaryTableHeaders = SUMMARY_TABLE_HEADERS
 
   const checkboxChange = (fieldName: string): void => {
-    const newSelectedFields = toggleSelectedField(selectedFields, fieldName)
-    updateSelectedFields(newSelectedFields)
-    setAllChecked(summaryData.length === newSelectedFields.length)
+    const newSelectedFeatures = toggleSelectedFeature(selectedFeatures, fieldName)
+    updateSelectedFeatures(newSelectedFeatures)
+    setAllChecked(summaryData.length === newSelectedFeatures.length)
   }
 
-  const toggleAllFields = (evt: any): void => {
+  const toggleAllFeatures = (evt: any): void => {
     const checked: boolean = evt.currentTarget.checked
-    const selectedFields = checked ? summaryData.map((d) => d["column_name"].value) : []
-    updateSelectedFields(selectedFields)
+    const selectedFeatures = checked ? summaryData.map((d) => d["column_name"].value) : []
+    updateSelectedFeatures(selectedFeatures)
     setAllChecked(checked)
   }
 
@@ -36,7 +36,7 @@ export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selected
             <th>
               <Checkbox
                 checked={allChecked}
-                onChange={toggleAllFields}
+                onChange={toggleAllFeatures}
               />
             </th>
             {
@@ -50,7 +50,7 @@ export const Summary: React.FC<SummaryParams> = ({ fields, summaryData, selected
           <SummaryTableRows
             data={summaryData}
             headers={headers}
-            selectedFields={selectedFields}
+            selectedFeatures={selectedFeatures}
             checkboxChange={checkboxChange}
           />
         </tbody>

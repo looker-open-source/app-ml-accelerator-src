@@ -41,7 +41,8 @@ const wizardInitialState: WizardState = {
       bqModelName: '',
       targetField: undefined,
       arimaTimeColumn: undefined,
-      selectedFields: [],
+      allFeatures: [],
+      selectedFeatures: [],
       summary: {
         exploreName: undefined,
         modelName: undefined,
