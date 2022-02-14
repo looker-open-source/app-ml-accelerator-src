@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
-import { FieldText, Select } from "@looker/components"
+import { FieldText, Select, Button } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
@@ -46,15 +46,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     sourceColumns,
     'date'
   ) : null
-  const firstUpdate = useRef(true)
 
-  useEffect(() => {
-    // don't run on component mount
-    if(firstUpdate.current) {
-      firstUpdate.current = false
-      return
-    }
-
+  const generateSummary = () => {
     if (
       !targetField ||
       !bqModelName ||
@@ -66,7 +59,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     setIsLoading(true)
     getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
       .finally(() => setIsLoading(false))
-  }, [exploreName, targetField])
+  }
 
   const updateStepData = (data: any) => {
     dispatch({
@@ -182,6 +175,14 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <div className="summary-factoid">
             Rows: <span className="factoid-bold">{ranQuery?.rowCount || '???'}</span>
           </div>
+
+          <Button
+            className="action-button summary-generate"
+            onClick={generateSummary}
+            disabled={!bqModelName || !targetField}
+          >
+            Generate Summary
+          </Button>
         </div>
       </div>
       { summary.data &&

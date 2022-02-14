@@ -23,7 +23,7 @@ export const QueryPane: React.FC = () => {
   }
 
   const limitChange = (value: string) => {
-    dispatch({ type: 'addToStepData', step: 'step2', limit: value })
+    dispatch({ type: 'addToStepData', step: 'step2', data: { limit: value }})
   }
 
   return (

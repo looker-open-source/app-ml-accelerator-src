@@ -43,6 +43,7 @@ export const StepContainer: React.FC<StepContainerParams> = ({
         <StepComplete
           stepText={stepText}
           isStepComplete={stepComplete}
+          isLoading={isLoading}
           stepNumber={stepNumber}
           buttonText={buttonText}
           handleCompleteClick={handleCompleteClick}
