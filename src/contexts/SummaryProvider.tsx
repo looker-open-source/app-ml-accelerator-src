@@ -120,7 +120,6 @@ export const SummaryProvider = ({ children }: any) => {
       }
       // in an effort to limit the number of calls to BigQuery
       // do not create the BQ view if its alrady been created for this sql and model name
-      debugger
       if (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model) {
         setPreviousBQValues({ sql: querySql, model: bqModelName })
         await createBQMLView(querySql, bqModelName)

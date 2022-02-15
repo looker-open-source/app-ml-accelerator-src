@@ -23,3 +23,16 @@
   bottom: 16px;
   right: 16px;
 }
+
+.status-message {
+  font-size: 12px;
+  padding-top: 4px;
+  text-align: right;
+
+  &.warning {
+    color: #FFA800
+  }
+  &.error {
+    color: #CC1F36
+  }
+}

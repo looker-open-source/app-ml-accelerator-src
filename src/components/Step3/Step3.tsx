@@ -1,23 +1,26 @@
-import React, { useEffect, useContext, useState, useRef } from 'react'
+import React, { useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
-import { FieldText, Select, Button } from "@looker/components"
+import { Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { hasSummaryData, buildFieldSelectOptions } from '../../services/summary'
+import { buildFieldSelectOptions } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
-import Summary from '../Summary'
-import './Step3.scss'
-import { wizardInitialState } from '../../reducers/wizard'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
+import Summary from '../Summary'
+import { GenerateSummaryButton } from './GenerateSummaryButton'
+import { ModelNameBlock } from './ModelNameBlock'
+import './Step3.scss'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { getSummaryData, createBQMLModel } = useContext(SummaryContext)
+  const { createBQMLModel } = useContext(SummaryContext)
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(false)
+  const [nameCheckStatus, setNameCheckStatus] = useState<string | undefined>()
+  const [loadingNameStatus, setLoadingNameStatus] = useState<boolean>(false)
   const { needsSaving } = state.wizard
   const { step1, step2, step3 } = state.wizard.steps
   const { objective } = step1
@@ -37,7 +40,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   } = step3
   const arima = isArima(objective || "")
   const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
-  const sourceColumnFormatted = sourceColumns.map((col) => col.replace(/\./g, '_')).sort()
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
     sourceColumns,
@@ -49,37 +51,11 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     'date'
   ) : null
 
-  const canGenerateSummary = (): boolean => (
-    Boolean(
-      targetField &&
-      bqModelName &&
-      !hasSummaryData(step3, exploreName, modelName, targetField, sourceColumnFormatted)
-    )
-  )
-
-  const generateSummary = () => {
-    if (!canGenerateSummary()) {
-      return
-    }
-
-    setIsLoading(true)
-    getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
-      .finally(() => setIsLoading(false))
-  }
-
   const updateStepData = (data: any) => {
     dispatch({
       type: 'addToStepData',
       step: 'step3',
       data
-    })
-  }
-
-  const handleModelNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    updateStepData({
-      bqModelName: e.target.value,
-      targetField: '',
-      summary: {...wizardInitialState.steps.step3.summary}
     })
   }
 
@@ -93,13 +69,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const updateSelectedFeatures = (selectedFeatures: string[]) => {
     updateStepData({ selectedFeatures })
-  }
-
-  const alphaNumericOnly = (e: any) => {
-    const re = /[0-9a-zA-Z_]+/g;
-    if (!re.test(e.key)) {
-      e.preventDefault();
-    }
   }
 
   const createModel = async () => {
@@ -138,17 +107,13 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       handleCompleteClick={handleCompleteClick}
     >
       <div className="model-blocks">
-        <div className="wizard-card">
-          <h2>Name your model</h2>
-          <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
-          <FieldText
-            onChange={handleModelNameChange}
-            value={bqModelName}
-            placeholder="Model_Name"
-            onKeyPress={alphaNumericOnly}
-            disabled={!!modelNameParam}
-          />
-        </div>
+        <ModelNameBlock
+          nameCheckStatus={nameCheckStatus}
+          setNameCheckStatus={setNameCheckStatus}
+          loadingNameStatus={loadingNameStatus}
+          setLoadingNameStatus={setLoadingNameStatus}
+          disabled={!!modelNameParam}
+        />
         <div className="wizard-card">
           <h2>Select your target</h2>
           <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
@@ -182,14 +147,11 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           <div className="summary-factoid">
             Rows: <span className="factoid-bold">{ranQuery?.rowCount || '???'}</span>
           </div>
-
-          <Button
-            className="action-button summary-generate"
-            onClick={generateSummary}
-            disabled={!canGenerateSummary()}
-          >
-            Generate Summary
-          </Button>
+          <GenerateSummaryButton
+            setIsLoading={setIsLoading}
+            loadingNameStatus={loadingNameStatus}
+            nameCheckStatus={nameCheckStatus}
+          />
         </div>
       </div>
       { summary.data &&

@@ -47,6 +47,7 @@ type IBQMLContext = {
   insertOrUpdateModelState?: (wizardState: WizardState) => Promise<any>,
   getAllSavedModels?: () => Promise<any>,
   getSavedModelState?: (modelName: string) => Promise<any>
+  getSavedModelByName?: (modelName: string) => Promise<any>
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
@@ -207,6 +208,13 @@ export const BQMLProvider = ({ children }: any) => {
     }
   }
 
+  const getSavedModelByName = async (modelName: string) => {
+    if (!modelName) { return { ok: false }}
+    return await getSavedModels?.({
+      [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
+    }, [MODEL_STATE_TABLE_COLUMNS.modelName, MODEL_STATE_TABLE_COLUMNS.createdByEmail])
+  }
+
   const getAllSavedModels = async () => {
     const { email: userEmail } = state.user
     if (!userEmail) { return { ok: false } }
@@ -248,7 +256,8 @@ export const BQMLProvider = ({ children }: any) => {
         createModelStateTable,
         insertOrUpdateModelState,
         getAllSavedModels,
-        getSavedModelState
+        getSavedModelState,
+        getSavedModelByName
       }}
     >
       {children}

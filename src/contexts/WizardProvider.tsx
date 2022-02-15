@@ -251,6 +251,7 @@ export const WizardProvider = ({ children }: any) => {
         summary: {
           exploreName: step2.exploreName,
           modelName: step2.modelName,
+          bqModelName: step3.bqModelName,
           target: step3.targetField,
           data: summaryData,
           fields: [...fields.dimensions, ...fields.measures]

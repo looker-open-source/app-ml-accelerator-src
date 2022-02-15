@@ -48,7 +48,8 @@ const wizardInitialState: WizardState = {
         modelName: undefined,
         fields: undefined,
         data: undefined,
-        target: undefined
+        target: undefined,
+        bqModelName: undefined
       }
     },
     step4: {

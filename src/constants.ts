@@ -22,6 +22,12 @@ export const JOB_STATUSES: {[key: string]: string} = {
   done: 'DONE'
 }
 
+export const NAME_CHECK_STATUSES = {
+  valid: 'valid',
+  warning: 'warning',
+  error: 'error'
+}
+
 export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
   modelName: 'model_info.model_name',
   createdByEmail: 'model_info.created_by_email',
