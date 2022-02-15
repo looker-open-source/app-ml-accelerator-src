@@ -14,21 +14,26 @@
     margin-top: 16px;
   }
   .modeltypecard {
+    position: relative;
     cursor: pointer;
     margin-bottom: 10px;
-    padding: 0 16px;
+    padding: 0 16px 10px;
+    overflow: hidden;
 
     &.active {
       background-color: #bed2f3;
+
+      .modeltypecard-footer {
+        color: #a9bcdb;
+      }
     }
   }
 
   .modeltypecard-footer {
-    text-align: right;
-    color: #5F6368;
-    padding-top: 8px;
-    justify-self: flex-end;
-    margin-top: auto;
-    font-size: 10px;
+    color: #eaeaea;
+    font-size: 22px;
+    bottom: -4px;
+    position: absolute;
+    right: 10px;
   }
 }
