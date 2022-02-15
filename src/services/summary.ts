@@ -1,5 +1,5 @@
 import { keyBy, compact } from 'lodash'
-import { Field, Step3State, Summary, SummaryTableHeaders } from '../types'
+import { Field, Step3State, SummaryTableHeaders } from '../types'
 import { titilize } from './string'
 
 export const formBQViewSQL = (

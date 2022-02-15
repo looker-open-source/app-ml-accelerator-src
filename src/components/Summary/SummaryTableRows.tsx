@@ -1,16 +1,38 @@
 import React from 'react'
 import { SummaryTableHeaders } from '../../types'
-import { Checkbox } from "@looker/components"
+import { Checkbox, Icon } from "@looker/components"
+import { TrackChanges } from '@styled-icons/material'
 
 type SummaryTableRows = {
   data: any[] | undefined
   headers: SummaryTableHeaders
+  targetField: string
   selectedFeatures: string[]
   checkboxChange: (fieldName: string) => void
 }
 
-export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, selectedFeatures, checkboxChange }) => {
+export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, targetField, selectedFeatures, checkboxChange }) => {
   if (!data) { return null }
+
+  const checkBoxCell = (rowData: any) => {
+    const rowColumnName = rowData["column_name"].value
+    if (targetField.replace(/\./g, '_') === rowColumnName) {
+      return (
+        <td className="checkbox">
+          <Icon icon={<TrackChanges />} className="target-icon" />
+        </td>
+      )
+    }
+    return (
+      <td className="checkbox">
+        <Checkbox
+          checked={selectedFeatures?.indexOf(rowColumnName) >= 0}
+          onChange={() => { checkboxChange(rowColumnName) }}
+          className="feature-checkbox"
+        />
+      </td>
+    )
+  }
 
   const tableRows = data.map((rowData, i) => {
     const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => (
@@ -18,12 +40,7 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, se
     ))
     return (
       <tr key={i}>
-        <td className="checkbox">
-          <Checkbox
-            checked={selectedFeatures?.indexOf(rowData["column_name"].value) >= 0}
-            onChange={() => { checkboxChange(rowData["column_name"].value) }}
-          />
-        </td>
+        {checkBoxCell(rowData)}
         {tds}
       </tr>)
   })

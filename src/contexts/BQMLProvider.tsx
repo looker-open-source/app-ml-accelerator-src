@@ -158,7 +158,6 @@ export const BQMLProvider = ({ children }: any) => {
   const insertOrUpdateModelState = (wizardState: WizardState) => {
     const  { bqModelName } = wizardState.steps.step3
     const { email: userEmail } = state.user
-    console.log({ 'saving_state': wizardState})
     const stateJson = JSON.stringify(generateModelState(wizardState))
 
     const sql = `

@@ -5,7 +5,7 @@ import { Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { buildFieldSelectOptions } from '../../services/summary'
+import { buildFieldSelectOptions, hasSummaryData } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
 import Summary from '../Summary'
@@ -40,6 +40,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   } = step3
   const arima = isArima(objective || "")
   const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
+  const sourceColumnsFormatted = sourceColumns.map((col) => col.replace(/\./g, '_')).sort()
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
     sourceColumns,
@@ -83,16 +84,35 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return { ok }
   }
 
-  const handleCompleteClick = async (): Promise<any> => {
-    if (!needsSaving) { return true }
-    setIsLoading(true)
-    const { ok } = await createModel()
-    return { ok, data: { bqModelName } }
+  const summaryUpToDate = () => (
+    hasSummaryData(
+      step3,
+      exploreName,
+      modelName,
+      targetField || '',
+      bqModelName,
+      sourceColumnsFormatted
+    )
+  )
+
+  const buildHandleCompleteClick = () => {
+    if (
+      !needsSaving ||
+      (needsSaving && !summaryUpToDate())
+    ) { return }
+
+    // passed into the stepComplete button to be executed
+    // before redirect to the next step
+    return async (): Promise<any> => {
+      setIsLoading(true)
+      const { ok } = await createModel()
+      return { ok, data: { bqModelName } }
+    }
   }
 
   const stepCompleteButtonText = () => (
     modelNameParam ?
-      needsSaving ?
+      needsSaving && summaryUpToDate()?
         "Update Model" :
         "Continue" :
       "Create Model"
@@ -104,7 +124,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepComplete={stepComplete}
       stepNumber={3}
       buttonText={stepCompleteButtonText()}
-      handleCompleteClick={handleCompleteClick}
+      handleCompleteClick={buildHandleCompleteClick()}
     >
       <div className="model-blocks">
         <ModelNameBlock
@@ -122,6 +142,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             value={targetField}
             placeholder="Target"
             onChange={handleTargetChange}
+            className="wizard-card-select"
           />
         </div>
         {
@@ -135,6 +156,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
                   value={arimaTimeColumn}
                   placeholder="Time Column"
                   onChange={handleTimeColumnChange}
+                  className="wizard-card-select"
                 />
               </div>
             )
@@ -151,14 +173,15 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             setIsLoading={setIsLoading}
             loadingNameStatus={loadingNameStatus}
             nameCheckStatus={nameCheckStatus}
+            summaryUpToDate={summaryUpToDate}
           />
         </div>
       </div>
-      { summary.data &&
+      { summary.data && summary.target &&
         (
           <Summary
+            targetField={summary.target}
             summaryData={summary.data}
-            fields={summary.fields || []}
             selectedFeatures={selectedFeatures || []}
             updateSelectedFeatures={updateSelectedFeatures} />
         )

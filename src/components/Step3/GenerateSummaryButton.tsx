@@ -5,24 +5,24 @@ import { hasSummaryData } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import { NAME_CHECK_STATUSES } from '../../constants'
 
-type GenerateSummaryButton = {
+type GenerateSummaryButtonProps = {
   setIsLoading: (value: boolean) => void
   loadingNameStatus: boolean,
   nameCheckStatus?: string,
+  summaryUpToDate: () => boolean
 }
 
-export const GenerateSummaryButton: React.FC<GenerateSummaryButton> = ({
+export const GenerateSummaryButton: React.FC<GenerateSummaryButtonProps> = ({
   setIsLoading,
   loadingNameStatus,
-  nameCheckStatus
+  nameCheckStatus,
+  summaryUpToDate
 }) => {
   const { getSummaryData } = useContext(SummaryContext)
   const { state } = useStore()
   const { step2, step3 } = state.wizard.steps
-  const { exploreName, modelName, ranQuery } = step2
+  const { ranQuery } = step2
   const { targetField, bqModelName } = step3
-  const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
-  const sourceColumnFormatted = sourceColumns.map((col) => col.replace(/\./g, '_')).sort()
 
   const canGenerateSummary = (): boolean => (
     Boolean(
@@ -30,7 +30,7 @@ export const GenerateSummaryButton: React.FC<GenerateSummaryButton> = ({
       nameCheckStatus !== NAME_CHECK_STATUSES.error &&
       targetField &&
       bqModelName &&
-      !hasSummaryData(step3, exploreName || '', modelName || '', targetField, bqModelName, sourceColumnFormatted)
+      !summaryUpToDate()
     )
   )
 
@@ -46,10 +46,10 @@ export const GenerateSummaryButton: React.FC<GenerateSummaryButton> = ({
     }
   }
 
-  const generateSummary = () => {
+  const generateSummary = async () => {
     setIsLoading(true)
-    getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
-      .finally(() => setIsLoading(false))
+    await getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
+    setIsLoading(false)
   }
 
   const [confirmationDialog, openDialog] = useConfirm({

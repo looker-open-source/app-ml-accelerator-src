@@ -25,8 +25,21 @@
     font-weight: 400;
     padding: 10px 10px 5px 10px;
 
+    .target-icon {
+      color: #4285F4;
+    }
+  }
+
+  td, th {
     &.checkbox {
       width: 40px;
+
+      .feature-checkbox {
+        [aria-checked="true"] + [class^="FauxCheckbox"] {
+          background: #4285F4;
+          border: solid 2px #4285F4;
+        }
+      }
     }
   }
 
