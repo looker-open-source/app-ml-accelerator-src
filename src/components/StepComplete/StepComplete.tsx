@@ -3,9 +3,11 @@ import { WIZARD_STEPS } from "../../constants"
 import { useHistory, useParams} from 'react-router-dom'
 import { Button } from '@looker/components'
 import { useStore } from '../../contexts/StoreProvider'
+import Spinner from '../Spinner'
 
 type StepCompleteParams = {
   isStepComplete?: boolean
+  isLoading?: boolean,
   stepNumber: number,
   stepText?: string,
   buttonText?: string,
@@ -14,6 +16,7 @@ type StepCompleteParams = {
 
 export const StepComplete: React.FC<StepCompleteParams> = ({
   isStepComplete,
+  isLoading,
   stepNumber,
   stepText,
   buttonText,
@@ -55,6 +58,7 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
       <Button
         className={`wizard-next-step-btn ${btnClass}`}
         onClick={handleClick}
+        disabled={isLoading}
       >
         { buttonText || "Continue" }
       </Button>

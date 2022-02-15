@@ -110,7 +110,7 @@ export const WizardProvider = ({ children }: any) => {
       if (step3.bqModelName && step3.targetField) {
         const { ok, value } = await fetchSummary(step3.bqModelName, step3.targetField)
         if (!ok || !value) { throw "Failed to load summmary" }
-        saveSummary(value, loadedWizardState, step3.selectedFields)
+        saveSummary(value, loadedWizardState, step3.selectedFeatures)
       }
 
       dispatch({ type: 'setNeedsSaving', value: false })
@@ -237,18 +237,21 @@ export const WizardProvider = ({ children }: any) => {
     }
   }
 
-  const saveSummary = (rawSummary: any, wizardState: WizardState, selectedFields?: string[]) => {
+  const saveSummary = (rawSummary: any, wizardState: WizardState, selectedFeatures?: string[]) => {
     const { step2, step3 } = wizardState.steps
     const fields = (rawSummary.fields || {})
     const summaryData = renameSummaryDataKeys(rawSummary.data)
+    const allFeatures = summaryData.map((d: any) => d["column_name"].value)
     dispatch({
       type: 'addToStepData',
       step: 'step3',
       data: {
-        selectedFields: selectedFields || summaryData.map((d: any) => d["column_name"].value),
+        allFeatures,
+        selectedFeatures: selectedFeatures || allFeatures,
         summary: {
           exploreName: step2.exploreName,
           modelName: step2.modelName,
+          bqModelName: step3.bqModelName,
           target: step3.targetField,
           data: summaryData,
           fields: [...fields.dimensions, ...fields.measures]

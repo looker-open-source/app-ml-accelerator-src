@@ -64,7 +64,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
           step2.exploreData &&
           (<Button
             onClick={runQuery}
-            className="run-query-button">
+            className="action-button">
               Run
           </Button>)
         }

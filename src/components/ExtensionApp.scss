@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;500&display=swap");
 
 html,
 body,
@@ -66,6 +66,7 @@ body,
 }
 
 .wizard-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

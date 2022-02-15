@@ -1,4 +1,5 @@
 export type UserState = {
   id?: number,
-  email?: string
+  email?: string,
+  firstName?: string
 }

@@ -32,16 +32,17 @@ import { WizardState } from '../types'
 
 type ISummaryContext = {
   getSummaryData?: (
-    sql: string | undefined,
-    bqModelName: string | undefined,
-    targetField: string | undefined
+    sql?: string,
+    bqModelName?: string,
+    targetField?: string
   ) => Promise<any>,
   createJob?: (sql: string) => Promise<any>,
   createBQMLModel?: (
-    objective: string | undefined,
-    bqModelName: string | undefined,
-    targetField: string | undefined,
-    arimaTimeColumn:  string | undefined
+    objective?: string,
+    bqModelName?: string,
+    targetField?: string,
+    features?: string[],
+    arimaTimeColumn?:  string
   ) => Promise<any>
 }
 
@@ -137,10 +138,11 @@ export const SummaryProvider = ({ children }: any) => {
   }
 
   const createBQMLModel = async (
-    objective: string | undefined,
-    bqModelName: string | undefined,
-    target: string | undefined,
-    arimaTimeColumn: string | undefined
+    objective?: string,
+    bqModelName?: string,
+    target?: string,
+    features?: string[],
+    arimaTimeColumn?: string
   ) => {
     try {
       if (
@@ -149,6 +151,8 @@ export const SummaryProvider = ({ children }: any) => {
         !bqmlModelDatasetName ||
         !target ||
         !bqModelName ||
+        !features ||
+        features.length <= 0 ||
         (isArima(objective) && !arimaTimeColumn)
       ) { return }
 
@@ -162,6 +166,7 @@ export const SummaryProvider = ({ children }: any) => {
         bqmlModelDatasetName,
         bqModelName,
         target,
+        features,
         arimaTimeColumn
       })
       if (!sql) {

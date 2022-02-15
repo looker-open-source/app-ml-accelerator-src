@@ -1,5 +1,5 @@
 import { keyBy, compact } from 'lodash'
-import { Field, Summary, SummaryTableHeaders } from '../types'
+import { Field, Step3State, SummaryTableHeaders } from '../types'
 import { titilize } from './string'
 
 export const formBQViewSQL = (
@@ -38,23 +38,33 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
   })
 }
 
-export const hasSummaryData = (summary: Summary, exploreName: string, modelName: string, target: string): boolean => (
-  Boolean(summary.exploreName === exploreName
+export const hasSummaryData = (
+  step3Data: Step3State,
+  exploreName: string,
+  modelName: string,
+  target: string,
+  bqModelName: string,
+  sourceColummns: string[]
+): boolean => {
+  const { summary, allFeatures } = step3Data
+  return Boolean(summary.exploreName === exploreName
     && summary.modelName === modelName
     && summary.target === target
+    && summary.bqModelName === bqModelName
+    && allFeatures?.sort().join(',') === sourceColummns.join(',')
     && summary.data
     && summary.data.length > 0)
-)
+}
 
-export const toggleSelectedField = (selectedFields: string[], fieldName: string): string[] => {
-  const selectedIndex: number = selectedFields.indexOf(fieldName);
+export const toggleSelectedFeature = (selectedFeatures: string[], fieldName: string): string[] => {
+  const selectedIndex: number = selectedFeatures.indexOf(fieldName);
   if (selectedIndex < 0) {
-    selectedFields.push(fieldName)
-    return selectedFields
+    selectedFeatures.push(fieldName)
+    return selectedFeatures
   }
 
-  selectedFields.splice(selectedIndex, 1)
-  return selectedFields
+  selectedFeatures.splice(selectedIndex, 1)
+  return selectedFeatures
 }
 
 const fieldIsType = (field: any, dataType?: string) => {

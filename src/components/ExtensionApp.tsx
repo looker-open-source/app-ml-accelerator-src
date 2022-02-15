@@ -25,7 +25,7 @@ export const ExtensionApp: React.FC = () => {
   const getUser = async () => {
     try {
       const { value } = await coreSDK.me()
-      dispatch({ type: "setUser", user: { id: value.id, email: value.email }})
+      dispatch({ type: "setUser", user: { id: value.id, email: value.email, firstName: value.first_name }})
     } catch (err) {
       dispatch({ type: 'addError', error: 'Failed to retrieve User' })
     } finally {

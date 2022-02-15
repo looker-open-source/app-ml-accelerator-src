@@ -36,6 +36,7 @@ type IFormSQLProps = {
   bqmlModelDatasetName: string,
   bqModelName: string,
   target: string,
+  features: string[],
   arimaTimeColumn?: string
 }
 
@@ -48,6 +49,7 @@ const formBoostedTreeSQL = ({
   bqmlModelDatasetName,
   bqModelName,
   target,
+  features,
   boostedType
 }: IFormBoostedTreeTypeSQLProps): string => {
   // *******
@@ -58,7 +60,7 @@ const formBoostedTreeSQL = ({
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}',
           BOOSTER_TYPE = 'GBTREE',
           INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])
-    AS SELECT * FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`;
+    AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`;
   `
 }
 
@@ -75,6 +77,7 @@ const formArimaSQL = ({
   bqmlModelDatasetName,
   bqModelName,
   target,
+  features,
   arimaTimeColumn
 }: IFormSQLProps) => {
   return `
@@ -85,7 +88,7 @@ const formArimaSQL = ({
       , HORIZON = 1000
       , HOLIDAY_REGION = 'none'
       , AUTO_ARIMA = TRUE)
-    AS (SELECT * FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`) ;
+    AS (SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`) ;
   `
 }
 

@@ -1,11 +1,12 @@
 import { SummaryField } from './field'
 
 export type Summary = {
-  fields: SummaryField[] | undefined
-  data: any[] | undefined
-  exploreName: string | undefined
-  modelName: string | undefined
-  target: string | undefined
+  fields?: SummaryField[]
+  data?: any[]
+  exploreName?: string
+  modelName?: string
+  target?: string
+  bqModelName?: string
 }
 
 export type SummaryTableHeader = {

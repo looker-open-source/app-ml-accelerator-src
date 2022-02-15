@@ -2,7 +2,8 @@ import { Field, WizardState, WizardSteps } from '../types'
 import { toggleArrayEntry } from '../services/array'
 import { getStepStateClone } from '../services/wizard'
 
-type Action = { type: 'populateWizard', wizardState: WizardState } |
+type Action = { type: 'clearState' } |
+  { type: 'populateWizard', wizardState: WizardState } |
   { type: 'setUnlockedStep', step: number } |
   { type: 'setNeedsSaving', value: boolean } |
   { type: 'addToStepData', step: keyof WizardSteps, data: any } |
@@ -40,13 +41,15 @@ const wizardInitialState: WizardState = {
       bqModelName: '',
       targetField: undefined,
       arimaTimeColumn: undefined,
-      selectedFields: [],
+      allFeatures: [],
+      selectedFeatures: [],
       summary: {
         exploreName: undefined,
         modelName: undefined,
         fields: undefined,
         data: undefined,
-        target: undefined
+        target: undefined,
+        bqModelName: undefined
       }
     },
     step4: {
@@ -62,6 +65,9 @@ const needsSavingSteps = ['step1', 'step2', 'step3']
 function wizardReducer(state: WizardState, action: Action): any {
   console.log({ reducer: action.type, action})
   switch (action.type) {
+    case 'clearState': {
+      return { ...wizardInitialState }
+    }
     case 'populateWizard': {
       console.log({wizardState: action.wizardState})
       return { ...action.wizardState }
