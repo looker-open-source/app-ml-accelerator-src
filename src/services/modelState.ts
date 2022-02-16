@@ -31,7 +31,8 @@ export const generateModelState = (wizardState: WizardState): SavedModelState =>
     },
     step4: {
       jobStatus: step4.jobStatus,
-      job: step4.job
+      job: step4.job,
+      modelInfo: step4.modelInfo
     },
     step5: {}
   }
@@ -84,7 +85,8 @@ const buildWizardStep3 = (modelStep3: any, wizardStep3: Step3State): Step3State 
 const buildWizardStep4 = (modelStep4: any, wizardStep4: Step4State): Step4State => {
   const mappedModelState = {
     jobStatus: modelStep4.jobStatus,
-    job: modelStep4.job
+    job: modelStep4.job,
+    modelInfo: modelStep4.modelInfo
   }
   return {...wizardStep4, ...mappedModelState}
 }
@@ -113,6 +115,10 @@ type SavedModelState = {
   }
   step4: {
     job?: any
+    modelInfo: {
+      bqModelName?: string,
+      bqModelObjective?: string
+    }
   },
   step5: {}
 }

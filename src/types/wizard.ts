@@ -41,8 +41,12 @@ export type Step3State = {
 }
 
 export type Step4State = {
-  jobStatus: string | undefined,
-  job: any,
+  jobStatus?: string,
+  job?: any,
+  modelInfo: {
+    bqModelName?: string,
+    bqModelObjective?: string
+  }
 }
 
 export type Step5State = {

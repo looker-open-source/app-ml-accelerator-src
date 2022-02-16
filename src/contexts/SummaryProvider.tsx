@@ -180,7 +180,11 @@ export const SummaryProvider = ({ children }: any) => {
 
       const jobState = {
         jobStatus: JOB_STATUSES.pending,
-        job: body.jobReference
+        job: body.jobReference,
+        modelInfo: {
+          bqModelName: bqModelName,
+          bqModelObjective: objective
+        }
       }
       // create a copy of the wizard state with the job added
       const { wizard } = state

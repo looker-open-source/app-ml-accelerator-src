@@ -25,10 +25,18 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
-import { JOB_STATUSES } from '../constants'
+import { BQML_MODEL, JOB_STATUSES } from '../constants'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
+import { modelIdGenerator, MODEL_TYPES } from '../services/modelTypes'
+import { formatParameterFilter } from '../services/string'
 
 type IModelContext = {
   stopPolling?: () => void
+  getModelEvalFuncData?: (
+    bqModelObjective: string,
+    evalFuncName: string,
+    bqModelName: string,
+    ) => Promise<any>
 }
 
 export const ModelContext = createContext<IModelContext>({})
@@ -39,6 +47,7 @@ export const ModelContext = createContext<IModelContext>({})
 export const ModelProvider = ({ children }: any) => {
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
+  const { coreSDK } = useContext(ExtensionContext2)
   const { pollJobStatus } = useContext(BQMLContext)
   const { jobStatus, job } = state.wizard.steps.step4
   const [ polling, setPolling ] = useState(false)
@@ -99,10 +108,44 @@ export const ModelProvider = ({ children }: any) => {
     }
   }
 
+  // Query looker for the big query evaluation data for the provided evaluation function
+  const getModelEvalFuncData = async (
+    bqModelObjective: string,
+    evalFuncName: string,
+    bqModelName: string
+  ) => {
+    try {
+      const modelType = MODEL_TYPES[bqModelObjective]
+      const evalFuncFields = modelType?.modelFields?.[evalFuncName].map((field: string) => `boosted_tree_evaluate.${field}`)
+
+      // query the model table filtering on our modelID
+      const { value: query } = await coreSDK.create_query({
+        model:  BQML_MODEL,
+        view: modelType.exploreName,
+        fields: evalFuncFields,
+        filters: {
+          [`${modelType.exploreName}.model_name`]: formatParameterFilter(
+            modelIdGenerator({ bqModelName, objective: bqModelObjective })
+          ),
+        }
+      })
+      const { ok, value } = await coreSDK.run_query({
+        query_id: query.id,
+        result_format: "json_detail",
+      })
+      if (!ok) { throw "Failed to run query" }
+      return { ok, value }
+    } catch (error) {
+      dispatch({type: 'addError', error: "Error fetching evaluation data: " + error})
+      return { ok: false }
+    }
+  }
+
   return (
     <ModelContext.Provider
       value={{
         stopPolling,
+        getModelEvalFuncData
       }}
     >
       {children}

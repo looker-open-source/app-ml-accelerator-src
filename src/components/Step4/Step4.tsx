@@ -1,20 +1,54 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
 import { useStore } from '../../contexts/StoreProvider'
 import { ModelContext } from '../../contexts/ModelProvider'
-import './Step4.scss'
 import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
+import { MODEL_TABS, MODEL_TYPES } from '../../services/modelTypes'
 import { Prompt } from 'react-router-dom'
+import { ModelSidebar } from './ModelSiderbar'
+import './Step4.scss'
+import { Icon } from '@looker/components'
+import { Alarm } from '@styled-icons/material'
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
-  const { stopPolling } = useContext(ModelContext)
-  const [isLoading, setIsLoading] = useState(false)
+  const { stopPolling, getModelEvalFuncData } = useContext(ModelContext)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [activeTab, setActiveTab] = useState<string>('')
+  const [evalData, setEvalData] = useState<any>()
   const { state } = useStore()
   const { needsSaving } = state.wizard
-  const { jobStatus } = state.wizard.steps.step4
+  const { jobStatus, modelInfo } = state.wizard.steps.step4
   const jobComplete = jobStatus === JOB_STATUSES.done
+
+  useEffect(() => {
+    const MODEL_TYPE = MODEL_TYPES[modelInfo.bqModelObjective || '']
+    const { modelTabs } = MODEL_TYPE
+    if (
+      !MODEL_TYPE ||
+      modelTabs.indexOf(activeTab) >= 0
+    ) { return }
+    setActiveTab(modelTabs[0])
+  }, [])
+
+  useEffect(() => {
+    if (
+      !jobComplete ||
+      !modelInfo.bqModelName ||
+      !modelInfo.bqModelObjective ||
+      !activeTab
+    ) { return }
+    setIsLoading(true)
+    getModelEvalFuncData?.(
+      modelInfo.bqModelObjective,
+      activeTab,
+      modelInfo.bqModelName
+    ). then(({ value }) => {
+      console.log({ value})
+      setEvalData(value.data)
+    }).finally(() => setIsLoading(false))
+  }, [jobComplete, activeTab])
 
   const onRouteChange = () => {
     stopPolling?.()
@@ -36,7 +70,31 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <h2>Model evaluation overview</h2>
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
 
-      { jobStatus }
+      { jobStatus === JOB_STATUSES.done ?
+        (
+          <div className="model-grid">
+            <div className="model-grid--sidebar">
+              <ModelSidebar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                bqModelObjective={modelInfo.bqModelObjective || ''}
+              />
+            </div>
+            <div className="model-grid--body">
+              {JSON.stringify(evalData)}
+            </div>
+          </div>
+        ) : (
+          <div className="model-job-pending">
+            <div className="model-job-pending--contents">
+              {/* @ts-ignore */}
+              <Icon icon={<Alarm />} size="large" className="model-job-pending--icon"/>
+              <h2>Creating Model...</h2>
+              <p>This process may take any where from 10 minutes to several hours to complete.</p>
+            </div>
+          </div>
+        )
+      }
     </StepContainer>
   )
 }

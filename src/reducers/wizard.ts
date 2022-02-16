@@ -55,6 +55,10 @@ const wizardInitialState: WizardState = {
     step4: {
       jobStatus: undefined,
       job: undefined,
+      modelInfo: {
+        bqModelName: undefined,
+        bqModelObjective: undefined
+      }
     },
     step5: { data: null }
   }

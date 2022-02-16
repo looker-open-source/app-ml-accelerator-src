@@ -29,10 +29,11 @@ import { IQuery } from "@looker/sdk/lib/4.0/models"
 import { BQMLContext } from './BQMLProvider'
 import { matchPath, useHistory, useLocation } from 'react-router-dom'
 import { buildWizardState } from '../services/modelState'
-import { SUMMARY_EXPLORE, SUMMARY_MODEL, WIZARD_STEPS } from '../constants'
+import { SUMMARY_EXPLORE, BQML_MODEL, WIZARD_STEPS } from '../constants'
 import { mapAPIExploreToClientExplore } from '../services/explores'
 import { getHeaderColumns } from '../services/resultsTable'
-import { formatSummaryFilter, renameSummaryDataKeys } from '../services/summary'
+import { renameSummaryDataKeys } from '../services/summary'
+import { formatParameterFilter } from '../services/string'
 
 type IWizardContext = {
   loadingModel?: boolean,
@@ -212,16 +213,16 @@ export const WizardProvider = ({ children }: any) => {
   const fetchSummary = async (bqModelName: string, targetField: string) => {
     try {
       // fetch explore to retrieve all field names
-      const { value: explore } = await sdk.lookml_model_explore(SUMMARY_MODEL, SUMMARY_EXPLORE)
+      const { value: explore } = await sdk.lookml_model_explore(BQML_MODEL, SUMMARY_EXPLORE)
 
       // query the summary table filtering on our newly created BQML data
       const { value: query } = await sdk.create_query({
-        model:  SUMMARY_MODEL,
+        model:  BQML_MODEL,
         view: SUMMARY_EXPLORE,
         fields: explore.fields.dimensions.map((d: any) => d.name),
         filters: {
-          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatSummaryFilter(bqModelName || "")}^_input^_data`,
-          [`${SUMMARY_EXPLORE}.target_field_name`]: formatSummaryFilter(targetField || "")
+          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data`,
+          [`${SUMMARY_EXPLORE}.target_field_name`]: formatParameterFilter(targetField || "")
         }
       })
 
