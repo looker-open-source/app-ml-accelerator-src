@@ -5,13 +5,13 @@ import { getWizardStepCompleteCallback } from '../../services/wizard'
 import { useStore } from '../../contexts/StoreProvider'
 import { ModelContext } from '../../contexts/ModelProvider'
 import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
-import { MODEL_TABS, MODEL_TYPES } from '../../services/modelTypes'
+import { MODEL_TYPES } from '../../services/modelTypes'
 import { Prompt } from 'react-router-dom'
 import { ModelSidebar } from './ModelSiderbar'
+import { ModelDataBody } from './ModelDataBody'
+import { IncompleteJob } from './IncompleteJob'
 import './Step4.scss'
-import { Icon } from '@looker/components'
-import { Alarm } from '@styled-icons/material'
-import { splitFieldName, titilize } from '../../services/string'
+
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { stopPolling, getModelEvalFuncData } = useContext(ModelContext)
@@ -22,6 +22,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { needsSaving } = state.wizard
   const { jobStatus, modelInfo } = state.wizard.steps.step4
   const jobComplete = jobStatus === JOB_STATUSES.done
+  const jobCanceled = jobStatus === JOB_STATUSES.canceled
 
   useEffect(() => {
     const MODEL_TYPE = MODEL_TYPES[modelInfo.bqModelObjective || '']
@@ -71,7 +72,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <h2>Model evaluation overview</h2>
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
 
-      { jobStatus === JOB_STATUSES.done ?
+      { jobComplete?
         (
           <div className="model-grid">
             <div className="model-grid--sidebar">
@@ -82,19 +83,12 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
               />
             </div>
             <div className="model-grid--body">
-              <ModelDataBody evalData={evalData[0]} />
+              { !isLoading && evalData &&
+                <ModelDataBody evalData={evalData[0]} />
+              }
             </div>
           </div>
-        ) : (
-          <div className="model-job-pending">
-            <div className="model-job-pending--contents">
-              {/* @ts-ignore */}
-              <Icon icon={<Alarm />} size="large" className="model-job-pending--icon"/>
-              <h2>Creating Model...</h2>
-              <p>This process may take any where from 10 minutes to several hours to complete.</p>
-            </div>
-          </div>
-        )
+        ) : (<IncompleteJob jobCanceled={jobCanceled} setIsLoading={setIsLoading}/>)
       }
     </StepContainer>
   )
@@ -104,24 +98,3 @@ export const WizardStep4 = withWizardStep({
   isStepComplete: getWizardStepCompleteCallback("step4"),
   stepNumber: 4
 })(Step4)
-
-const ModelDataBody: React.FC<{ evalData: any }> = ({ evalData }) => {
-  if (!evalData) { return (<></>) }
-
-  const dataItems = []
-
-  for (const key in evalData) {
-    dataItems.push(
-      <div className="model-data-item">
-        <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
-        <div className="model-data-item--value">{evalData[key].value}</div>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      { dataItems }
-    </div>
-  )
-}

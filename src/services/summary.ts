@@ -35,14 +35,14 @@ export const hasSummaryData = (
   modelName: string,
   target: string,
   bqModelName: string,
-  sourceColummns: string[]
+  sourceColumns: string[]
 ): boolean => {
   const { summary, allFeatures } = step3Data
   return Boolean(summary.exploreName === exploreName
     && summary.modelName === modelName
     && summary.target === target
     && summary.bqModelName === bqModelName
-    && allFeatures?.sort().join(',') === sourceColummns.join(',')
+    && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data
     && summary.data.length > 0)
 }

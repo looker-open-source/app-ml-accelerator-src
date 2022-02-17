@@ -17,6 +17,7 @@ export const WIZARD_KEYS: {[key: number]: keyof WizardSteps} = {
 }
 
 export const JOB_STATUSES: {[key: string]: string} = {
+  canceled: 'CANCELED',
   pending: 'PENDING',
   running: 'RUNNING',
   done: 'DONE'

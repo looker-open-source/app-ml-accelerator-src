@@ -47,7 +47,7 @@
   }
 }
 
-.model-job-pending {
+.model-job-pending, .model-job-canceled {
   height: 50vh;
   display: flex;
   justify-content: center;
@@ -57,14 +57,33 @@
     align-self: center;
 
     p {
-      width: 270px;
+      width: 380px;
     }
   }
 
   & &--icon {
     width: 100%;
     height: 50px;
+  }
+
+  .model-job-pending--icon {
     color: #FFA800;
+  }
+
+  .model-job-canceled--icon {
+    color: #CC1F36;
+  }
+
+  & &--button {
+    margin-top: 16px;
+    background: transparent;
+    color: #4285F4;
+    cursor: pointer;
+    border: none;
+
+    &:hover, &:active, &:focus {
+      background: transparent;
+    }
   }
 }
 

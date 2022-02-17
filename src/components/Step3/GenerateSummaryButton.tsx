@@ -1,7 +1,6 @@
 import React, { useContext } from 'react'
 import { useStore } from "../../contexts/StoreProvider"
 import { Button, useConfirm } from "@looker/components"
-import { hasSummaryData } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import { NAME_CHECK_STATUSES } from '../../constants'
 

@@ -34,6 +34,7 @@ type IBQMLContext = {
   expired?: boolean,
   setExpired?: (value: boolean) => void,
   queryJob?: (sql: string) => Promise<any>,
+  cancelJob?: (props: { jobId: string, location: string }) => Promise<any>
   getJob?: (props: any) => Promise<any>,
   pollJobStatus?: (
     jobId: string,
@@ -113,6 +114,23 @@ export const BQMLProvider = ({ children }: any) => {
       {
         query: sql,
         useLegacySql: false
+      }
+    )
+    return result
+  }
+
+  /**
+   * Cancel a job
+   * location param is the location the job returns when fetching it (stored in step4.job.location)
+   */
+   const cancelJob = async ({ jobId, location }: { jobId: string, location: string }) => {
+    if (!jobId) {
+      throw "Failed fetch job because jobId was not provided"
+    }
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/jobs/${jobId}/cancel`,
+      {
+        location
       }
     )
     return result
@@ -250,6 +268,7 @@ export const BQMLProvider = ({ children }: any) => {
         expired,
         setExpired,
         queryJob,
+        cancelJob,
         getJob,
         pollJobStatus,
         createModelStateTable,

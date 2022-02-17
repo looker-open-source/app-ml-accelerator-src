@@ -67,7 +67,7 @@ const wizardInitialState: WizardState = {
 const needsSavingSteps = ['step1', 'step2', 'step3']
 
 function wizardReducer(state: WizardState, action: Action): any {
-  console.log({ reducer: action.type, action})
+  console.log({ reducer: action.type, action, state})
   switch (action.type) {
     case 'clearState': {
       return { ...wizardInitialState }

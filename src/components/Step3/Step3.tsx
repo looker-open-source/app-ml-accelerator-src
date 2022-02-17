@@ -113,7 +113,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const stepCompleteButtonText = () => (
     modelNameParam ?
       needsSaving && summaryUpToDate()?
-        "Update Model" :
+        "ReCreate Model" :
         "Continue" :
       "Create Model"
   )
