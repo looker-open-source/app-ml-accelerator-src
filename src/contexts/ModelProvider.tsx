@@ -116,7 +116,7 @@ export const ModelProvider = ({ children }: any) => {
   ) => {
     try {
       const modelType = MODEL_TYPES[bqModelObjective]
-      const evalFuncFields = modelType?.modelFields?.[evalFuncName].map((field: string) => `boosted_tree_evaluate.${field}`)
+      const evalFuncFields = modelType?.modelFields?.[evalFuncName]
 
       // query the model table filtering on our modelID
       const { value: query } = await coreSDK.create_query({
@@ -134,6 +134,9 @@ export const ModelProvider = ({ children }: any) => {
         result_format: "json_detail",
       })
       if (!ok) { throw "Failed to run query" }
+      if (value.errors && value.errors.length >= 1) {
+        throw value.errors[0].message
+      }
       return { ok, value }
     } catch (error) {
       dispatch({type: 'addError', error: "Error fetching evaluation data: " + error})

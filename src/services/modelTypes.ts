@@ -24,7 +24,11 @@ export const MODEL_TYPES: {[key: string]: any} = {
     exploreName: 'boosted_tree',
     modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
     modelFields: {
-      [MODEL_EVAL_FUNCS.evaluate]: ['mean_absolute_error', 'mean_squared_error', 'mean_squared_log_error', 'median_absolute_error', 'r2_score', 'explained_variance']
+      [MODEL_EVAL_FUNCS.evaluate]:
+        ['mean_absolute_error', 'mean_squared_error', 'mean_squared_log_error',
+        'median_absolute_error', 'r2_score', 'explained_variance'].map(
+          (field: string) => `boosted_tree_evaluate.${field}`
+        )
     }
   },
   BOOSTED_TREE_CLASSIFIER: {
@@ -35,7 +39,9 @@ export const MODEL_TYPES: {[key: string]: any} = {
     exploreName: 'boosted_tree',
     modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
     modelFields: {
-      [MODEL_EVAL_FUNCS.evaluate]: ['precision', 'recall', 'accuracy', 'f1_score', 'log_loss', 'roc_auc']
+      [MODEL_EVAL_FUNCS.evaluate]: ['precision', 'recall', 'accuracy', 'f1_score', 'log_loss', 'roc_auc'].map(
+        (field: string) => `boosted_tree_evaluate.${field}`
+      )
     }
   },
   ARIMA_PLUS: {

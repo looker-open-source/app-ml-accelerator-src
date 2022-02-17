@@ -11,6 +11,7 @@ import { ModelSidebar } from './ModelSiderbar'
 import './Step4.scss'
 import { Icon } from '@looker/components'
 import { Alarm } from '@styled-icons/material'
+import { splitFieldName, titilize } from '../../services/string'
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { stopPolling, getModelEvalFuncData } = useContext(ModelContext)
@@ -45,7 +46,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       activeTab,
       modelInfo.bqModelName
     ). then(({ value }) => {
-      console.log({ value})
+      console.log({value})
       setEvalData(value.data)
     }).finally(() => setIsLoading(false))
   }, [jobComplete, activeTab])
@@ -81,7 +82,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
               />
             </div>
             <div className="model-grid--body">
-              {JSON.stringify(evalData)}
+              <ModelDataBody evalData={evalData[0]} />
             </div>
           </div>
         ) : (
@@ -103,3 +104,24 @@ export const WizardStep4 = withWizardStep({
   isStepComplete: getWizardStepCompleteCallback("step4"),
   stepNumber: 4
 })(Step4)
+
+const ModelDataBody: React.FC<{ evalData: any }> = ({ evalData }) => {
+  if (!evalData) { return (<></>) }
+
+  const dataItems = []
+
+  for (const key in evalData) {
+    dataItems.push(
+      <div className="model-data-item">
+        <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
+        <div className="model-data-item--value">{evalData[key].value}</div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      { dataItems }
+    </div>
+  )
+}
