@@ -1,6 +1,6 @@
 import { keyBy, compact } from 'lodash'
 import { Field, Step3State, SummaryTableHeaders } from '../types'
-import { titilize } from './string'
+import { titilize, splitFieldName } from './string'
 
 export const formBQViewSQL = (
   sql: string | undefined,
@@ -16,15 +16,6 @@ export const formBQViewSQL = (
   }
   return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${sql}`
 }
-
-const splitFieldName = (fieldName: string) => {
-  const names = fieldName.split('.')
-  return names.length >= 1 ? names[1] : fieldName
-}
-
-export const formatSummaryFilter = (fieldName: string) => (
-  fieldName.replace(/\.|_+/g, '^_')
-)
 
 // Removes the table name from the column keys
 // e.g. summary_table.pct_null => pct_null
@@ -44,14 +35,14 @@ export const hasSummaryData = (
   modelName: string,
   target: string,
   bqModelName: string,
-  sourceColummns: string[]
+  sourceColumns: string[]
 ): boolean => {
   const { summary, allFeatures } = step3Data
   return Boolean(summary.exploreName === exploreName
     && summary.modelName === modelName
     && summary.target === target
     && summary.bqModelName === bqModelName
-    && allFeatures?.sort().join(',') === sourceColummns.join(',')
+    && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data
     && summary.data.length > 0)
 }

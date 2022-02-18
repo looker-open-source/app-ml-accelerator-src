@@ -29,10 +29,11 @@ import { IQuery } from "@looker/sdk/lib/4.0/models"
 import { BQMLContext } from './BQMLProvider'
 import { matchPath, useHistory, useLocation } from 'react-router-dom'
 import { buildWizardState } from '../services/modelState'
-import { SUMMARY_EXPLORE, SUMMARY_MODEL, WIZARD_STEPS } from '../constants'
+import { SUMMARY_EXPLORE, BQML_LOOKER_MODEL, WIZARD_STEPS, JOB_STATUSES } from '../constants'
 import { mapAPIExploreToClientExplore } from '../services/explores'
 import { getHeaderColumns } from '../services/resultsTable'
-import { formatSummaryFilter, renameSummaryDataKeys } from '../services/summary'
+import { renameSummaryDataKeys } from '../services/summary'
+import { formatParameterFilter } from '../services/string'
 
 type IWizardContext = {
   loadingModel?: boolean,
@@ -44,7 +45,8 @@ type IWizardContext = {
     tableHeaders?: ResultsTableHeaderItem[]) => void,
   createAndRunQuery?: (stepData: Step2State) => Promise<any>,
   fetchSummary?: (bqModelName: string, targetField: string) => Promise<any>,
-  saveSummary?: (rawSummary: any, wizardState: WizardState) => void
+  saveSummary?: (rawSummary: any, wizardState: WizardState) => void,
+  persistWizardState?: (wizardState: WizardState, retry?: boolean) => Promise<any>
 }
 
 export const WizardContext = createContext<IWizardContext>({})
@@ -56,7 +58,7 @@ export const WizardProvider = ({ children }: any) => {
   const modelNameParam = match ? match?.params?.modelNameParam : undefined
   const { dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
-  const { getSavedModelState } = useContext(BQMLContext)
+  const { getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
   const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
 
 
@@ -88,7 +90,7 @@ export const WizardProvider = ({ children }: any) => {
         type: 'populateWizard',
         wizardState: loadedWizardState
       })
-      const { step2, step3 } = loadedWizardState.steps
+      const { step2, step3, step4 } = loadedWizardState.steps
       if (!step2.modelName || !step2.exploreName) {
         throw "Failed to load model"
       }
@@ -113,7 +115,9 @@ export const WizardProvider = ({ children }: any) => {
         saveSummary(value, loadedWizardState, step3.selectedFeatures)
       }
 
-      dispatch({ type: 'setNeedsSaving', value: false })
+      if (step4.jobStatus !== JOB_STATUSES.canceled) {
+        dispatch({ type: 'setNeedsSaving', value: false })
+      }
       console.log('end load model')
     } catch (error) {
       dispatch({type: 'addError', error: `${error}`})
@@ -212,16 +216,16 @@ export const WizardProvider = ({ children }: any) => {
   const fetchSummary = async (bqModelName: string, targetField: string) => {
     try {
       // fetch explore to retrieve all field names
-      const { value: explore } = await sdk.lookml_model_explore(SUMMARY_MODEL, SUMMARY_EXPLORE)
+      const { value: explore } = await sdk.lookml_model_explore(BQML_LOOKER_MODEL, SUMMARY_EXPLORE)
 
       // query the summary table filtering on our newly created BQML data
       const { value: query } = await sdk.create_query({
-        model:  SUMMARY_MODEL,
+        model:  BQML_LOOKER_MODEL,
         view: SUMMARY_EXPLORE,
         fields: explore.fields.dimensions.map((d: any) => d.name),
         filters: {
-          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatSummaryFilter(bqModelName || "")}^_input^_data`,
-          [`${SUMMARY_EXPLORE}.target_field_name`]: formatSummaryFilter(targetField || "")
+          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data`,
+          [`${SUMMARY_EXPLORE}.target_field_name`]: formatParameterFilter(targetField || "")
         }
       })
 
@@ -247,7 +251,7 @@ export const WizardProvider = ({ children }: any) => {
       step: 'step3',
       data: {
         allFeatures,
-        selectedFeatures: selectedFeatures || allFeatures,
+        selectedFeatures: selectedFeatures || [...allFeatures],
         summary: {
           exploreName: step2.exploreName,
           modelName: step2.modelName,
@@ -260,6 +264,32 @@ export const WizardProvider = ({ children }: any) => {
     })
   }
 
+  // Save key information from the wizards state associated with the bqModelName
+  // into a BQ table so we can reload past models
+  const persistWizardState = async (wizardState: WizardState, retry: boolean = false) => {
+    try {
+      {
+        const { ok, body } = await createModelStateTable?.()
+        if (!ok || !body.jobComplete) {
+          throw "Failed to create table"
+        }
+      }
+      const { ok, body } = await insertOrUpdateModelState?.(wizardState)
+      if (!ok) {
+        throw "Failed to save your model"
+      }
+      dispatch({ type: 'setNeedsSaving', value: false })
+      return { ok, body }
+    } catch (error) {
+      if (retry) {
+        console.error("Failed to save model to BQ model state")
+        return
+      }
+      // retry once
+      persistWizardState(wizardState, true)
+    }
+  }
+
   return (
     <WizardContext.Provider
       value={{
@@ -268,7 +298,8 @@ export const WizardProvider = ({ children }: any) => {
         saveQueryToState,
         createAndRunQuery,
         fetchSummary,
-        saveSummary
+        saveSummary,
+        persistWizardState
       }}
     >
       {children}

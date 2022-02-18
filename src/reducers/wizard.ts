@@ -55,6 +55,10 @@ const wizardInitialState: WizardState = {
     step4: {
       jobStatus: undefined,
       job: undefined,
+      modelInfo: {
+        bqModelName: undefined,
+        bqModelObjective: undefined
+      }
     },
     step5: { data: null }
   }
@@ -63,7 +67,7 @@ const wizardInitialState: WizardState = {
 const needsSavingSteps = ['step1', 'step2', 'step3']
 
 function wizardReducer(state: WizardState, action: Action): any {
-  console.log({ reducer: action.type, action})
+  console.log({ reducer: action.type, action, state})
   switch (action.type) {
     case 'clearState': {
       return { ...wizardInitialState }

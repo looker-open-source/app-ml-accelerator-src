@@ -34,6 +34,7 @@ type IBQMLContext = {
   expired?: boolean,
   setExpired?: (value: boolean) => void,
   queryJob?: (sql: string) => Promise<any>,
+  cancelJob?: (props: { jobId: string, location: string }) => Promise<any>
   getJob?: (props: any) => Promise<any>,
   pollJobStatus?: (
     jobId: string,
@@ -113,6 +114,23 @@ export const BQMLProvider = ({ children }: any) => {
       {
         query: sql,
         useLegacySql: false
+      }
+    )
+    return result
+  }
+
+  /**
+   * Cancel a job
+   * location param is the location the job returns when fetching it (stored in step4.job.location)
+   */
+   const cancelJob = async ({ jobId, location }: { jobId: string, location: string }) => {
+    if (!jobId) {
+      throw "Failed fetch job because jobId was not provided"
+    }
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/jobs/${jobId}/cancel`,
+      {
+        location
       }
     )
     return result
@@ -224,10 +242,12 @@ export const BQMLProvider = ({ children }: any) => {
 
   const getSavedModelState = async (modelName: string) => {
     try {
-      if (!modelName) { return { ok: false } }
+      const { email: userEmail } = state.user
+      if (!modelName || !userEmail) { return { ok: false } }
 
       const { value } = await getSavedModels({
-        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
+        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName,
+        [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
       })
       const savedData = value.data[0]
       const stateJson = savedData ? savedData[MODEL_STATE_TABLE_COLUMNS.stateJson].value : null
@@ -250,6 +270,7 @@ export const BQMLProvider = ({ children }: any) => {
         expired,
         setExpired,
         queryJob,
+        cancelJob,
         getJob,
         pollJobStatus,
         createModelStateTable,

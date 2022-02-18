@@ -20,3 +20,12 @@
     })
     .join(" ");
 }
+
+export const splitFieldName = (fieldName: string) => {
+  const names = fieldName.split('.')
+  return names.length >= 1 ? names[1] : fieldName
+}
+
+export const formatParameterFilter = (fieldName: string) => (
+  fieldName.replace(/\.|_+/g, '^_')
+)

@@ -1,29 +1,63 @@
+export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
+  trainingInfo: 'trainingInfo',
+  evaluate: 'evaluate',
+  arimaEvaluate: 'arimaEvaluate',
+  confusionMatrix: 'confusionMatrix',
+  rocCurve: 'rocCurve'
+}
+
+export const MODEL_TABS: {[key:string]: string} = {
+  [MODEL_EVAL_FUNCS.trainingInfo]: 'ML.TRAINING_INFO',
+  [MODEL_EVAL_FUNCS.evaluate]: 'ML.EVALUATE',
+  [MODEL_EVAL_FUNCS.arimaEvaluate]: 'ML.ARIMA_EVALUATE',
+  [MODEL_EVAL_FUNCS.confusionMatrix]: 'ML.CONFUSION_MATRIX',
+  [MODEL_EVAL_FUNCS.rocCurve]: 'ML.ROC_CURVE'
+}
+
 export const MODEL_TYPES: {[key: string]: any} = {
   BOOSTED_TREE_REGRESSOR: {
     label: 'Regression',
     value: 'BOOSTED_TREE_REGRESSOR',
     detail: 'BOOSTED_TREE_REGRESSOR',
     description: 'I want to recommend something',
-    targetDataType: 'numeric'
+    targetDataType: 'numeric',
+    exploreName: 'boosted_tree',
+    modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
+    modelFields: {
+      [MODEL_EVAL_FUNCS.evaluate]:
+        ['mean_absolute_error', 'mean_squared_error', 'mean_squared_log_error',
+        'median_absolute_error', 'r2_score', 'explained_variance'].map(
+          (field: string) => `boosted_tree_evaluate.${field}`
+        )
+    }
   },
   BOOSTED_TREE_CLASSIFIER: {
     label: 'Classification',
     value: 'BOOSTED_TREE_CLASSIFIER',
     detail: 'BOOSTED_TREE_CLASSIFIER',
-    description: 'I want to classify something'
+    description: 'I want to classify something',
+    exploreName: 'boosted_tree',
+    modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
+    modelFields: {
+      [MODEL_EVAL_FUNCS.evaluate]: ['precision', 'recall', 'accuracy', 'f1_score', 'log_loss', 'roc_auc'].map(
+        (field: string) => `boosted_tree_evaluate.${field}`
+      )
+    }
   },
   ARIMA_PLUS: {
     label: 'Time series forecasting',
     value: 'ARIMA_PLUS',
     detail: 'ARIMA_PLUS',
     description: 'I want to forecast a number (e.g. future sales)',
-    targetDataType: 'numeric'
+    targetDataType: 'numeric',
+    modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.arimaEvaluate],
   },
   KMEANS: {
     label: 'Clustering',
     value: 'KMEANS',
     detail: 'KMEANS',
-    description: 'Try Clustering'
+    description: 'Try Clustering',
+    modelTabs: [MODEL_EVAL_FUNCS.evaluate]
   },
 }
 
@@ -97,3 +131,15 @@ export const MODEL_TYPE_CREATE_METHOD: { [key: string]: (props: IFormSQLProps) =
   BOOSTED_TREE_CLASSIFIER: formBoostedTreeClassifierSQL,
   ARIMA_PLUS: formArimaSQL
 }
+
+type modelIdGeneratorProps = {
+  bqModelName: string,
+  objective: string
+}
+
+export const modelIdGenerator = ({
+  bqModelName,
+  objective
+}: modelIdGeneratorProps): string => (
+  `${bqModelName}_${objective.toLowerCase()}`
+)

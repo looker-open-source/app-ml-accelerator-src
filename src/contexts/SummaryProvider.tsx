@@ -28,7 +28,6 @@ import { formBQViewSQL } from '../services/summary'
 import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
 import { JOB_STATUSES } from '../constants'
-import { WizardState } from '../types'
 
 type ISummaryContext = {
   getSummaryData?: (
@@ -53,13 +52,11 @@ export const SummaryContext = createContext<ISummaryContext>({})
  */
 export const SummaryProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
-  const { fetchSummary, saveSummary } = useContext(WizardContext)
+  const { fetchSummary, saveSummary, persistWizardState } = useContext(WizardContext)
   const {
     queryJob,
     pollJobStatus,
-    getJob,
-    createModelStateTable,
-    insertOrUpdateModelState
+    getJob
   } = useContext(BQMLContext)
   const { gcpProject, bqmlModelDatasetName } = state.userAttributes
   const [ previousBQValues, setPreviousBQValues ] = useState<any>({
@@ -180,7 +177,11 @@ export const SummaryProvider = ({ children }: any) => {
 
       const jobState = {
         jobStatus: JOB_STATUSES.pending,
-        job: body.jobReference
+        job: body.jobReference,
+        modelInfo: {
+          bqModelName: bqModelName,
+          bqModelObjective: objective
+        }
       }
       // create a copy of the wizard state with the job added
       const { wizard } = state
@@ -191,7 +192,7 @@ export const SummaryProvider = ({ children }: any) => {
           step4: jobState
         }
       }
-      await persistWizardState(wizardState)
+      await persistWizardState?.(wizardState)
       dispatch({
         type: 'addToStepData',
         step: 'step4',
@@ -202,31 +203,6 @@ export const SummaryProvider = ({ children }: any) => {
       console.log({error})
       dispatch({type: 'addError', error: "Failed to create model: " + error})
       return { ok: false }
-    }
-  }
-
-  // Save key information from the wizards state associated with the bqModelName
-  // into a BQ table so we can reload past models
-  const persistWizardState = async (wizardState: WizardState, retry: boolean = false) => {
-    try {
-      {
-        const { ok, body } = await createModelStateTable?.()
-        if (!ok || !body.jobComplete) {
-          throw "Failed to create table"
-        }
-      }
-      const { ok, body } = await insertOrUpdateModelState?.(wizardState)
-      if (!ok) {
-        throw "Failed to save your model"
-      }
-      dispatch({ type: 'setNeedsSaving', value: false })
-    } catch (error) {
-      if (retry) {
-        console.error("Failed to save model to BQ model state")
-        return
-      }
-      // retry once
-      persistWizardState(wizardState, true)
     }
   }
 
