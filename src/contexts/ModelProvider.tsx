@@ -25,7 +25,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
-import { BQML_MODEL, JOB_STATUSES } from '../constants'
+import { BQML_LOOKER_MODEL, JOB_STATUSES } from '../constants'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { modelIdGenerator, MODEL_TYPES } from '../services/modelTypes'
 import { formatParameterFilter } from '../services/string'
@@ -96,7 +96,6 @@ export const ModelProvider = ({ children }: any) => {
         dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
         throw body.status.errorResult.message
       }
-      console.log({ JobPollState: body })
       dispatch({
         type: 'addToStepData',
         step: 'step4',
@@ -122,9 +121,13 @@ export const ModelProvider = ({ children }: any) => {
       const modelType = MODEL_TYPES[bqModelObjective]
       const evalFuncFields = modelType?.modelFields?.[evalFuncName]
 
+      if (!evalFuncFields || evalFuncFields.length <= 0) {
+        throw "Failed to find fields associated with this evaluate function."
+      }
+
       // query the model table filtering on our modelID
       const { value: query } = await coreSDK.create_query({
-        model:  BQML_MODEL,
+        model:  BQML_LOOKER_MODEL,
         view: modelType.exploreName,
         fields: evalFuncFields,
         filters: {
@@ -150,7 +153,7 @@ export const ModelProvider = ({ children }: any) => {
 
   const cancelModelCreate = async () => {
     try{
-      if (!job || !cancelJob) { throw "Refresh and try again."}
+      if (!job || !cancelJob) { throw "Refresh and try again." }
       const { ok } = await cancelJob({
         jobId: job.jobId,
         location: job.location

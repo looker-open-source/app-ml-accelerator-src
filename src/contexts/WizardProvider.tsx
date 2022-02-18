@@ -29,7 +29,7 @@ import { IQuery } from "@looker/sdk/lib/4.0/models"
 import { BQMLContext } from './BQMLProvider'
 import { matchPath, useHistory, useLocation } from 'react-router-dom'
 import { buildWizardState } from '../services/modelState'
-import { SUMMARY_EXPLORE, BQML_MODEL, WIZARD_STEPS, JOB_STATUSES } from '../constants'
+import { SUMMARY_EXPLORE, BQML_LOOKER_MODEL, WIZARD_STEPS, JOB_STATUSES } from '../constants'
 import { mapAPIExploreToClientExplore } from '../services/explores'
 import { getHeaderColumns } from '../services/resultsTable'
 import { renameSummaryDataKeys } from '../services/summary'
@@ -216,11 +216,11 @@ export const WizardProvider = ({ children }: any) => {
   const fetchSummary = async (bqModelName: string, targetField: string) => {
     try {
       // fetch explore to retrieve all field names
-      const { value: explore } = await sdk.lookml_model_explore(BQML_MODEL, SUMMARY_EXPLORE)
+      const { value: explore } = await sdk.lookml_model_explore(BQML_LOOKER_MODEL, SUMMARY_EXPLORE)
 
       // query the summary table filtering on our newly created BQML data
       const { value: query } = await sdk.create_query({
-        model:  BQML_MODEL,
+        model:  BQML_LOOKER_MODEL,
         view: SUMMARY_EXPLORE,
         fields: explore.fields.dimensions.map((d: any) => d.name),
         filters: {
@@ -264,7 +264,7 @@ export const WizardProvider = ({ children }: any) => {
     })
   }
 
-    // Save key information from the wizards state associated with the bqModelName
+  // Save key information from the wizards state associated with the bqModelName
   // into a BQ table so we can reload past models
   const persistWizardState = async (wizardState: WizardState, retry: boolean = false) => {
     try {

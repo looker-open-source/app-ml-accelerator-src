@@ -25,32 +25,37 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const jobCanceled = jobStatus === JOB_STATUSES.canceled
 
   useEffect(() => {
-    const MODEL_TYPE = MODEL_TYPES[modelInfo.bqModelObjective || '']
-    const { modelTabs } = MODEL_TYPE
-    if (
-      !MODEL_TYPE ||
-      modelTabs.indexOf(activeTab) >= 0
-    ) { return }
-    setActiveTab(modelTabs[0])
+    if (!modelInfo.bqModelObjective) { return }
+    const MODEL_TYPE = MODEL_TYPES[modelInfo.bqModelObjective]
+    if (MODEL_TYPE) {
+      const { modelTabs } = MODEL_TYPE
+      if (!activeTab || modelTabs.indexOf(activeTab) < 0) {
+        setActiveTab(modelTabs[0])
+      }
+    }
   }, [])
 
   useEffect(() => {
+    fetchModelData()
+  }, [jobComplete, activeTab])
+
+  const fetchModelData = async () => {
     if (
       !jobComplete ||
       !modelInfo.bqModelName ||
       !modelInfo.bqModelObjective ||
       !activeTab
     ) { return }
+
     setIsLoading(true)
-    getModelEvalFuncData?.(
+    const { value } = await getModelEvalFuncData?.(
       modelInfo.bqModelObjective,
       activeTab,
       modelInfo.bqModelName
-    ). then(({ value }) => {
-      console.log({value})
-      setEvalData(value.data)
-    }).finally(() => setIsLoading(false))
-  }, [jobComplete, activeTab])
+    )
+    setEvalData(value.data)
+    setIsLoading(false)
+  }
 
   const onRouteChange = () => {
     stopPolling?.()
@@ -71,7 +76,6 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       )}
       <h2>Model evaluation overview</h2>
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
-
       { jobComplete?
         (
           <div className="model-grid">
@@ -88,7 +92,9 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
               }
             </div>
           </div>
-        ) : (<IncompleteJob jobCanceled={jobCanceled} setIsLoading={setIsLoading}/>)
+        ) : (
+          <IncompleteJob jobCanceled={jobCanceled} setIsLoading={setIsLoading}/>
+        )
       }
     </StepContainer>
   )
