@@ -242,10 +242,12 @@ export const BQMLProvider = ({ children }: any) => {
 
   const getSavedModelState = async (modelName: string) => {
     try {
-      if (!modelName) { return { ok: false } }
+      const { email: userEmail } = state.user
+      if (!modelName || !userEmail) { return { ok: false } }
 
       const { value } = await getSavedModels({
-        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
+        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName,
+        [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
       })
       const savedData = value.data[0]
       const stateJson = savedData ? savedData[MODEL_STATE_TABLE_COLUMNS.stateJson].value : null

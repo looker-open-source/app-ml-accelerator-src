@@ -11,6 +11,7 @@ import { ModelSidebar } from './ModelSiderbar'
 import { ModelDataBody } from './ModelDataBody'
 import { IncompleteJob } from './IncompleteJob'
 import './Step4.scss'
+import { titilize } from '../../services/string'
 
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -71,7 +72,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <Prompt message={onRouteChange}/>
       { jobComplete && needsSaving && (
         <div className="minor-error">
-          You have made changes that are not reflected in this model.  Return to the {WIZARD_STEPS['step3']} tab and `Update Model`.
+          You have made changes that are not reflected in this model.  Return to the {titilize(WIZARD_STEPS['step3'])} tab and 'ReCreate Model'.
         </div>
       )}
       <h2>Model evaluation overview</h2>
