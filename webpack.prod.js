@@ -13,6 +13,7 @@
 // limitations under the License.
 
 const commonConfig = require("./webpack.config");
+const dotenv = require('dotenv-webpack');
 
 module.exports = {
   ...commonConfig,
@@ -20,4 +21,11 @@ module.exports = {
   optimization: {
     chunkIds: "named",
   },
+  // **************************
+  // TODO: REMOVE THE DOTENV PLUGIN FROM PROD
+  // **************************
+  plugins: [
+    ...commonConfig.plugins,
+    new dotenv()
+  ],
 };
