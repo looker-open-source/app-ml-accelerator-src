@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const webpack = require('webpack');
 const commonConfig = require("./webpack.config");
 
 module.exports = {
