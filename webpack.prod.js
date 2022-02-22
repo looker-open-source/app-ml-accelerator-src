@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const webpack = require('webpack');
+const dotenv = require('dotenv-webpack');
 const commonConfig = require("./webpack.config");
 
 module.exports = {
@@ -21,16 +21,8 @@ module.exports = {
   optimization: {
     chunkIds: "named",
   },
-  // **************************
-  // TODO: REMOVE THE DOTENV PLUGIN FROM PROD
-  // **************************
   plugins: [
     ...commonConfig.plugins,
-    new webpack.DefinePlugin({
-      BIGQUERY_CONN: JSON.stringify(process.env.BIGQUERY_CONN),
-      GOOGLE_CLIENT_ID: JSON.stringify(process.env.GOOGLE_CLIENT_ID),
-      BQML_MODEL_DATASET_NAME: JSON.stringify(process.env.BQML_MODEL_DATASET_NAME),
-      GCP_PROJECT: JSON.stringify(process.env.GCP_PROJECT)
-    })
+    new dotenv({ systemvars: true })
   ],
 };

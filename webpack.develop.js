@@ -43,6 +43,6 @@ module.exports = {
   },
   plugins: [
     ...commonConfig.plugins,
-    new dotenv()
+    new dotenv({ systemvars: true })
   ],
 };
