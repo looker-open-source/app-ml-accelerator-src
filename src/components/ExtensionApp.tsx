@@ -7,30 +7,20 @@ import { LookerBQMLApp } from './LookerBQMLApp'
 import './ExtensionApp.scss'
 import { useStore } from '../contexts/StoreProvider'
 import { BQMLProvider } from '../contexts/BQMLProvider'
+import { UserContext } from '../contexts/UserProvider'
 
 export const ExtensionApp: React.FC = () => {
   const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
+  const { getSelf } = useContext(UserContext)
   const { state, dispatch } = useStore()
   const [clientId, setClientId] = useState<string | null>()
 
   useEffect(() => {
-    if (!state.user.email) {
-      getUser()
-    }
+    getSelf?.()
     if (!clientId) {
       getUserAttributes()
     }
   }, [])
-
-  const getUser = async () => {
-    try {
-      const { value } = await coreSDK.me()
-      dispatch({ type: "setUser", user: { id: value.id, email: value.email, firstName: value.first_name }})
-    } catch (err) {
-      dispatch({ type: 'addError', error: 'Failed to retrieve User' })
-    } finally {
-    }
-  }
 
   const getUserAttributes = async () => {
     try {

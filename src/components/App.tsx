@@ -24,12 +24,15 @@ import { Looker40SDK } from '@looker/sdk'
 import { StoreProvider } from '../contexts/StoreProvider'
 import { hot } from 'react-hot-loader/root'
 import { ExtensionApp } from './ExtensionApp'
+import { UserProvider } from '../contexts/UserProvider'
 
 export const App = hot(() => (
   <ExtensionProvider2 type={Looker40SDK}>
     <ComponentsProvider>
       <StoreProvider>
-        <ExtensionApp />
+        <UserProvider>
+          <ExtensionApp />
+        </UserProvider>
       </StoreProvider>
     </ComponentsProvider>
   </ExtensionProvider2>
