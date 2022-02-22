@@ -45,8 +45,7 @@
     "webpack": "^5.61.0",
     "webpack-bundle-analyzer": "^4.2.0",
     "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2",
-    "dotenv-webpack": "^7.0.3"
+    "webpack-dev-server": "^3.11.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",
@@ -71,6 +70,7 @@
     "@types/use-combined-reducers": "^1.0.0",
     "babel-preset-nano-react-app": "^0.1.0",
     "css-loader": "^6.3.0",
+    "dotenv-webpack": "^7.0.3",
     "jest": "^27.2.0",
     "minimist": "^1.2.2",
     "nodemon": "^2.0.6",

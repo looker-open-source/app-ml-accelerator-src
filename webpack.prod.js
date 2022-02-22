@@ -13,7 +13,6 @@
 // limitations under the License.
 
 const commonConfig = require("./webpack.config");
-const dotenv = require('dotenv-webpack');
 
 module.exports = {
   ...commonConfig,
@@ -26,6 +25,11 @@ module.exports = {
   // **************************
   plugins: [
     ...commonConfig.plugins,
-    new dotenv()
+    new webpack.DefinePlugin({
+      BIGQUERY_CONN: JSON.stringify(process.env.BIGQUERY_CONN),
+      GOOGLE_CLIENT_ID: JSON.stringify(process.env.GOOGLE_CLIENT_ID),
+      BQML_MODEL_DATASET_NAME: JSON.stringify(process.env.BQML_MODEL_DATASET_NAME),
+      GCP_PROJECT: JSON.stringify(process.env.GCP_PROJECT)
+    })
   ],
 };
