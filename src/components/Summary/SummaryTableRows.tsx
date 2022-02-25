@@ -1,17 +1,18 @@
 import React from 'react'
 import { SummaryTableHeaders } from '../../types'
 import { Checkbox, Icon } from "@looker/components"
-import { TrackChanges } from '@styled-icons/material'
+import { TrackChanges, AccessTime } from '@styled-icons/material'
 
 type SummaryTableRows = {
   data: any[] | undefined
   headers: SummaryTableHeaders
   targetField: string
+  arimaTimeColumn?: string
   selectedFeatures: string[]
   checkboxChange: (fieldName: string) => void
 }
 
-export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, targetField, selectedFeatures, checkboxChange }) => {
+export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, targetField, arimaTimeColumn, selectedFeatures, checkboxChange }) => {
   if (!data) { return null }
 
   const checkBoxCell = (rowData: any) => {
@@ -20,6 +21,19 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
       return (
         <td className="checkbox">
           <Icon icon={<TrackChanges />} className="target-icon" />
+        </td>
+      )
+    }
+    if (arimaTimeColumn && arimaTimeColumn.replace(/\./g, '_') === rowColumnName) {
+      return (
+        <td className="checkbox">
+          <Icon icon={<AccessTime />} className="target-icon" />
+        </td>
+      )
+    }
+    if (arimaTimeColumn) {
+      return (
+        <td className="checkbox">
         </td>
       )
     }

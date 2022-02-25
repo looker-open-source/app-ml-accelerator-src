@@ -41,7 +41,8 @@ type ISummaryContext = {
     bqModelName?: string,
     targetField?: string,
     features?: string[],
-    arimaTimeColumn?:  string
+    arimaTimeColumn?:  string,
+    advancedSettings?: any
   ) => Promise<any>
 }
 
@@ -72,35 +73,46 @@ export const SummaryProvider = ({ children }: any) => {
     querySql: string | undefined,
     bqModelName: string | undefined
   ) => {
-    if (!bqmlModelDatasetName) {
-      throw "User Attribute 'looker_temp_dataset_name' must be defined"
-    }
-
-    const sql = formBQViewSQL(querySql, bqmlModelDatasetName, bqModelName)
-    if (!sql) {
-      throw "Failed to create BigQuery View SQL statement"
-    }
-    const { body } = await createJob(sql)
-    if (!body.jobComplete) {
-      // Give it another 10s to get the job status in case BQ is taking a while to create the view
-      if (!pollJobStatus) {
-        throw "Failed to  finish creating bigQuery view"
+    try {
+      if (!bqmlModelDatasetName) {
+        throw "User Attribute 'looker_temp_dataset_name' must be defined"
       }
-      const { promise } = pollJobStatus(
-        body.jobReference.jobId,
-        3300,
-        3
-      )
-      await promise
+
+      const sql = formBQViewSQL(querySql, bqmlModelDatasetName, bqModelName)
+      if (!sql) {
+        throw "Failed to create BigQuery View SQL statement"
+      }
+      const { ok, body } = await createJob(sql)
+      if (!ok) { return { ok, body }}
+      if (!body.jobComplete) {
+        // Give it another 10s to get the job status in case BQ is taking a while to create the view
+        if (!pollJobStatus) {
+          throw "Failed to  finish creating bigQuery view"
+        }
+        const { promise } = pollJobStatus(
+          body.jobReference.jobId,
+          3300,
+          3
+        )
+        const result = await promise
+        return result;
+      }
+      return { ok, body }
+    } catch (error) {
+      return { ok: false }
     }
   }
 
   const createJob = async (sql: string) => {
-    const { ok, body } = await queryJob?.(sql)
-    if (!ok) {
-      throw "Failed to create or replace bigQuery view"
+    try {
+      const { ok, body } = await queryJob?.(sql)
+      if (!ok) {
+        throw "Failed to create or replace bigQuery view"
+      }
+      return { ok, body }
+    } catch(error) {
+      return { ok: false }
     }
-    return { ok, body }
   }
 
   /**
@@ -119,16 +131,21 @@ export const SummaryProvider = ({ children }: any) => {
       // do not create the BQ view if its alrady been created for this sql and model name
       if (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model) {
         setPreviousBQValues({ sql: querySql, model: bqModelName })
-        await createBQMLView(querySql, bqModelName)
+        const result = await createBQMLView(querySql, bqModelName)
+
+        if (!result.ok) {
+          throw "Failed to create BQML View"
+        }
       }
 
       const { ok, value } = await fetchSummary?.(bqModelName, targetField)
-      if (!ok || !value) {
+      if (!ok || !value || (value.errors && value.errors.length > 0)) {
         throw "Failed to fetch summary."
       }
       saveSummary?.(value, state.wizard)
       return { ok, value }
     } catch(error) {
+      setPreviousBQValues({ sql: null, model: null })
       dispatch({type: 'addError', error: "Failed to fetch summary.  Please try again."})
       return { ok: false }
     }
@@ -139,7 +156,8 @@ export const SummaryProvider = ({ children }: any) => {
     bqModelName?: string,
     target?: string,
     features?: string[],
-    arimaTimeColumn?: string
+    arimaTimeColumn?: string,
+    advancedSettings?: any
   ) => {
     try {
       if (
@@ -153,18 +171,14 @@ export const SummaryProvider = ({ children }: any) => {
         (isArima(objective) && !arimaTimeColumn)
       ) { return }
 
-      // TODO:
-      // CHECK THAT MODEL NAME IS NOT ALREADY TAKEN BY ANOTHER USER
-      // IF ITS THEIR OWN EXISTING MODEL & NO modelNameParam,
-      // PROMPT THE USER TO CONFIRM THEY WANT TO OVERWRITE THEIR OWN MODEL
-
       const sql = MODEL_TYPE_CREATE_METHOD[objective]({
         gcpProject,
         bqmlModelDatasetName,
         bqModelName,
         target,
         features,
-        arimaTimeColumn
+        arimaTimeColumn,
+        advancedSettings
       })
       if (!sql) {
         throw "Failed to create BigQuery Model SQL statement"

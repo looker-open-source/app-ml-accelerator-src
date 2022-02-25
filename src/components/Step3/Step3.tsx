@@ -12,6 +12,7 @@ import Summary from '../Summary'
 import { GenerateSummaryButton } from './GenerateSummaryButton'
 import { ModelNameBlock } from './ModelNameBlock'
 import './Step3.scss'
+import { AdvancedSettings } from './AdvancedSettings'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -36,7 +37,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     selectedFeatures,
     targetField,
     bqModelName,
-    arimaTimeColumn
+    arimaTimeColumn,
+    advancedSettings
   } = step3
   const arima = isArima(objective || "")
   const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
@@ -78,7 +80,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       bqModelName,
       targetField,
       selectedFeatures,
-      arimaTimeColumn
+      arimaTimeColumn,
+      advancedSettings
     )
     setIsLoading(false)
     return { ok }
@@ -91,15 +94,18 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       modelName,
       targetField || '',
       bqModelName,
+      advancedSettings,
       sourceColumnsFormatted
     )
   )
 
   const buildHandleCompleteClick = () => {
-    if (
-      !needsSaving ||
-      (needsSaving && !summaryUpToDate())
-    ) { return }
+    if (modelNameParam) {
+      if (
+        !needsSaving ||
+        (needsSaving && !summaryUpToDate())
+      ) { return }
+    }
 
     // passed into the stepComplete button to be executed
     // before redirect to the next step
@@ -117,6 +123,11 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         "Continue" :
       "Create Model"
   )
+
+  const buildAdvancedSettings = () => {
+    if (!objective) { return <></> }
+    return MODEL_TYPES[objective].advancedSettings ? <AdvancedSettings objective={objective}/> : <></>
+  }
 
   return (
     <StepContainer
@@ -177,10 +188,12 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           />
         </div>
       </div>
+      { buildAdvancedSettings() }
       { summary.data && summary.target &&
         (
           <Summary
             targetField={summary.target}
+            arimaTimeColumn={summary.arimaTimeColumn}
             summaryData={summary.data}
             selectedFeatures={selectedFeatures || []}
             updateSelectedFeatures={updateSelectedFeatures} />

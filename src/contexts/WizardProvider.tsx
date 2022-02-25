@@ -252,11 +252,14 @@ export const WizardProvider = ({ children }: any) => {
       data: {
         allFeatures,
         selectedFeatures: selectedFeatures || [...allFeatures],
+        advancedSettings: step3.advancedSettings || {},
         summary: {
           exploreName: step2.exploreName,
           modelName: step2.modelName,
           bqModelName: step3.bqModelName,
           target: step3.targetField,
+          arimaTimeColumn: step3.arimaTimeColumn,
+          advancedSettings: step3.advancedSettings || {},
           data: summaryData,
           fields: [...fields.dimensions, ...fields.measures]
         }

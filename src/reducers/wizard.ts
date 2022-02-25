@@ -43,13 +43,16 @@ const wizardInitialState: WizardState = {
       arimaTimeColumn: undefined,
       allFeatures: [],
       selectedFeatures: [],
+      advancedSettings: {},
       summary: {
         exploreName: undefined,
         modelName: undefined,
         fields: undefined,
         data: undefined,
         target: undefined,
-        bqModelName: undefined
+        bqModelName: undefined,
+        arimaTimeColumn: undefined,
+        advancedSettings: {},
       }
     },
     step4: {

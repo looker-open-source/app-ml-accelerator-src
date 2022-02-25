@@ -1,4 +1,5 @@
 import { keyBy, compact } from 'lodash'
+import { AdvancedSettings } from '../components/Step3/AdvancedSettings'
 import { Field, Step3State, SummaryTableHeaders } from '../types'
 import { titilize, splitFieldName } from './string'
 
@@ -35,6 +36,7 @@ export const hasSummaryData = (
   modelName: string,
   target: string,
   bqModelName: string,
+  advancedSettings: string,
   sourceColumns: string[]
 ): boolean => {
   const { summary, allFeatures } = step3Data
@@ -42,6 +44,7 @@ export const hasSummaryData = (
     && summary.modelName === modelName
     && summary.target === target
     && summary.bqModelName === bqModelName
+    && summary.advancedSettings === advancedSettings
     && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data
     && summary.data.length > 0)

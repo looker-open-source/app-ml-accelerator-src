@@ -7,6 +7,8 @@ export type Summary = {
   modelName?: string
   target?: string
   bqModelName?: string
+  advancedSettings?: any
+  arimaTimeColumn?: any
 }
 
 export type SummaryTableHeader = {

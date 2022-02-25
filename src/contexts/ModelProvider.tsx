@@ -124,7 +124,6 @@ export const ModelProvider = ({ children }: any) => {
       if (!evalFuncFields || evalFuncFields.length <= 0) {
         throw "Failed to find fields associated with this evaluate function."
       }
-
       // query the model table filtering on our modelID
       const { value: query } = await coreSDK.create_query({
         model:  BQML_LOOKER_MODEL,

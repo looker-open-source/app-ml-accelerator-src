@@ -37,6 +37,7 @@ export type Step3State = {
   arimaTimeColumn: string | undefined,
   allFeatures: string[] | undefined,
   selectedFeatures: string[] | undefined,
+  advancedSettings: any,
   summary: Summary
 }
 
