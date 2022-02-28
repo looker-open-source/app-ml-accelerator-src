@@ -88,15 +88,16 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const summaryUpToDate = () => (
-    hasSummaryData(
-      step3,
+    hasSummaryData({
+      step3Data: step3,
       exploreName,
       modelName,
-      targetField || '',
+      target: targetField || '',
       bqModelName,
       advancedSettings,
-      sourceColumnsFormatted
-    )
+      sourceColumns: sourceColumnsFormatted,
+      arimaTimeColumn: arima ? arimaTimeColumn : undefined
+    })
   )
 
   const buildHandleCompleteClick = () => {

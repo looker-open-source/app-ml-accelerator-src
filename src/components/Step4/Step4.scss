@@ -83,6 +83,9 @@
 
     &:hover, &:active, &:focus {
       background: transparent;
+      outline: none;
+      border-color: transparent;
+      box-shadow: none;
     }
   }
 }
@@ -102,5 +105,16 @@
   & &--value {
     padding: 5px 10px;
     width: 300px;
+  }
+}
+
+.job-time-running {
+  font-size: 12px;
+  margin-top: 8px;
+
+  .job-time-running-time {
+    font-size: 16px;
+    font-weight: 100;
+    letter-spacing: 0.06em;
   }
 }

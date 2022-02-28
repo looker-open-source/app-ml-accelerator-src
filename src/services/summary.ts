@@ -15,7 +15,17 @@ export const formBQViewSQL = (
   ) {
     return false
   }
-  return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${sql}`
+  return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${removeLimit(sql)}`
+}
+
+const removeLimit = (sql: string) => {
+  const clauses = sql.split("\n")
+  let limitIndex = -1
+  clauses.forEach((s: string, i: number) =>
+    (s.indexOf('LIMIT') >= 0) ? limitIndex = i : null
+  )
+  clauses.splice(limitIndex, 1)
+  return clauses.join('\n')
 }
 
 // Removes the table name from the column keys
@@ -30,20 +40,33 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
   })
 }
 
-export const hasSummaryData = (
+type hasSummaryProps = {
   step3Data: Step3State,
   exploreName: string,
   modelName: string,
   target: string,
   bqModelName: string,
   advancedSettings: string,
-  sourceColumns: string[]
-): boolean => {
+  sourceColumns: string[],
+  arimaTimeColumn?: string
+}
+
+export const hasSummaryData = ({
+  step3Data,
+  exploreName,
+  modelName,
+  target,
+  bqModelName,
+  advancedSettings,
+  sourceColumns,
+  arimaTimeColumn
+}: hasSummaryProps): boolean => {
   const { summary, allFeatures } = step3Data
   return Boolean(summary.exploreName === exploreName
     && summary.modelName === modelName
     && summary.target === target
     && summary.bqModelName === bqModelName
+    && (arimaTimeColumn ? summary.arimaTimeColumn === arimaTimeColumn : true)
     && summary.advancedSettings === advancedSettings
     && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data

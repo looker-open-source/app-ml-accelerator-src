@@ -101,7 +101,10 @@ export const ModelProvider = ({ children }: any) => {
         step: 'step4',
         data: {
           jobStatus: body.status.state,
-          job: body.jobReference
+          job: {
+            ...body.jobReference,
+            startTime: body.statistics.startTime
+          }
         }
       })
     } catch (error: any) {

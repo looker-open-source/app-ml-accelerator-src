@@ -85,7 +85,6 @@ export const WizardProvider = ({ children }: any) => {
         throw `Model does not exist: ${modelNameParam}`
       }
       const loadedWizardState = buildWizardState(modelState)
-      console.log({ loadedWizardState })
       dispatch({
         type: 'populateWizard',
         wizardState: loadedWizardState
@@ -118,7 +117,6 @@ export const WizardProvider = ({ children }: any) => {
       if (step4.jobStatus !== JOB_STATUSES.canceled) {
         dispatch({ type: 'setNeedsSaving', value: false })
       }
-      console.log('end load model')
     } catch (error) {
       dispatch({type: 'addError', error: `${error}`})
     }

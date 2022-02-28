@@ -21,7 +21,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [evalData, setEvalData] = useState<any>()
   const { state } = useStore()
   const { needsSaving } = state.wizard
-  const { jobStatus, modelInfo } = state.wizard.steps.step4
+  const { jobStatus, modelInfo, job } = state.wizard.steps.step4
   const jobComplete = jobStatus === JOB_STATUSES.done
   const jobCanceled = jobStatus === JOB_STATUSES.canceled
 
@@ -94,7 +94,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             </div>
           </div>
         ) : (
-          <IncompleteJob jobCanceled={jobCanceled} setIsLoading={setIsLoading}/>
+          <IncompleteJob jobCanceled={jobCanceled} setIsLoading={setIsLoading} startTime={job.startTime}/>
         )
       }
     </StepContainer>
