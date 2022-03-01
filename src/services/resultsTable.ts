@@ -1,5 +1,7 @@
-import { SelectedFields, ResultsTableHeaderItem, ExploreData } from '../types'
+import { SelectedFields, ResultsTableHeaderItem, ExploreData, Field } from '../types'
 import { find, some } from 'lodash'
+import { buildFieldSelectOptions } from './summary'
+import { REQUIRE_FIELD_MESSAGES } from '../constants'
 
 /*
   getHeaderColumns creates an an array of header columns based on the dimensions, measures selected
@@ -77,4 +79,16 @@ export function hasOrphanedSorts(
     if (!hasMatchingColumn) { break }
   }
   return !hasMatchingColumn
+}
+
+
+export const getRequiredFieldMessages = (fieldDetails: any, fieldNames: string[], requiredFieldTypes: string[]) => {
+  const messages: string[] = []
+  requiredFieldTypes.forEach((type) => {
+    const matchedFields = buildFieldSelectOptions(fieldDetails, fieldNames, type)
+    if (!matchedFields || matchedFields.length <= 0) {
+      messages.push(REQUIRE_FIELD_MESSAGES[type])
+    }
+  })
+  return messages
 }

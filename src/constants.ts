@@ -29,6 +29,11 @@ export const NAME_CHECK_STATUSES = {
   error: 'error'
 }
 
+export const REQUIRE_FIELD_MESSAGES: {[key: string]: string} = {
+  date_date: 'You must select one date field.',
+  numeric: 'You must select one numeric field.'
+}
+
 export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
   modelName: 'model_info.model_name',
   createdByEmail: 'model_info.created_by_email',
