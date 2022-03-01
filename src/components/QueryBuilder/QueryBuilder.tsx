@@ -33,16 +33,6 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
       .finally(() => setIsLoading(false))
   }, [step2.sorts])
 
-  // useEffect(() => {
-  //   if (!step2.exploreData) { return }
-  //   const messages = getRequiredFieldMessages(
-  //     step2.exploreData?.fieldDetails,
-  //     [...step2.selectedFields.dimensions, ...step2.selectedFields.measures],
-  //     getRequiredFieldTypes()
-  //   )
-  //   setRequiredFieldMessages(messages)
-  // }, [step2.selectedFields, step2.exploreData])
-
   const runQuery = async() => {
     if (
       step2.tableHeaders &&
@@ -58,11 +48,6 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     saveQueryToState?.(step2, results, exploreUrl)
     setIsLoading(false)
   }
-
-  // const getRequiredFieldTypes = () => {
-  //   if (!step1.objective) { return [] }
-  //   return MODEL_TYPES[step1.objective].requiredFieldTypes || []
-  // }
 
   const directoryPaneContents = step2.exploreName ?
     (<FieldsSelect/>) : (<ExploreSelect />)
