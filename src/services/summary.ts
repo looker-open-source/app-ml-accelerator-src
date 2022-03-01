@@ -90,7 +90,7 @@ export const toggleSelectedFeature = (selectedFeatures: string[], fieldName: str
 const fieldIsType = (field: any, dataType?: string) => {
   if (!dataType) { return true }
   if (dataType === 'date') {
-    return field.type.indexOf(dataType) >= 0
+    return field.type === 'date_date' // this is the only supported date type by BigQuery for Arima models
   }
   if(dataType === 'numeric') {
     return field.is_numeric

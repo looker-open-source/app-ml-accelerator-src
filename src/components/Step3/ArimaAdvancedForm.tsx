@@ -50,7 +50,7 @@ export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective 
         <Label>Horizon</Label>
         <FieldText
           onChange={handleHorizonChange}
-          value={horizon}
+          value={horizon || ""}
           placeholder="Horizon"
           onKeyPress={numericOnly}
         />
