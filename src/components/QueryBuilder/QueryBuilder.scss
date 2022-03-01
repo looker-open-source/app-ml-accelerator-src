@@ -35,27 +35,3 @@
     padding: 0 20px;
   }
 }
-
-.objective-requirements {
-  font-size: 12px;
-  background-color: #f7f7f7;
-  display: inline-block;
-  padding: 6px 8px 6px 22px;
-  border-radius: 20px;
-  margin-right: 12px;
-}
-
-.objective-requirements-indicator {
-  display: inline-block;
-  height: 12px;
-  width: 12px;
-  background-color: #24b25f;
-  border-radius: 20px;
-  margin-left: 10px;
-  position: relative;
-  top: 2px;
-
-  &.warning {
-    background-color: #FFA800;
-  }
-}

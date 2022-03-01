@@ -1,14 +1,14 @@
-import React, { useEffect, useContext, useRef, useState } from "react"
+import React, { useEffect, useContext, useRef } from "react"
 import { useStore } from "../../contexts/StoreProvider"
 import NoExplorePlaceHolder from './NoExplorePlaceHolder'
 import ExploreSelect from './ExploreSelect'
 import ExploreFilter from "./ExploreFilter"
 import FieldsSelect from './FieldsSelect'
 import QueryPane from './QueryPane'
-import { getRequiredFieldMessages, hasOrphanedSorts } from '../../services/resultsTable'
+import { hasOrphanedSorts } from '../../services/resultsTable'
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
-import { MODEL_TYPES } from "../../services/modelTypes"
+import RequiredFieldMessages from "./RequiredFieldMessages"
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void
@@ -17,8 +17,7 @@ type QueryBuilderProps = {
 export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => {
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
   const { state, dispatch } = useStore()
-  const [ requiredFieldMessages, setRequiredFieldMessages ] = useState<string[]>([])
-  const { step1, step2 } = state.wizard.steps
+  const { step2 } = state.wizard.steps
   const firstUpdate = useRef(true)
 
   // re-run the query when a sort is applied
@@ -34,15 +33,15 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
       .finally(() => setIsLoading(false))
   }, [step2.sorts])
 
-  useEffect(() => {
-    if (!step2.exploreData) { return }
-    const messages = getRequiredFieldMessages(
-      step2.exploreData?.fieldDetails,
-      [...step2.selectedFields.dimensions, ...step2.selectedFields.measures],
-      getRequiredFieldTypes()
-    )
-    setRequiredFieldMessages(messages)
-  }, [step2.selectedFields, step2.exploreData])
+  // useEffect(() => {
+  //   if (!step2.exploreData) { return }
+  //   const messages = getRequiredFieldMessages(
+  //     step2.exploreData?.fieldDetails,
+  //     [...step2.selectedFields.dimensions, ...step2.selectedFields.measures],
+  //     getRequiredFieldTypes()
+  //   )
+  //   setRequiredFieldMessages(messages)
+  // }, [step2.selectedFields, step2.exploreData])
 
   const runQuery = async() => {
     if (
@@ -60,10 +59,10 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     setIsLoading(false)
   }
 
-  const getRequiredFieldTypes = () => {
-    if (!step1.objective) { return [] }
-    return MODEL_TYPES[step1.objective].requiredFieldTypes || []
-  }
+  // const getRequiredFieldTypes = () => {
+  //   if (!step1.objective) { return [] }
+  //   return MODEL_TYPES[step1.objective].requiredFieldTypes || []
+  // }
 
   const directoryPaneContents = step2.exploreName ?
     (<FieldsSelect/>) : (<ExploreSelect />)
@@ -78,19 +77,14 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
           <ExploreFilter />
         </div>
         <div className="query-header-actions">
-          { step2.exploreData && <>
-              { getRequiredFieldTypes().length > 0 &&
-                <div className="objective-requirements">
-                  { requiredFieldMessages.length > 0 ? requiredFieldMessages.join(' ') : 'All field requirements met.'  }
-                  <div className={`objective-requirements-indicator ${requiredFieldMessages.length > 0 ? 'warning' : 'success'}`} />
-                </div>
-              }
+          { step2.exploreData && (<>
+              <RequiredFieldMessages />
               <Button
                 onClick={runQuery}
                 className="action-button">
                   Run
               </Button>
-            </>
+            </>)
           }
         </div>
       </div>
