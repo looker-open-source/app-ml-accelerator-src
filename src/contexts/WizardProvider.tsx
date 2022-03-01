@@ -27,7 +27,7 @@ import { useStore } from './StoreProvider'
 import { ResultsTableHeaderItem, Step2State, WizardState } from '../types'
 import { IQuery } from "@looker/sdk/lib/4.0/models"
 import { BQMLContext } from './BQMLProvider'
-import { matchPath, useHistory, useLocation } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import { buildWizardState } from '../services/modelState'
 import { SUMMARY_EXPLORE, BQML_LOOKER_MODEL, WIZARD_STEPS, JOB_STATUSES } from '../constants'
 import { mapAPIExploreToClientExplore } from '../services/explores'
@@ -53,14 +53,11 @@ export const WizardContext = createContext<IWizardContext>({})
 
 export const WizardProvider = ({ children }: any) => {
   const history = useHistory()
-  const { pathname } = useLocation()
-  const match = matchPath<any>(pathname, '/ml/:page/:modelNameParam')
-  const modelNameParam = match ? match?.params?.modelNameParam : undefined
+  const { modelNameParam } = useParams<any>()
   const { dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
   const { getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
   const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
-
 
   // on first load
   useEffect(() => {
@@ -81,11 +78,10 @@ export const WizardProvider = ({ children }: any) => {
     try {
       const modelState = await getSavedModelState?.(modelNameParam)
       if (!modelState) {
-        history.push(`/ml/${WIZARD_STEPS['step1']}`)
+        history.push(`/ml/create/${WIZARD_STEPS['step1']}`)
         throw `Model does not exist: ${modelNameParam}`
       }
       const loadedWizardState = buildWizardState(modelState)
-      console.log({ loadedWizardState })
       dispatch({
         type: 'populateWizard',
         wizardState: loadedWizardState
@@ -118,7 +114,6 @@ export const WizardProvider = ({ children }: any) => {
       if (step4.jobStatus !== JOB_STATUSES.canceled) {
         dispatch({ type: 'setNeedsSaving', value: false })
       }
-      console.log('end load model')
     } catch (error) {
       dispatch({type: 'addError', error: `${error}`})
     }
@@ -252,11 +247,14 @@ export const WizardProvider = ({ children }: any) => {
       data: {
         allFeatures,
         selectedFeatures: selectedFeatures || [...allFeatures],
+        advancedSettings: step3.advancedSettings || {},
         summary: {
           exploreName: step2.exploreName,
           modelName: step2.modelName,
           bqModelName: step3.bqModelName,
           target: step3.targetField,
+          arimaTimeColumn: step3.arimaTimeColumn,
+          advancedSettings: step3.advancedSettings || {},
           data: summaryData,
           fields: [...fields.dimensions, ...fields.measures]
         }

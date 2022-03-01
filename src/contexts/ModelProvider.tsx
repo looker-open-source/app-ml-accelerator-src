@@ -101,7 +101,10 @@ export const ModelProvider = ({ children }: any) => {
         step: 'step4',
         data: {
           jobStatus: body.status.state,
-          job: body.jobReference
+          job: {
+            ...body.jobReference,
+            startTime: body.statistics.startTime
+          }
         }
       })
     } catch (error: any) {
@@ -124,7 +127,6 @@ export const ModelProvider = ({ children }: any) => {
       if (!evalFuncFields || evalFuncFields.length <= 0) {
         throw "Failed to find fields associated with this evaluate function."
       }
-
       // query the model table filtering on our modelID
       const { value: query } = await coreSDK.create_query({
         model:  BQML_LOOKER_MODEL,

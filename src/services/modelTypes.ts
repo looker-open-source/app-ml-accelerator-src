@@ -20,6 +20,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     value: 'BOOSTED_TREE_REGRESSOR',
     detail: 'BOOSTED_TREE_REGRESSOR',
     description: 'I want to recommend something',
+    requiredFieldTypes: ['numeric'],
     targetDataType: 'numeric',
     exploreName: 'boosted_tree',
     modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
@@ -36,6 +37,8 @@ export const MODEL_TYPES: {[key: string]: any} = {
     value: 'BOOSTED_TREE_CLASSIFIER',
     detail: 'BOOSTED_TREE_CLASSIFIER',
     description: 'I want to classify something',
+    requiredFieldTypes: ['numeric'],
+    targetDataType: 'numeric',
     exploreName: 'boosted_tree',
     modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
     modelFields: {
@@ -49,8 +52,18 @@ export const MODEL_TYPES: {[key: string]: any} = {
     value: 'ARIMA_PLUS',
     detail: 'ARIMA_PLUS',
     description: 'I want to forecast a number (e.g. future sales)',
+    requiredFieldTypes: ['date_date', 'numeric'],
+    exploreName: 'arima',
     targetDataType: 'numeric',
-    modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.arimaEvaluate],
+    advancedSettings: true,
+    modelTabs: [MODEL_EVAL_FUNCS.arimaEvaluate],
+    modelFields: {
+      [MODEL_EVAL_FUNCS.arimaEvaluate]:
+        ['non_seasonal_p', 'non_seasonal_d', 'non_seasonal_q', 'has_drift', 'log_likelihood', 'aic', 'variance',
+        'seasonal_periods', 'has_holiday_effect', 'has_spikes_and_dips', 'has_step_changes', 'error_message'].map(
+          (field: string) => `arima_evaluate.${field}`
+        )
+    }
   },
   KMEANS: {
     label: 'Clustering',
@@ -71,7 +84,8 @@ type IFormSQLProps = {
   bqModelName: string,
   target: string,
   features: string[],
-  arimaTimeColumn?: string
+  arimaTimeColumn?: string,
+  advancedSettings?: any
 }
 
 interface IFormBoostedTreeTypeSQLProps extends IFormSQLProps {
@@ -86,9 +100,6 @@ const formBoostedTreeSQL = ({
   features,
   boostedType
 }: IFormBoostedTreeTypeSQLProps): string => {
-  // *******
-  // TODO: Replace Select * with Select ${feature_fields}
-  // *******
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}_boosted_tree_${boostedType.toLowerCase()}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}',
@@ -111,18 +122,19 @@ const formArimaSQL = ({
   bqmlModelDatasetName,
   bqModelName,
   target,
-  features,
+  advancedSettings = {},
   arimaTimeColumn
 }: IFormSQLProps) => {
+  if (!arimaTimeColumn) { return '' }
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}_arima
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
-      , time_series_timestamp_col = '${arimaTimeColumn}'
-      , time_series_data_col = '${target}'
-      , HORIZON = 1000
-      , HOLIDAY_REGION = 'none'
+      , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
+      , time_series_data_col = '${target.replace(".", "_")}'
+      , HORIZON = ${ advancedSettings.horizon || '1000' }
+      ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
       , AUTO_ARIMA = TRUE)
-    AS (SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`) ;
+    AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`) ;
   `
 }
 
@@ -140,6 +152,9 @@ type modelIdGeneratorProps = {
 export const modelIdGenerator = ({
   bqModelName,
   objective
-}: modelIdGeneratorProps): string => (
-  `${bqModelName}_${objective.toLowerCase()}`
-)
+}: modelIdGeneratorProps): string => {
+  if (isArima(objective)) {
+    return `${bqModelName}_arima`
+  }
+  return `${bqModelName}_${objective.toLowerCase()}`
+}

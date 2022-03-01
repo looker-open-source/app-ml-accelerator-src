@@ -44,3 +44,18 @@
 .wizard-card-select {
   margin-top: 22px;
 }
+
+.advanced-settings-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 22px;
+  padding: 12px 32px;
+}
+
+.advanced-settings-form-item {
+  .select-with-label {
+    margin-top: 4px;
+    min-width: 300px;
+  }
+}

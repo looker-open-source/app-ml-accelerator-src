@@ -8,6 +8,7 @@ import QueryPane from './QueryPane'
 import { hasOrphanedSorts } from '../../services/resultsTable'
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
+import RequiredFieldMessages from "./RequiredFieldMessages"
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void
@@ -60,14 +61,17 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
         <div className="explore-filter">
           <ExploreFilter />
         </div>
-        {
-          step2.exploreData &&
-          (<Button
-            onClick={runQuery}
-            className="action-button">
-              Run
-          </Button>)
-        }
+        <div className="query-header-actions">
+          { step2.exploreData && (<>
+              <RequiredFieldMessages />
+              <Button
+                onClick={runQuery}
+                className="action-button">
+                  Run
+              </Button>
+            </>)
+          }
+        </div>
       </div>
       <div className="default-layout">
         <div className="pane directory-pane">

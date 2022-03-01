@@ -1,4 +1,5 @@
 import { keyBy, compact } from 'lodash'
+import { AdvancedSettings } from '../components/Step3/AdvancedSettings'
 import { Field, Step3State, SummaryTableHeaders } from '../types'
 import { titilize, splitFieldName } from './string'
 
@@ -14,7 +15,20 @@ export const formBQViewSQL = (
   ) {
     return false
   }
-  return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${sql}`
+  return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${removeLimit(sql)}`
+}
+
+const removeLimit = (sql: string) => {
+  const clauses = sql.split("\n")
+  let limitIndex = -1
+  clauses.forEach((s: string, i: number) =>
+    (s.indexOf('LIMIT') >= 0) ? limitIndex = i : null
+  )
+  if (limitIndex === -1) {
+    return sql
+  }
+  clauses.splice(limitIndex, 1)
+  return clauses.join('\n')
 }
 
 // Removes the table name from the column keys
@@ -29,19 +43,34 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
   })
 }
 
-export const hasSummaryData = (
+type hasSummaryProps = {
   step3Data: Step3State,
   exploreName: string,
   modelName: string,
   target: string,
   bqModelName: string,
-  sourceColumns: string[]
-): boolean => {
+  advancedSettings: string,
+  sourceColumns: string[],
+  arimaTimeColumn?: string
+}
+
+export const hasSummaryData = ({
+  step3Data,
+  exploreName,
+  modelName,
+  target,
+  bqModelName,
+  advancedSettings,
+  sourceColumns,
+  arimaTimeColumn
+}: hasSummaryProps): boolean => {
   const { summary, allFeatures } = step3Data
   return Boolean(summary.exploreName === exploreName
     && summary.modelName === modelName
     && summary.target === target
     && summary.bqModelName === bqModelName
+    && (arimaTimeColumn ? summary.arimaTimeColumn === arimaTimeColumn : true)
+    && summary.advancedSettings === advancedSettings
     && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data
     && summary.data.length > 0)
@@ -61,7 +90,7 @@ export const toggleSelectedFeature = (selectedFeatures: string[], fieldName: str
 const fieldIsType = (field: any, dataType?: string) => {
   if (!dataType) { return true }
   if (dataType === 'date') {
-    return field.type.indexOf(dataType) >= 0
+    return field.type === 'date_date' // this is the only supported date type by BigQuery for Arima models
   }
   if(dataType === 'numeric') {
     return field.is_numeric

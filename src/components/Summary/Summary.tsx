@@ -6,12 +6,13 @@ import { SummaryTableRows } from './SummaryTableRows'
 
 type SummaryParams = {
   targetField: string,
+  arimaTimeColumn?: string,
   summaryData: any[],
   selectedFeatures: string[],
   updateSelectedFeatures: (selectedFeatures: string[]) =>  void
 }
 
-export const Summary: React.FC<SummaryParams> = ({ targetField, summaryData, selectedFeatures, updateSelectedFeatures }) => {
+export const Summary: React.FC<SummaryParams> = ({ targetField, arimaTimeColumn, summaryData, selectedFeatures, updateSelectedFeatures }) => {
   const [allChecked, setAllChecked] = useState(summaryData.length === selectedFeatures.length)
   const headers: SummaryTableHeaders = SUMMARY_TABLE_HEADERS
   const targetFieldFormatted = targetField.replace(/\./g, '_')
@@ -35,11 +36,14 @@ export const Summary: React.FC<SummaryParams> = ({ targetField, summaryData, sel
         <thead>
           <tr>
             <th className="checkbox">
-              <Checkbox
-                checked={allChecked}
-                onChange={toggleAllFeatures}
-                className="feature-checkbox"
-              />
+              {
+                !arimaTimeColumn &&
+                <Checkbox
+                  checked={allChecked}
+                  onChange={toggleAllFeatures}
+                  className="feature-checkbox"
+                />
+              }
             </th>
             {
               Object.keys(headers).map((header: keyof SummaryTableHeaders, i) => (
@@ -53,6 +57,7 @@ export const Summary: React.FC<SummaryParams> = ({ targetField, summaryData, sel
             data={summaryData}
             headers={headers}
             targetField={targetFieldFormatted}
+            arimaTimeColumn={arimaTimeColumn}
             selectedFeatures={selectedFeatures}
             checkboxChange={checkboxChange}
           />

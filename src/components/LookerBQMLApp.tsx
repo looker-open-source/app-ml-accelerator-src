@@ -34,7 +34,7 @@ export const _LookerBQMLApp: React.FC = () => {
             <Route exact path="/">
               <HomeLanding />
             </Route>
-            <Route path="/ml">
+            <Route path={["/ml/create", "/ml/:modelNameParam?"]}>
               <WizardProvider>
                 <MLWizard />
               </WizardProvider>

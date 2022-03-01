@@ -28,6 +28,7 @@ export const generateModelState = (wizardState: WizardState): SavedModelState =>
       targetField: step3.targetField,
       arimaTimeColumn: step3.arimaTimeColumn,
       selectedFeatures: step3.selectedFeatures,
+      advancedSettings: step3.advancedSettings || {}
     },
     step4: {
       jobStatus: step4.jobStatus,
@@ -78,6 +79,7 @@ const buildWizardStep3 = (modelStep3: any, wizardStep3: Step3State): Step3State 
     targetField: modelStep3.targetField,
     arimaTimeColumn: modelStep3.arimaTimeColumn,
     selectedFeatures: modelStep3.selectedFeatures,
+    advancedSettings: modelStep3.advancedSettings || {}
   }
   return {...wizardStep3, ...mappedModelState}
 }
@@ -112,6 +114,7 @@ type SavedModelState = {
     targetField?: string
     arimaTimeColumn?: string
     selectedFeatures?: string[]
+    advancedSettings: any
   }
   step4: {
     job?: any
