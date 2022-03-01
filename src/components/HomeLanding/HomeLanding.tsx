@@ -30,7 +30,7 @@ export const HomeLanding : React.FC = () => {
   }
 
   const handleModelSelect = async (modelName: string) => {
-    history.push(`/ml/${WIZARD_STEPS['step4']}/${modelName}`)
+    history.push(`/ml/${modelName}/${WIZARD_STEPS['step4']}`)
   }
 
   const clearState = () => {

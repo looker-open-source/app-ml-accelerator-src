@@ -18,7 +18,7 @@ export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective 
       data: {
         advancedSettings: {
           ...state.wizard.steps.step3.advancedSettings,
-          horizon: e.target.value
+          horizon: e.target.value || undefined
         }
       }
     })
@@ -50,7 +50,7 @@ export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective 
         <Label>Horizon</Label>
         <FieldText
           onChange={handleHorizonChange}
-          value={horizon || 1000}
+          value={horizon}
           placeholder="Horizon"
           onKeyPress={numericOnly}
         />

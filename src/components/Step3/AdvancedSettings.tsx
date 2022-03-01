@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { isArima } from '../../services/modelTypes'
 import ExpanderBar from '../QueryBuilder/Expander'
 import { ArimaAdvancedForm } from './ArimaAdvancedForm'
 
@@ -14,7 +15,7 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ objective })
   }
 
   const buildAdvancedSettingsForm = () => {
-    if (objective === 'ARIMA_PLUS') {
+    if (isArima(objective)) {
       return (<ArimaAdvancedForm objective={objective} />)
     }
     return <></>

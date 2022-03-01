@@ -24,6 +24,9 @@ const removeLimit = (sql: string) => {
   clauses.forEach((s: string, i: number) =>
     (s.indexOf('LIMIT') >= 0) ? limitIndex = i : null
   )
+  if (limitIndex === -1) {
+    return sql
+  }
   clauses.splice(limitIndex, 1)
   return clauses.join('\n')
 }

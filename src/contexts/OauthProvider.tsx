@@ -94,7 +94,6 @@ export const OauthProvider = ({
    * still active if it has not already expired.
    */
   const signOut = (expiredAttempt: boolean = false) => {
-    console.log('signing out')
     if (expiredAttempt) {
       setAttempts(attempts + 1)
     }

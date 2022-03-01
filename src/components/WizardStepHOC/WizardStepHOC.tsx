@@ -17,7 +17,7 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
     return (props: any): any => {
       const { loadingModel } = useContext(WizardContext)
       const { state } = useStore()
-      const { modelNameParam } = useParams<{modelNameParam: string}>()
+      const { modelNameParam } = useParams<any>()
       const { unlockedStep } = state.wizard
       const [ stepComplete, setStepComplete ] = useState(false)
       const stepKey: keyof WizardSteps = WIZARD_KEYS[stepNumber]
@@ -32,8 +32,8 @@ export const withWizardStep = ({isStepComplete, stepNumber}: WizardStepProps): W
 
       if (enforceStep && !loadingModel) {
         const enforcementPath = modelNameParam ?
-          `/ml/${WIZARD_STEPS[`step${unlockedStep}`]}/${modelNameParam}` :
-          `/ml/${WIZARD_STEPS[`step${unlockedStep}`]}`
+          `/ml/${modelNameParam}/${WIZARD_STEPS[`step${unlockedStep}`]}` :
+          `/ml/create/${WIZARD_STEPS[`step${unlockedStep}`]}`
 
         return (<Redirect to={enforcementPath} />)
       }

@@ -21,7 +21,7 @@ GCP_PROJECT= # name of your GPC project
 ## permissions for accessing GoogleAPIs BigQuery
 In GCP Console
 
-- Enabled Oauth Access
+- Enable Oauth Access
   Go to APIs and Services
     Go to Libraries, search for "BigQuery API", and make sure it is enabled
     Go to Credentials, create Credentials > Oauth Client ID > Application type "Web Application"

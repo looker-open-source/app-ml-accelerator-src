@@ -44,9 +44,9 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
     }
 
     if (modelName) {
-      history.push(`/ml/${WIZARD_STEPS[`step${nextStep}`]}/${modelName}`)
+      history.push(`/ml/${modelName}/${WIZARD_STEPS[`step${nextStep}`]}`)
     } else{
-      history.push(`/ml/${WIZARD_STEPS[`step${nextStep}`]}`)
+      history.push(`/ml/create/${WIZARD_STEPS[`step${nextStep}`]}`)
     }
   }
 
