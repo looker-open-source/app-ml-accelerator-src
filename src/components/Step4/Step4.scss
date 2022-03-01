@@ -48,10 +48,13 @@
 }
 
 .model-job-pending, .model-job-canceled {
-  height: 50vh;
+  display: inline-block;
   display: flex;
   justify-content: center;
   text-align: center;
+  background-color: #f7f7f7;
+  padding: 32px;
+  margin-top: 32px;
 
   &--contents {
     align-self: center;
@@ -108,9 +111,15 @@
   }
 }
 
+.flex-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 .job-time-running {
   font-size: 12px;
-  margin-top: 8px;
+  margin-top: 18px;
 
   .job-time-running-time {
     font-size: 16px;

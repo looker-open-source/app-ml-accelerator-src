@@ -94,7 +94,9 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             </div>
           </div>
         ) : (
-          <IncompleteJob jobCanceled={jobCanceled} setIsLoading={setIsLoading} startTime={job.startTime}/>
+          <div className="flex-center">
+            <IncompleteJob jobCanceled={jobCanceled} setIsLoading={setIsLoading} startTime={job.startTime}/>
+          </div>
         )
       }
     </StepContainer>
