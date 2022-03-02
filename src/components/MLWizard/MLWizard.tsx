@@ -13,6 +13,7 @@ import Step2 from '../Step2'
 import Step3 from '../Step3'
 import Step4 from '../Step4'
 import './MLWizard.scss'
+import Step5 from '../Step5'
 
 export const _MLWizard: React.FC = () => {
   const { loadingModel } = useContext(WizardContext)
@@ -61,7 +62,7 @@ export const _MLWizard: React.FC = () => {
           </Route>
           <Route
             path={`${path}/${WIZARD_STEPS.step5}`}>
-              apply
+              <Step5 />
           </Route>
         </Switch>
       </div>

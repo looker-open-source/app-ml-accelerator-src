@@ -27,7 +27,7 @@ import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
 import { poll } from '../services/common'
 import { generateModelState } from '../services/modelState'
-import { JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
+import { BQML_LOOKER_MODEL, JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
 import { WizardState } from '../types'
 
 type IBQMLContext = {

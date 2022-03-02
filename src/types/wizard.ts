@@ -47,11 +47,14 @@ export type Step4State = {
   modelInfo: {
     bqModelName?: string,
     bqModelObjective?: string
+    bqModelTarget?: string
+    bqModelArimaTimeColumn?: string
+    bqModelAdvancedSettings?: any
   }
 }
 
 export type Step5State = {
-  data: any
+  lookId?: string
 }
 
 export type GenericStepState = Step1State | Step2State | Step3State | Step4State | Step5State

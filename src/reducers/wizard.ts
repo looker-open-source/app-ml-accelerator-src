@@ -60,10 +60,13 @@ const wizardInitialState: WizardState = {
       job: undefined,
       modelInfo: {
         bqModelName: undefined,
-        bqModelObjective: undefined
+        bqModelObjective: undefined,
+        bqModelTarget: undefined,
+        bqModelArimaTimeColumn: undefined,
+        bqModelAdvancedSettings: undefined
       }
     },
-    step5: { data: null }
+    step5: { lookId: undefined }
   }
 }
 
