@@ -54,6 +54,12 @@
 }
 
 .advanced-settings-form-item {
+  .infotip {
+    position: absolute;
+    margin-top: -2px;
+    margin-left: 4px;
+  }
+
   .select-with-label {
     margin-top: 4px;
     min-width: 300px;

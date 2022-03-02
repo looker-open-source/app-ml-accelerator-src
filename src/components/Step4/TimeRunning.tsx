@@ -18,8 +18,8 @@ export const TimeRunning: React.FC<{ startTime?: number }> = ({ startTime }) => 
     const timeSince = now - startTime
     const days = Math.floor(timeSince / day)
     const hours = Math.floor(timeSince % day / hour).toString()
-    const mins = Math.floor(timeSince % day % hour / min).toString()
-    const seconds = Math.floor(timeSince % day % hour % min / second).toString()
+    const mins = Math.floor(timeSince % hour / min).toString()
+    const seconds = Math.floor(timeSince % min / second).toString()
     setTimePiece({
       days,
       hours: hours.length == 1 ? `0${hours}` : hours,
