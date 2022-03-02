@@ -10,9 +10,11 @@ Add a .env file with the following keys:
 ```
 BIGQUERY_CONN= # the name of the big query connection
 GOOGLE_CLIENT_ID= # the client id of your Oauth Client in GCP console
-LOOKER_TEMP_DATASET_NAME=  # dataset where you'll be storing generated results from BQ
-GCP_PROJECT= # name of your GPC project
+BQML_MODEL_DATASET_NAME=  # BigQuery dataset where you'll be storing views/tables/models
+GCP_PROJECT= # name of your GCP project
 ```
+
+If you are using Heroku to host, ensure you set config variables to the same values as these .env variables
 
 ## starting service locally
 `yarn develop`

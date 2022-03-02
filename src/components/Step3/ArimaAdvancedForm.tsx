@@ -2,6 +2,7 @@ import { FieldText, Label, Select } from '@looker/components'
 import React, { useState } from 'react'
 import { HOLIDAY_REGION_OPTIONS } from '../../constants'
 import { useStore } from '../../contexts/StoreProvider'
+import { InfoTip } from '../InfoTip/InfoTip'
 
 type ArimaAdvancedFormProps = {
   objective: string
@@ -47,7 +48,10 @@ export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective 
   return (
     <>
       <div className="advanced-settings-form-item">
-        <Label>Horizon</Label>
+        <Label>
+          Horizon
+          <InfoTip content="The number of days to predict into the future" />
+        </Label>
         <FieldText
           onChange={handleHorizonChange}
           value={horizon || ""}
@@ -56,7 +60,9 @@ export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective 
         />
       </div>
       <div className="advanced-settings-form-item">
-        <Label>Holiday Region</Label>
+        <Label>
+          Holiday Region
+        </Label>
         <Select
           options={HOLIDAY_REGION_OPTIONS}
           placeholder="Holiday Region"
