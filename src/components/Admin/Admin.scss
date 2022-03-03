@@ -1,0 +1,65 @@
+.admin-model-list {
+  margin: 32px auto 0;
+  padding: 0;
+  list-style-type: none;
+  width: 80%;
+  max-width: 1200px;
+}
+
+.admin-model-list-item {
+  border-top: 1px solid #adadad;
+  padding: 18px 22px;
+}
+
+.modelstate-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  cursor: pointer;
+
+  .modelstate-item--title {
+    font-size: 18px;
+
+    .modelstate-item--title-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #5F6368;
+      margin-right: 8px;
+    }
+  }
+}
+
+.modelstate-item-content {
+  height: 0;
+  overflow: hidden;
+  padding: 0 18px;
+  transition: all .1s ease-in;
+
+  &.open {
+    height: auto;
+    background-color: #f7f7f7;
+    padding: 12px 18px;
+    margin-top: 12px;
+  }
+
+  .share-form-add-email {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .share-form-add-input {
+    width: 280px;
+  }
+
+  .share-form-checklist-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  .share-form-checkbox-label {
+    margin-left: 8px;
+  }
+}

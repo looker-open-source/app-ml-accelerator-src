@@ -37,7 +37,8 @@ export const REQUIRE_FIELD_MESSAGES: {[key: string]: string} = {
 export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
   modelName: 'model_info.model_name',
   createdByEmail: 'model_info.created_by_email',
-  stateJson: 'model_info.state_json'
+  stateJson: 'model_info.state_json',
+  sharedWithEmails: 'model_info.shared_with_emails'
 }
 
 export const DESC_STRING = "desc"

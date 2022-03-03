@@ -237,7 +237,7 @@ export const BQMLProvider = ({ children }: any) => {
     if (!userEmail) { return { ok: false } }
     return await getSavedModels({
       [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
-    }, [MODEL_STATE_TABLE_COLUMNS.modelName])
+    }, Object.values(MODEL_STATE_TABLE_COLUMNS))
   }
 
   const getSavedModelState = async (modelName: string) => {
