@@ -46,6 +46,7 @@ type IBQMLContext = {
   },
   createModelStateTable?: () => Promise<any>,
   insertOrUpdateModelState?: (wizardState: WizardState) => Promise<any>,
+  updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
   getAllSavedModels?: () => Promise<any>,
   getSavedModelState?: (modelName: string) => Promise<any>
   getSavedModelByName?: (modelName: string) => Promise<any>
@@ -194,6 +195,21 @@ export const BQMLProvider = ({ children }: any) => {
     return queryJob(sql)
   }
 
+  const updateModelStateSharedWithEmails = (bqModelName: string, sharedWithEmails: string[]) => {
+    const sharedWithEmailsJson = JSON.stringify(sharedWithEmails)
+
+    const sql = `
+      MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
+          USING (SELECT '${bqModelName}' AS model_name
+                  , '${sharedWithEmailsJson}' as shared_with_emails
+                ) AS S
+          ON T.model_name = S.model_name
+          WHEN MATCHED THEN
+            UPDATE SET shared_with_emails=S.shared_with_emails
+    `
+    return queryJob(sql)
+  }
+
   const getSavedModels = async (
     filters: {[key: string]: string},
     fields?: string[]
@@ -275,6 +291,7 @@ export const BQMLProvider = ({ children }: any) => {
         pollJobStatus,
         createModelStateTable,
         insertOrUpdateModelState,
+        updateModelStateSharedWithEmails,
         getAllSavedModels,
         getSavedModelState,
         getSavedModelByName
