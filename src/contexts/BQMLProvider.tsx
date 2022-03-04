@@ -47,7 +47,7 @@ type IBQMLContext = {
   createModelStateTable?: () => Promise<any>,
   insertOrUpdateModelState?: (wizardState: WizardState) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
-  getAllSavedModels?: () => Promise<any>,
+  getAllSavedModels?: (hideError?: boolean) => Promise<any>,
   getSavedModelState?: (modelName: string) => Promise<any>
   getSavedModelByName?: (modelName: string) => Promise<any>
 }
@@ -63,6 +63,7 @@ export const BQMLProvider = ({ children }: any) => {
   const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
+  const [ canExpire, setCanExpire ] = useState(true)
   const { gcpProject, bqmlModelDatasetName } = state.userAttributes
 
   /**
@@ -88,19 +89,21 @@ export const BQMLProvider = ({ children }: any) => {
               Authorization: `Bearer ${token}`,
             },
           }
-
       setExpired(false)
       const { ok, status, body } = await extensionSDK.fetchProxy(
         `https://bigquery.googleapis.com/bigquery/v2/${pathname}`,
         init
       )
       if (status === 401 || status === 404) {
-        setExpired(true)
-        dispatch({ type: 'addError', error: 'Unauthorized request to google api' })
+        if (canExpire) {
+          setCanExpire(false)
+          setExpired(true)
+          dispatch({ type: 'addError', error: 'Unauthorized request to google api.' })
+        }
       }
       return { ok, body, status }
     } catch (error) {
-      setExpired(true)
+      // setExpired(true)
       dispatch({ type: 'addError', error: "Failed to connect to BigQuery. Please refresh and try again." })
       return { ok: false }
     }
@@ -113,7 +116,7 @@ export const BQMLProvider = ({ children }: any) => {
     const result = await invokeBQApi(
       `projects/${gcpProject}/queries`,
       {
-        query: sql,
+        query: sql.replace(/\n/g, ' '),
         useLegacySql: false
       }
     )
@@ -169,7 +172,8 @@ export const BQMLProvider = ({ children }: any) => {
       CREATE TABLE IF NOT EXISTS ${bqmlModelDatasetName}.bqml_model_info
                   (model_name         STRING,
                    state_json         STRING,
-                   created_by_email   STRING)
+                   created_by_email   STRING,
+                   shared_with_emails   STRING)
     `
     return queryJob(sql)
   }
@@ -214,46 +218,52 @@ export const BQMLProvider = ({ children }: any) => {
     filters: {[key: string]: string},
     fields?: string[]
   ) => {
+    const { value: query } = await coreSDK.create_query({
+      model:  'bqml_extension',
+      view: 'model_info',
+      fields: fields || Object.values(MODEL_STATE_TABLE_COLUMNS),
+      filters
+    })
+    const { ok, value } = await coreSDK.run_query({
+      query_id: query.id,
+      result_format: "json_detail",
+    })
+    if (!ok) {
+      throw "Please try refreshing the page."
+    }
+    if (value.errors && value.errors.length >= 1) {
+      throw value.errors[0].message
+    }
+    return { ok, value }
+  }
+
+  const getSavedModelByName = async (modelName: string) => {
     try {
-      const { value: query } = await coreSDK.create_query({
-        model:  'bqml_extension',
-        view: 'model_info',
-        fields: fields || Object.values(MODEL_STATE_TABLE_COLUMNS),
-        filters
-      })
-      const { ok, value } = await coreSDK.run_query({
-        query_id: query.id,
-        result_format: "json_detail",
-      })
-      if (!ok) {
-        throw "Please try refreshing the page."
-      }
-      if (value.errors && value.errors.length >= 1) {
-        throw value.errors[0].message
-      }
-      return { ok, value }
+      if (!modelName) { return { ok: false }}
+      return await getSavedModels?.({
+        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
+      }, [MODEL_STATE_TABLE_COLUMNS.modelName, MODEL_STATE_TABLE_COLUMNS.createdByEmail])
     } catch (error) {
-      dispatch({
-        type: 'addError',
-        error: 'Failed to retrieves model(s): ' + error
-      })
       return { ok: false }
     }
   }
 
-  const getSavedModelByName = async (modelName: string) => {
-    if (!modelName) { return { ok: false }}
-    return await getSavedModels?.({
-      [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
-    }, [MODEL_STATE_TABLE_COLUMNS.modelName, MODEL_STATE_TABLE_COLUMNS.createdByEmail])
-  }
-
-  const getAllSavedModels = async () => {
-    const { email: userEmail } = state.user
-    if (!userEmail) { return { ok: false } }
-    return await getSavedModels({
-      [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
-    }, Object.values(MODEL_STATE_TABLE_COLUMNS))
+  const getAllSavedModels = async (hideError?: boolean) => {
+    try {
+      const { email: userEmail } = state.user
+      if (!userEmail) { return { ok: false } }
+      return await getSavedModels({
+        [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
+      }, Object.values(MODEL_STATE_TABLE_COLUMNS))
+    } catch (error) {
+      if (!hideError) {
+        dispatch({
+          type: 'addError',
+          error: 'Failed to retrieve model(s): ' + error
+        })
+      }
+      return { ok: false }
+    }
   }
 
   const getSavedModelState = async (modelName: string) => {

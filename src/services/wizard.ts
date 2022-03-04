@@ -1,11 +1,12 @@
-import { WIZARD_STEPS } from "../constants"
-import { Step1State, Step2State, Step3State, Step4State, Step5State, WizardSteps } from '../types'
+import { Step2State, Step3State, WizardSteps } from '../types'
 import { isArima } from "./modelTypes"
 
-export const hasNoEmptyValues = (obj: any) => {
+export const hasNoEmptyValues = (obj: any, ignoreKeys?: string[]) => {
   if (!obj) { return false }
   for (const key in obj) {
-    if (!obj[key]) { return false }
+    if (!ignoreKeys || !ignoreKeys.includes(key)) {
+      if (!obj[key]) { return false }
+    }
   }
   return true
 }
@@ -22,8 +23,8 @@ const step3Validation = (stepData: Step3State, objective: string) => {
   ) {
     return false
   }
-
-  return hasNoEmptyValues(stepData.summary)
+  const ignoreKeys = isArima(objective) ? undefined : ['arimaTimeColumn']
+  return hasNoEmptyValues(stepData.summary, ignoreKeys)
 }
 
 export const getWizardStepCompleteCallback = (stepName: keyof WizardSteps): any => {

@@ -9,6 +9,7 @@ import MLWizard from './MLWizard'
 import HomeLanding from './HomeLanding'
 import Admin from './Admin'
 import './ExtensionApp.scss'
+import { AdminProvider } from '../contexts/AdminProvider'
 
 
 export const _LookerBQMLApp: React.FC = () => {
@@ -37,7 +38,9 @@ export const _LookerBQMLApp: React.FC = () => {
               <HomeLanding />
             </Route>
             <Route exact path="/admin">
-              <Admin />
+              <AdminProvider>
+                <Admin />
+              </AdminProvider>
             </Route>
             <Route path={["/ml/create", "/ml/:modelNameParam?"]}>
               <WizardProvider>

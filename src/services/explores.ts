@@ -1,4 +1,3 @@
-import { Looker40SDK as LookerSDK } from "@looker/sdk"
 import { ILookmlModel, ILookmlModelExploreField } from "@looker/sdk/lib/4.0/models"
 import { compact } from 'lodash'
 

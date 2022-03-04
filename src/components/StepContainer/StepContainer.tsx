@@ -1,4 +1,5 @@
 import React from 'react'
+import LoadingOverlay from '../LoadingOverlay'
 import Spinner from '../Spinner'
 import StepComplete from '../StepComplete'
 
@@ -27,17 +28,7 @@ export const StepContainer: React.FC<StepContainerParams> = ({
 
   return (
     <section className={`step-container ${loadingClass} ${customClass}`}>
-      { isLoading &&
-        (
-          <>
-            <div className="step-container-loading-overlay">
-            </div>
-            <div className="step-container-spinner-container">
-              <Spinner className="step-container-spinner"/>
-            </div>
-          </>
-        )
-      }
+      <LoadingOverlay isLoading={!!isLoading} />
       { children }
       <div className="wizard-footer-bar">
         <StepComplete

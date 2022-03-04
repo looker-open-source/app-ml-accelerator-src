@@ -2,8 +2,9 @@ import React, { useContext, useState } from "react"
 import { Button, Checkbox, FieldText, IconButton, Label } from "@looker/components"
 import { Add } from "@styled-icons/material"
 import { MODEL_STATE_TABLE_COLUMNS } from "../../../constants"
-import { BQMLContext } from "../../../contexts/BQMLProvider"
 import { toggleArrayEntry } from "../../../services/array"
+import { AdminContext } from "../../../contexts/AdminProvider"
+import Spinner from "../../Spinner"
 
 type AdminModelsShareFormProps = {
   model: any
@@ -14,7 +15,8 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
   const [ sharedList, setSharedList ] = useState<string[]>(sharedWithEmails)
   const [ checkedList, setCheckedList ] = useState<string[]>(sharedWithEmails)
   const [ emailToAdd, setEmailToAdd ] = useState<string>("")
-  const { updateModelStateSharedWithEmails } = useContext(BQMLContext)
+  const [ isLoading, setIsLoading ] = useState<boolean>(false)
+  const { updateSharedEmails } = useContext(AdminContext)
 
   const checkboxChange = (email: string) => {
     if (
@@ -43,6 +45,11 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
       emailToAdd
     ])
     setEmailToAdd("")
+  }
+
+  const handleSave = async () => {
+    const bqModelName = model[MODEL_STATE_TABLE_COLUMNS.modelName].value
+    await updateSharedEmails?.(bqModelName, checkedList)
   }
 
   return (
@@ -81,8 +88,9 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
           ))
         }
       </div>
-      <Button className="action-button">
+      <Button className="action-button" onClick={handleSave} disabled={isLoading}>
         Save
+        { isLoading && <Spinner />}
       </Button>
     </div>
   )
