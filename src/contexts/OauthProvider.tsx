@@ -73,7 +73,6 @@ export const OauthProvider = ({
         response_type: 'token',
       })
       const { access_token } = response
-      console.log({access_token})
       setToken(access_token)
       setAttempts(0)
       return true

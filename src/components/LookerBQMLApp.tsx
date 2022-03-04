@@ -38,9 +38,10 @@ export const _LookerBQMLApp: React.FC = () => {
               <HomeLanding />
             </Route>
             <Route exact path="/admin">
-              <AdminProvider>
+              {/* <AdminProvider>
                 <Admin />
-              </AdminProvider>
+              </AdminProvider> */}
+              admin
             </Route>
             <Route path={["/ml/create", "/ml/:modelNameParam?"]}>
               <WizardProvider>
