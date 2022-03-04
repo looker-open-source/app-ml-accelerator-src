@@ -7,7 +7,10 @@ import ErrorBar from './ErrorBar'
 import TitleBar from './TitleBar'
 import MLWizard from './MLWizard'
 import HomeLanding from './HomeLanding'
+import Admin from './Admin'
 import './ExtensionApp.scss'
+import { AdminProvider } from '../contexts/AdminProvider'
+
 
 export const _LookerBQMLApp: React.FC = () => {
   const { loggingIn, token, signIn, signOut } = useContext(OauthContext)
@@ -33,6 +36,12 @@ export const _LookerBQMLApp: React.FC = () => {
           <Switch>
             <Route exact path="/">
               <HomeLanding />
+            </Route>
+            <Route exact path="/admin">
+              {/* <AdminProvider>
+                <Admin />
+              </AdminProvider> */}
+              admin
             </Route>
             <Route path={["/ml/create", "/ml/:modelNameParam?"]}>
               <WizardProvider>

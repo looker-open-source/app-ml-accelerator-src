@@ -20,8 +20,11 @@ export const HomeLanding : React.FC = () => {
 
   const populateSavedModels = async () => {
     setLoadingModels(true)
-    const { ok, value } = await getAllSavedModels?.()
-    if (!ok) { return }
+    const { ok, value } = await getAllSavedModels?.(true)
+    if (!ok) {
+      setLoadingModels(false)
+      return
+    }
     const bqModelNameList = value.data.map((record: any) =>
       record[MODEL_STATE_TABLE_COLUMNS.modelName]?.value
     )

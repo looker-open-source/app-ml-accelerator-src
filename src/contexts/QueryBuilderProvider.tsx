@@ -53,7 +53,6 @@
         }
 
         const { ok, value } = await sdk.all_lookml_models({})
-
         if (!ok) {
           throw "Failed to fetch models"
         }
