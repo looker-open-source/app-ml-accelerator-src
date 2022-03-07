@@ -19,12 +19,6 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
   const { updateSharedEmails } = useContext(AdminContext)
 
   const checkboxChange = (email: string) => {
-    if (
-      email === 'everyone' &&
-      sharedList.includes('everyone')
-    ) {
-      setSharedList([...sharedList, email])
-    }
     const newCheckedList = toggleArrayEntry(checkedList, email)
     console.log({newCheckedList})
     setCheckedList(newCheckedList)
@@ -49,7 +43,10 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
 
   const handleSave = async () => {
     const bqModelName = model[MODEL_STATE_TABLE_COLUMNS.modelName].value
+    setIsLoading(true)
     await updateSharedEmails?.(bqModelName, checkedList)
+    setSharedList([...checkedList])
+    setIsLoading(false)
   }
 
   return (
@@ -65,15 +62,6 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
         <IconButton icon={<Add />} label="Add" onClick={addEmail} size="large"/>
       </div>
       <div className="share-form-checklist">
-        <div className="share-form-checklist-item">
-          <Checkbox
-            checked={checkedList.includes('everyone')}
-            onChange={() => { checkboxChange('everyone') }}
-          />
-          <Label className="share-form-checkbox-label">
-            Everyone
-          </Label>
-        </div>
         {
           sharedList.map((email:string, i) => (
             <div className="share-form-checklist-item" key={i}>
@@ -88,10 +76,12 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
           ))
         }
       </div>
-      <Button className="action-button" onClick={handleSave} disabled={isLoading}>
-        Save
-        { isLoading && <Spinner />}
-      </Button>
+      <div className="share-form-actions">
+        <Button className="action-button" onClick={handleSave} disabled={isLoading}>
+          Save
+        </Button>
+        { isLoading && <Spinner className="inline-spinner" size={28} />}
+      </div>
     </div>
   )
 }

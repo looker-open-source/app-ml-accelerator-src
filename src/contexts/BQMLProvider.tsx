@@ -47,7 +47,8 @@ type IBQMLContext = {
   createModelStateTable?: () => Promise<any>,
   insertOrUpdateModelState?: (wizardState: WizardState) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
-  getAllSavedModels?: (hideError?: boolean) => Promise<any>,
+  getAllMySavedModels?: (hideError?: boolean) => Promise<any>,
+  getAllAccessibleSavedModels?: (hideError?: boolean) => Promise<any>,
   getSavedModelState?: (modelName: string) => Promise<any>
   getSavedModelByName?: (modelName: string) => Promise<any>
 }
@@ -248,12 +249,31 @@ export const BQMLProvider = ({ children }: any) => {
     }
   }
 
-  const getAllSavedModels = async (hideError?: boolean) => {
+  const getAllMySavedModels = async (hideError?: boolean) => {
     try {
       const { email: userEmail } = state.user
       if (!userEmail) { return { ok: false } }
       return await getSavedModels({
         [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
+      }, Object.values(MODEL_STATE_TABLE_COLUMNS))
+    } catch (error) {
+      if (!hideError) {
+        dispatch({
+          type: 'addError',
+          error: 'Failed to retrieve model(s): ' + error
+        })
+      }
+      return { ok: false }
+    }
+  }
+
+  // Get all models user has access to
+  const getAllAccessibleSavedModels = async (hideError?: boolean) => {
+    try {
+      const { email: userEmail } = state.user
+      if (!userEmail) { return { ok: false } }
+      return await getSavedModels({
+        [MODEL_STATE_TABLE_COLUMNS.fullEmailList]: `%"${userEmail}"%`
       }, Object.values(MODEL_STATE_TABLE_COLUMNS))
     } catch (error) {
       if (!hideError) {
@@ -302,7 +322,8 @@ export const BQMLProvider = ({ children }: any) => {
         createModelStateTable,
         insertOrUpdateModelState,
         updateModelStateSharedWithEmails,
-        getAllSavedModels,
+        getAllMySavedModels,
+        getAllAccessibleSavedModels,
         getSavedModelState,
         getSavedModelByName
       }}
@@ -311,36 +332,3 @@ export const BQMLProvider = ({ children }: any) => {
     </BQMLContext.Provider>
   )
 }
-
-
-// CREATE MODEL looker_scratch.david_boosted_tree_classifier
-// OPTIONS(MODEL_TYPE='BOOSTED_TREE_CLASSIFIER',
-//         BOOSTER_TYPE = 'GBTREE',
-//         INPUT_LABEL_COLS = ['input_label_col'])
-// AS SELECT * FROM `project.dataset.input_data_view`;
-
-
-// CREATE OR REPLACE MODEL looker_scratch.david_boosted_tree_classifier
-// OPTIONS(MODEL_TYPE='BOOSTED_TREE_REGRESSOR',
-//         BOOSTER_TYPE = 'GBTREE',
-//         INPUT_LABEL_COLS = ['input_label_col'])
-// AS SELECT * FROM `project.dataset.input_data_view`;
-
-
-// CREATE OR REPLACE MODEL dataset.model_name
-//                   OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
-//                     , time_series_timestamp_col = 'user_selected_time_column'
-//                     , time_series_data_col = 'user_selected_data_column'
-
-//                     {% if arima_hyper_params.set_horizon._parameter_value == 1000 %}
-//                     {% else %}
-//                       , HORIZON = {% parameter arima_hyper_params.set_horizon %}
-//                     {% endif %}
-
-//                     {% if arima_hyper_params.set_holiday_region._parameter_value == 'none' %}
-//                     {% else %}
-//                     , HOLIDAY_REGION = '{% parameter arima_hyper_params.set_holiday_region %}'
-//                     {% endif %}
-
-//                     , AUTO_ARIMA = TRUE)
-//                   AS (SELECT * FROM `project.dataset.input_data_view`) ;

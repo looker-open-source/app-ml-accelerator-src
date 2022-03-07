@@ -1,18 +1,21 @@
 import { Select } from "@looker/components"
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useState, useMemo } from "react"
 import { Link, useHistory } from "react-router-dom"
 import { MODEL_STATE_TABLE_COLUMNS, WIZARD_STEPS } from "../../constants"
 import { BQMLContext } from "../../contexts/BQMLProvider"
 import { useStore } from "../../contexts/StoreProvider"
+import { buildModelListOptions, filterModelListOptions } from "../../services/modelList"
 import './HomeLanding.scss'
 
 export const HomeLanding : React.FC = () => {
   const history = useHistory()
   const { state, dispatch } = useStore()
-  const [ savedModels, setSavedModels ] = useState<any[]>()
-  const [ loadingModels, setLoadingModels ] = useState<boolean>()
-  const { getAllSavedModels } = useContext(BQMLContext)
-  const { firstName } = state.user
+  const [ savedModels, setSavedModels ] = useState<any[]>([])
+  const [ filteredModels, setFilteredModels ] = useState<any[]>([])
+  const [ loadingModels, setLoadingModels ] = useState<boolean>(false)
+  const [ filterSearchTerm, setFilterSearchTerm ] = useState("")
+  const { getAllAccessibleSavedModels } = useContext(BQMLContext)
+  const { firstName, email } = state.user
 
   useEffect(() => {
     populateSavedModels()
@@ -20,17 +23,26 @@ export const HomeLanding : React.FC = () => {
 
   const populateSavedModels = async () => {
     setLoadingModels(true)
-    const { ok, value } = await getAllSavedModels?.(true)
+    const { ok, value } = await getAllAccessibleSavedModels?.(true)
     if (!ok) {
       setLoadingModels(false)
       return
     }
-    const bqModelNameList = value.data.map((record: any) =>
-      record[MODEL_STATE_TABLE_COLUMNS.modelName]?.value
-    )
-    setSavedModels(bqModelNameList)
+
+    const modelListOptions = buildModelListOptions(value.data, email || "")
+
+    setSavedModels([...modelListOptions])
+    setFilteredModels([...modelListOptions])
     setLoadingModels(false)
   }
+
+  useEffect(() => {
+    if (!filterSearchTerm) {
+      setFilteredModels([...savedModels])
+    }
+    const newFilteredModels = filterModelListOptions([...savedModels], filterSearchTerm)
+    setFilteredModels(newFilteredModels)
+  }, [filterSearchTerm])
 
   const handleModelSelect = async (modelName: string) => {
     history.push(`/ml/${modelName}/${WIZARD_STEPS['step4']}`)
@@ -52,10 +64,13 @@ export const HomeLanding : React.FC = () => {
         <div className="grid-item-small-right">
           <label>Select a Model</label>
           <Select
-            options={savedModels?.map((model) => ({ value: model, label: model }))}
+            options={filteredModels}
             placeholder="View/Edit a Model"
             onChange={handleModelSelect}
             isLoading={loadingModels}
+            value={filterSearchTerm}
+            onFilter={setFilterSearchTerm}
+            isFilterable
           />
         </div>
       </div>
