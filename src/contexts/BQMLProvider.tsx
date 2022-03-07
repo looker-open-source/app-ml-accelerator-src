@@ -292,10 +292,15 @@ export const BQMLProvider = ({ children }: any) => {
       if (!modelName || !userEmail) { return { ok: false } }
 
       const { value } = await getSavedModels({
-        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName,
-        [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: userEmail
+        [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
       })
       const savedData = value.data[0]
+
+      // check if current user has access to model
+      if (savedData[MODEL_STATE_TABLE_COLUMNS.createdByEmail]?.value !== userEmail &&
+        !savedData[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]?.value.includes(`"${userEmail}"`)) {
+          throw "You do not have access to this model."
+      }
       const stateJson = savedData ? savedData[MODEL_STATE_TABLE_COLUMNS.stateJson].value : null
       if (!stateJson) {
         throw "Please try again."
