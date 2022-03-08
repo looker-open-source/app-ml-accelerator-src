@@ -29,9 +29,11 @@ import { isArima, MODEL_TYPES } from '../services/modelTypes'
 import { formatParameterFilter } from '../services/string'
 import { buildApplyFilters } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
+import { WizardContext } from './WizardProvider'
 
 type IApplyContext = {
-  isLoading?: boolean
+  isLoading?: boolean,
+  init?: () => Promise<any>
 }
 
 export const ApplyContext = createContext<IApplyContext>({})
@@ -42,13 +44,10 @@ export const ApplyContext = createContext<IApplyContext>({})
 export const ApplyProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { coreSDK } = useContext(ExtensionContext2)
+  const { persistWizardState } = useContext(WizardContext)
   const [ isLoading, setIsLoading ] = useState<boolean>(false)
   const { personalFolderId, looksFolderId, id: userId } = state.user
   const { step4, step5 } = state.wizard.steps
-
-  useEffect(() => {
-    init()
-  }, [])
 
   const init = async () => {
     setIsLoading(true)
@@ -56,11 +55,9 @@ export const ApplyProvider = ({ children }: any) => {
     if (!folderId) {
       folderId = await createLooksFolder()
     }
-    if (!step5.lookId && folderId) {
+    if ((!step5.look || !step5.look.id) && folderId) {
       await createLook(folderId)
-    } //else if (true) {
-      //await updateLook()
-    //}
+    }
     setIsLoading(false)
   }
 
@@ -76,7 +73,7 @@ export const ApplyProvider = ({ children }: any) => {
     // Create a folder for bqml looks to be saved in
     const newFolderName = getLooksFolderName(userId)
     try {
-      const { value: looksFolder } = await coreSDK.create_folder({
+      const { ok, value: looksFolder } = await coreSDK.create_folder({
         name: newFolderName,
         parent_id: `${personalFolderId}`,
       })
@@ -98,7 +95,7 @@ export const ApplyProvider = ({ children }: any) => {
 
   const getLook = async () => {
     try {
-      const { ok, value } = await coreSDK.look(`${step5.lookId}`)
+      const { ok, value } = await coreSDK.look(`${step5.look.id}`)
     } catch (err) {
       dispatch({
         type: 'addError',
@@ -111,10 +108,13 @@ export const ApplyProvider = ({ children }: any) => {
     const {
       bqModelObjective,
       bqModelName,
-      bqModelTarget,
-      bqModelArimaTimeColumn,
-      bqModelAdvancedSettings
+      // bqModelTarget,
+      // bqModelArimaTimeColumn,
+      // bqModelAdvancedSettings
     } = step4.modelInfo
+    // TODO: REMOVE THIS
+    const { target: bqModelTarget, arimaTimeColumn: bqModelArimaTimeColumn, advancedSettings: bqModelAdvancedSettings } = state.wizard.steps.step3.summary
+
     if (
       !bqModelObjective ||
       !bqModelName ||
@@ -134,6 +134,7 @@ export const ApplyProvider = ({ children }: any) => {
       const { ok, value: queryResult } = await coreSDK.create_query({
         model: BQML_LOOKER_MODEL,
         view: modelType.exploreName,
+        fields: ['arima_forecast.date_date', 'arima_forecast.total_forecast', 'arima_forecast.time_series_data_col'],
         filters
       })
 
@@ -163,18 +164,31 @@ export const ApplyProvider = ({ children }: any) => {
       })
       if (!look.ok) {
         const error = look.error.errors[0]
-        const msg = `${error.field} - ${error.message}`
-        throw Error(msg)
+        throw `${error.field} - ${error.message}`
       }
-      debugger
+
+      const lookObj = {
+        id: look.value.id,
+        embedUrl: look.value.embed_url
+      }
+      // save look id to BQ model state table
+      await persistWizardState?.({
+        ...state.wizard,
+        steps: {
+          ...state.wizard.steps,
+          step5: {
+            ...state.wizard.steps.step5,
+            look: lookObj
+          }
+        }
+      })
       dispatch({
         type: 'addToStepData',
         step: 'step5',
         data: {
-          lookId: look.value
+          look: lookObj
         }
       })
-
     } catch (error) {
       dispatch({
         type: 'addError',
@@ -189,23 +203,36 @@ export const ApplyProvider = ({ children }: any) => {
       const queryResult = await createQuery()
       const queryId = queryResult.id
 
-      const { ok, value: look } = await coreSDK.update_look(step5.lookId, {
+      const look = await coreSDK.update_look(step5.look.id, {
         query_id: queryId,
         title: bqModelName
       })
-      if (!ok) {
+      if (!look.ok) {
         throw "error"
       }
 
-      debugger
+      const lookObj = {
+        id: look.value.id,
+        embedUrl: look.value.embed_url
+      }
+      // save look id to BQ model state table
+      await persistWizardState?.({
+        ...state.wizard,
+        steps: {
+          ...state.wizard.steps,
+          step5: {
+            ...state.wizard.steps.step5,
+            look: lookObj
+          }
+        }
+      })
       dispatch({
         type: 'addToStepData',
         step: 'step5',
         data: {
-          lookId: look.value
+          look: lookObj
         }
       })
-
     } catch (error) {
       dispatch({
         type: 'addError',
@@ -217,7 +244,8 @@ export const ApplyProvider = ({ children }: any) => {
   return (
     <ApplyContext.Provider
       value={{
-        isLoading
+        isLoading,
+        init
       }}
     >
       {children}

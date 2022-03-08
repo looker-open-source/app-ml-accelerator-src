@@ -220,7 +220,7 @@ export const BQMLProvider = ({ children }: any) => {
     fields?: string[]
   ) => {
     const { value: query } = await coreSDK.create_query({
-      model:  'bqml_extension',
+      model:  BQML_LOOKER_MODEL,
       view: 'model_info',
       fields: fields || Object.values(MODEL_STATE_TABLE_COLUMNS),
       filters

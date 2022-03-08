@@ -54,7 +54,7 @@ export type Step4State = {
 }
 
 export type Step5State = {
-  lookId?: string
+  look?: any
 }
 
 export type GenericStepState = Step1State | Step2State | Step3State | Step4State | Step5State

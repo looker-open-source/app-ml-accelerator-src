@@ -36,7 +36,7 @@ export const generateModelState = (wizardState: WizardState): SavedModelState =>
       modelInfo: step4.modelInfo
     },
     step5: {
-      lookId: step5.lookId
+      look: step5.look
     }
   }
   return modelStateToSave
@@ -97,7 +97,7 @@ const buildWizardStep4 = (modelStep4: any, wizardStep4: Step4State): Step4State 
 
 const buildWizardStep5 = (modelStep5: any, wizardStep5: Step5State): Step5State => {
   const mappedModelState = {
-    lookId: modelStep5.lookId
+    look: modelStep5.look
   }
   return {...wizardStep5, ...mappedModelState}
 }
@@ -131,6 +131,6 @@ type SavedModelState = {
     }
   },
   step5: {
-    lookId?: string
+    look: any
   }
 }

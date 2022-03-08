@@ -27,7 +27,7 @@ import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { BQML_LOOKER_MODEL, JOB_STATUSES } from '../constants'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
-import { modelIdGenerator, MODEL_TYPES } from '../services/modelTypes'
+import { MODEL_TYPES } from '../services/modelTypes'
 import { formatParameterFilter } from '../services/string'
 import { WizardContext } from './WizardProvider'
 
@@ -133,9 +133,7 @@ export const ModelProvider = ({ children }: any) => {
         view: modelType.exploreName,
         fields: evalFuncFields,
         filters: {
-          [`${modelType.exploreName}.model_name`]: formatParameterFilter(
-            modelIdGenerator({ bqModelName, objective: bqModelObjective })
-          ),
+          [`${modelType.exploreName}.model_name`]: formatParameterFilter(bqModelName),
         }
       })
       const { ok, value } = await coreSDK.run_query({

@@ -10,7 +10,7 @@ type buildApplyFiltersProps = {
   bqModelAdvancedSettings?: any
 }
 
-export const buildApplyFilters = async ({
+export const buildApplyFilters = ({
   modelType,
   bqModelObjective,
   bqModelName,
@@ -19,7 +19,7 @@ export const buildApplyFilters = async ({
   bqModelAdvancedSettings
 }: buildApplyFiltersProps) => {
   let filters = {
-    [`${modelType.exploreName}.model_name`]: bqModelName
+    [`${modelType.exploreName}.model_name`]: formatParameterFilter(bqModelName)
   }
   if (isArima(bqModelObjective) && bqModelArimaTimeColumn) {
     filters = {
@@ -29,7 +29,7 @@ export const buildApplyFilters = async ({
     }
 
     if (bqModelAdvancedSettings.horizon) {
-      filters[`${modelType.exploreName}.horizon`] = bqModelAdvancedSettings.horizon
+      filters[`${modelType.exploreName}.set_horizon`] = bqModelAdvancedSettings.horizon
     }
   }
 

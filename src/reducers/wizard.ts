@@ -66,7 +66,7 @@ const wizardInitialState: WizardState = {
         bqModelAdvancedSettings: undefined
       }
     },
-    step5: { lookId: undefined }
+    step5: { look: undefined }
   }
 }
 
