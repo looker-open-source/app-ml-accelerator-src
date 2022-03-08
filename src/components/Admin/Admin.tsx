@@ -15,7 +15,10 @@ export const Admin : React.FC = () => {
   const populateModels = async () => {
     setIsLoading(true)
     const { ok, value } = await getAllMySavedModels?.(true)
-    if (!ok) { return }
+    if (!ok) {
+      setIsLoading(false)
+      return
+    }
     setModels(value.data)
     setIsLoading(false)
   }
@@ -25,7 +28,7 @@ export const Admin : React.FC = () => {
       <LoadingOverlay isLoading={isLoading} />
       <h2>Model Admin</h2>
       <p>Share your models with other users.</p>
-      { !isLoading && !models ? (
+      { !isLoading && models.length <= 0 ? (
         <div className="admin-no-models">
           You do not have any saved models
         </div>
