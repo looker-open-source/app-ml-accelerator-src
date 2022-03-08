@@ -1,3 +1,11 @@
+.admin-no-models {
+  width: 100%;
+  margin-top: 120px;
+  text-align: center;
+  font-weight: 100;
+  font-size: 20px;
+}
+
 .admin-model-list {
   margin: 32px auto 0;
   padding: 0;
@@ -61,5 +69,14 @@
 
   .share-form-checkbox-label {
     margin-left: 8px;
+  }
+
+  .share-form-actions {
+    margin-top: 18px;
+  }
+
+  .inline-spinner {
+    display: inline-block;
+    vertical-align: middle;
   }
 }
