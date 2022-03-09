@@ -55,7 +55,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     requiredFieldTypes: ['date_date', 'numeric'],
     exploreName: 'arima',
     targetDataType: 'numeric',
-    advancedSettings: true,
+    optionalParameters: true,
     modelTabs: [MODEL_EVAL_FUNCS.arimaEvaluate],
     modelFields: {
       [MODEL_EVAL_FUNCS.arimaEvaluate]:
@@ -101,7 +101,7 @@ const formBoostedTreeSQL = ({
   boostedType
 }: IFormBoostedTreeTypeSQLProps): string => {
   return `
-    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}_boosted_tree_${boostedType.toLowerCase()}
+    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}',
           BOOSTER_TYPE = 'GBTREE',
           INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])
@@ -127,7 +127,7 @@ const formArimaSQL = ({
 }: IFormSQLProps) => {
   if (!arimaTimeColumn) { return '' }
   return `
-    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}_arima
+    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
@@ -142,19 +142,4 @@ export const MODEL_TYPE_CREATE_METHOD: { [key: string]: (props: IFormSQLProps) =
   BOOSTED_TREE_REGRESSOR: formBoostedTreeRegressorSQL,
   BOOSTED_TREE_CLASSIFIER: formBoostedTreeClassifierSQL,
   ARIMA_PLUS: formArimaSQL
-}
-
-type modelIdGeneratorProps = {
-  bqModelName: string,
-  objective: string
-}
-
-export const modelIdGenerator = ({
-  bqModelName,
-  objective
-}: modelIdGeneratorProps): string => {
-  if (isArima(objective)) {
-    return `${bqModelName}_arima`
-  }
-  return `${bqModelName}_${objective.toLowerCase()}`
 }

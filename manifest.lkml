@@ -6,8 +6,10 @@ application: looker-bqml-app {
   url: "http://localhost:8080/bundle.js"
   # file: "bundle.js
   entitlements: {
-    core_api_methods: ["all_lookml_models", "create_query", "run_query", "lookml_model_explore",  "model_fieldname_suggestions", "me"]
+    core_api_methods: ["all_lookml_models", "create_query", "run_query", "lookml_model_explore",  "model_fieldname_suggestions", "me", "search_folders", "create_folder", "look", "create_look", "update_look", "create_embed_url_as_me"]
     use_form_submit:  yes
+    use_embeds: yes
+    use_iframes:  yes
     scoped_user_attributes: [
       "bigquery_connection_name",
       "google_client_id",

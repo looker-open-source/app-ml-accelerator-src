@@ -11,7 +11,7 @@ import { initialStates } from '../reducers'
 // make previously saved models unable to load
 export const generateModelState = (wizardState: WizardState): SavedModelState => {
   const { unlockedStep } = wizardState
-  const { step1, step2, step3, step4 } = wizardState.steps
+  const { step1, step2, step3, step4, step5 } = wizardState.steps
   const modelStateToSave = {
     unlockedStep: unlockedStep > 3 ? unlockedStep : 4,
     step1: step1,
@@ -35,7 +35,9 @@ export const generateModelState = (wizardState: WizardState): SavedModelState =>
       job: step4.job,
       modelInfo: step4.modelInfo
     },
-    step5: {}
+    step5: {
+      look: step5.look
+    }
   }
   return modelStateToSave
 }
@@ -94,7 +96,9 @@ const buildWizardStep4 = (modelStep4: any, wizardStep4: Step4State): Step4State 
 }
 
 const buildWizardStep5 = (modelStep5: any, wizardStep5: Step5State): Step5State => {
-  const mappedModelState = {}
+  const mappedModelState = {
+    look: modelStep5.look
+  }
   return {...wizardStep5, ...mappedModelState}
 }
 
@@ -121,7 +125,12 @@ type SavedModelState = {
     modelInfo: {
       bqModelName?: string,
       bqModelObjective?: string
+      bqModelTarget?: string,
+      bqModelArimaTimeColumn?: string,
+      bqModelAdvancedSettings?: any
     }
   },
-  step5: {}
+  step5: {
+    look: any
+  }
 }

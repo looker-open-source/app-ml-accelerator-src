@@ -24,8 +24,14 @@ body,
     box-sizing: border-box;
   }
 
+  .bqml-app--header {
+    position: fixed;
+    width: 100%;
+    z-index: 9999;
+  }
+
   .bqml-app-container {
-    padding: 58px 30px;
+    padding: 100px 30px;
   }
 
   h2 {

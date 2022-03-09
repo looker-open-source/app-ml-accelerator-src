@@ -11,8 +11,8 @@ export const TitleBar : React.FC = () => {
         </Link>
       </div>
       <div className="button_container">
-      <Link to={'/admin'} className="toolbar-button-link">
-        <ButtonOutline className="ToolBar-button">Model Admin</ButtonOutline>
+        <Link to={'/admin'} className="toolbar-button-link">
+          <ButtonOutline className="ToolBar-button">Model Admin</ButtonOutline>
         </Link>
       </div>
     </div>

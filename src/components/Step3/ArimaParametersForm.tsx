@@ -4,11 +4,11 @@ import { HOLIDAY_REGION_OPTIONS } from '../../constants'
 import { useStore } from '../../contexts/StoreProvider'
 import { InfoTip } from '../InfoTip/InfoTip'
 
-type ArimaAdvancedFormProps = {
+type ArimaParametersFormProps = {
   objective: string
 }
 
-export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective }) => {
+export const ArimaParametersForm: React.FC<ArimaParametersFormProps> = ({ objective }) => {
   const { state, dispatch } = useStore()
   const { horizon, holidayRegion } = state.wizard.steps.step3.advancedSettings
 
@@ -47,10 +47,10 @@ export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective 
 
   return (
     <>
-      <div className="advanced-settings-form-item">
+      <div className="optional-parameters-form-item">
         <Label>
           Horizon
-          <InfoTip content="The number of days to predict into the future" />
+          <InfoTip content="The number of interval units to predict into the future" />
         </Label>
         <FieldText
           onChange={handleHorizonChange}
@@ -59,7 +59,7 @@ export const ArimaAdvancedForm: React.FC<ArimaAdvancedFormProps> = ({ objective 
           onKeyPress={numericOnly}
         />
       </div>
-      <div className="advanced-settings-form-item">
+      <div className="optional-parameters-form-item">
         <Label>
           Holiday Region
         </Label>

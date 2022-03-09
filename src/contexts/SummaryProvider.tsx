@@ -194,7 +194,10 @@ export const SummaryProvider = ({ children }: any) => {
         job: body.jobReference,
         modelInfo: {
           bqModelName: bqModelName,
-          bqModelObjective: objective
+          bqModelObjective: objective,
+          bqModelTarget: target,
+          bqModelArimaTimeColumn: arimaTimeColumn,
+          bqModelAdvancedSettings: advancedSettings
         }
       }
       // create a copy of the wizard state with the job added
