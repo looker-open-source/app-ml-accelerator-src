@@ -107,12 +107,10 @@ export const ApplyProvider = ({ children }: any) => {
     const {
       bqModelObjective,
       bqModelName,
-      // bqModelTarget,
-      // bqModelArimaTimeColumn,
-      // bqModelAdvancedSettings
+      bqModelTarget,
+      bqModelArimaTimeColumn,
+      bqModelAdvancedSettings
     } = step4.modelInfo
-    // TODO: REMOVE THIS
-    const { target: bqModelTarget, arimaTimeColumn: bqModelArimaTimeColumn, advancedSettings: bqModelAdvancedSettings } = state.wizard.steps.step3.summary
 
     if (
       !bqModelObjective ||

@@ -143,18 +143,3 @@ export const MODEL_TYPE_CREATE_METHOD: { [key: string]: (props: IFormSQLProps) =
   BOOSTED_TREE_CLASSIFIER: formBoostedTreeClassifierSQL,
   ARIMA_PLUS: formArimaSQL
 }
-
-// type modelIdGeneratorProps = {
-//   bqModelName: string,
-//   objective: string
-// }
-
-// export const modelIdGenerator = ({
-//   bqModelName,
-//   objective
-// }: modelIdGeneratorProps): string => {
-//   if (isArima(objective)) {
-//     return `${bqModelName}_arima`
-//   }
-//   return `${bqModelName}_${objective.toLowerCase()}`
-// }
