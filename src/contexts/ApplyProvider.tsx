@@ -21,19 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
 import { getLooksFolderName } from '../services/user'
-import { isArima, MODEL_TYPES } from '../services/modelTypes'
-import { formatParameterFilter } from '../services/string'
+import { MODEL_TYPES } from '../services/modelTypes'
 import { buildApplyFilters } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
 import { WizardContext } from './WizardProvider'
 
 type IApplyContext = {
   isLoading?: boolean,
-  init?: () => Promise<any>
+  initArima?: () => Promise<any>
 }
 
 export const ApplyContext = createContext<IApplyContext>({})
@@ -49,7 +48,7 @@ export const ApplyProvider = ({ children }: any) => {
   const { personalFolderId, looksFolderId, id: userId } = state.user
   const { step4, step5 } = state.wizard.steps
 
-  const init = async () => {
+  const initArima = async () => {
     setIsLoading(true)
     let folderId = looksFolderId
     if (!folderId) {
@@ -245,7 +244,7 @@ export const ApplyProvider = ({ children }: any) => {
     <ApplyContext.Provider
       value={{
         isLoading,
-        init
+        initArima
       }}
     >
       {children}
