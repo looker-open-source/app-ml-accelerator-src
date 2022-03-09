@@ -12,7 +12,7 @@ import Summary from '../Summary'
 import { GenerateSummaryButton } from './GenerateSummaryButton'
 import { ModelNameBlock } from './ModelNameBlock'
 import './Step3.scss'
-import { AdvancedSettings } from './AdvancedSettings'
+import { OptionalParameters } from './OptionalParameters'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -125,9 +125,9 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       "Create Model"
   )
 
-  const buildAdvancedSettings = () => {
+  const buildOptionalParameters = () => {
     if (!objective) { return <></> }
-    return MODEL_TYPES[objective].advancedSettings ? <AdvancedSettings objective={objective}/> : <></>
+    return MODEL_TYPES[objective].optionalParameters ? <OptionalParameters objective={objective}/> : <></>
   }
 
   return (
@@ -189,7 +189,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           />
         </div>
       </div>
-      { buildAdvancedSettings() }
+      { buildOptionalParameters() }
       { summary.data && summary.target &&
         (
           <Summary

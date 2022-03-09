@@ -39,7 +39,7 @@ export const AdminProvider = ({ children }: any) => {
     try {
       const { ok, body } = await updateModelStateSharedWithEmails?.(bqModelName, sharedWithEmails)
       if (!ok) {
-        throw "Requested was unsuccessful"
+        throw "Request was unsuccessful"
       }
       return { ok, body }
     } catch (error) {

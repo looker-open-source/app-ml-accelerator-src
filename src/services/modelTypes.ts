@@ -55,7 +55,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     requiredFieldTypes: ['date_date', 'numeric'],
     exploreName: 'arima',
     targetDataType: 'numeric',
-    advancedSettings: true,
+    optionalParameters: true,
     modelTabs: [MODEL_EVAL_FUNCS.arimaEvaluate],
     modelFields: {
       [MODEL_EVAL_FUNCS.arimaEvaluate]:

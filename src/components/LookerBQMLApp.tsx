@@ -29,8 +29,10 @@ export const _LookerBQMLApp: React.FC = () => {
 
   return (
     <div className="bqml-app">
-      <ErrorBar></ErrorBar>
-      <TitleBar></TitleBar>
+      <div className="bqml-app--header">
+        <ErrorBar></ErrorBar>
+        <TitleBar></TitleBar>
+      </div>
       <div className="bqml-app-container">
         { !loggingIn && token && (
           <Switch>

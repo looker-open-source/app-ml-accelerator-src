@@ -60,11 +60,8 @@ export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, t
       className={`wizard-card modeltypecard ${selectedClass}`}
       onClick={() => handleSelect({ value: type })}
     >
-      <h2>{title}</h2>
-      <p>{description}</p>
-      <div className="modeltypecard-footer">
-        {type}
-      </div>
+      <h2>{description}</h2>
+      <p>{title}</p>
     </div>
   )
 }
