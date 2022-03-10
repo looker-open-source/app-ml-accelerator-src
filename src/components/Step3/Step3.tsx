@@ -13,6 +13,7 @@ import { GenerateSummaryButton } from './GenerateSummaryButton'
 import { ModelNameBlock } from './ModelNameBlock'
 import './Step3.scss'
 import { OptionalParameters } from './OptionalParameters'
+import AdvancedSettings from './AdvancedSettings'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -174,6 +175,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             )
         }
         <div className="wizard-card">
+          <AdvancedSettings objective={objective}/>
           <h2>Data Summary Statistics</h2>
           <div className="summary-factoid">
             Columns: <span className="factoid-bold">{sourceColumns.length}</span>

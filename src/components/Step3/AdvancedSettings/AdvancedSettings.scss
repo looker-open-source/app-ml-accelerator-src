@@ -1,0 +1,58 @@
+.advanced-settings-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.settings-dialog--content {
+  position: relative;
+  border-top: none !important;
+}
+
+.settings-dialog--footer {
+  border-top: 1px solid #DEE1E5;
+}
+
+.settings-dialog--container {
+  font-size: 16px;
+  min-width: 740px;
+
+  h1 {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  .settings-dialog-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0 20px;
+
+    .form-row {
+      display: flex;
+      align-items: flex-end;
+      flex-direction: row;
+      margin-top: 20px;
+
+      p {
+        font-size: 10px !important;
+        line-height: 0 !important;
+      }
+    }
+
+    .settings-form-checkbox {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+}
+
+.settings-dialog--buttons {
+  button {
+    margin-left: 15px;
+  }
+  .cancel-button:hover {
+    background-color: #efefef;
+  }
+}

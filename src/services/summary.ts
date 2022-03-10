@@ -1,5 +1,4 @@
 import { keyBy, compact } from 'lodash'
-import { AdvancedSettings } from '../components/Step3/AdvancedSettings'
 import { Field, Step3State, SummaryTableHeaders } from '../types'
 import { titilize, splitFieldName } from './string'
 

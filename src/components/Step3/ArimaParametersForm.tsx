@@ -1,8 +1,9 @@
 import { FieldText, Label, Select } from '@looker/components'
 import React, { useState } from 'react'
-import { HOLIDAY_REGION_OPTIONS } from '../../constants'
+import { HOLIDAY_REGION_OPTIONS } from '../../services/advancedSettings'
 import { useStore } from '../../contexts/StoreProvider'
 import { InfoTip } from '../InfoTip/InfoTip'
+import { numericOnly } from '../../services/common'
 
 type ArimaParametersFormProps = {
   objective: string
@@ -36,13 +37,6 @@ export const ArimaParametersForm: React.FC<ArimaParametersFormProps> = ({ object
         }
       }
     })
-  }
-
-  const numericOnly = (e: any) => {
-    const re = /[0-9]+/g;
-    if (!re.test(e.key)) {
-      e.preventDefault();
-    }
   }
 
   return (

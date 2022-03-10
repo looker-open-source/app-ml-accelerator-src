@@ -52,3 +52,31 @@ export const poll = ({
   }
   return { promise: executeWrapper(), cancel }
 };
+
+export const arrayToSelectOptions = (options: string[]) => {
+  return options.map((option) => ({
+    value: option,
+    label: option
+  }))
+}
+
+export const alphaNumericOnly = (e: any) => {
+  const re = /[0-9a-zA-Z_]+/g;
+  if (!re.test(e.key)) {
+    e.preventDefault();
+  }
+}
+
+export const numericOnly = (e: any) => {
+  const re = /[0-9]+/g;
+  if (!re.test(e.key)) {
+    e.preventDefault();
+  }
+}
+
+export const floatOnly = (e: any) => {
+  const re = /[0-9.]+/g;
+  if (!re.test(e.key)) {
+    e.preventDefault();
+  }
+}

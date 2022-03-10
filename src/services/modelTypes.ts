@@ -78,6 +78,11 @@ export const isArima = (objective: string): boolean => (
   objective === MODEL_TYPES.ARIMA_PLUS.value
 )
 
+export const isBoostedTree = (objective: string): boolean => (
+  objective === MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value ||
+  objective === MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value
+)
+
 type IFormSQLProps = {
   gcpProject: string,
   bqmlModelDatasetName: string,
