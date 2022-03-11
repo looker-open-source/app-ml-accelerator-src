@@ -12,10 +12,10 @@ type ClassWeightsProps = {
 
 export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => {
   const { state } = useStore()
-  const { allFeatures } = state.wizard.steps.step3
-  const [ features, setFeatures ] = useState(allFeatures || [])
+  const { selectedFeatures } = state.wizard.steps.step3
+  const [ features, setFeatures ] = useState(selectedFeatures || [])
 
-  if (!allFeatures || allFeatures.length <= 0) {
+  if (!selectedFeatures || selectedFeatures.length <= 0) {
     return (
       <div className="advanced-settings-class-weights">
         <div>Class Weights</div>
@@ -48,7 +48,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
       }
     })
 
-      const newFeatures = removeExactMatches([...features], newColumn)
+    const newFeatures = removeExactMatches([...features], newColumn)
     if (column) {
       setFeatures([...newFeatures, column])
     } else {
@@ -75,8 +75,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
         ...classWeightsWithoutColumn
       }
     })
-    if (column) {
-      console.log({features})
+    if (column && selectedFeatures.includes(column)) {
       setFeatures([...features, column])
     }
   }
@@ -86,46 +85,32 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
     <div className="advanced-settings-class-weights">
       <h3>Class Weights</h3>
       {
-        (Object.keys(classWeights)).map((column, i) => {
-          console.log({ column, classWeights })
-          return (
-            <div className="form-row" key={i}>
-              <div className="form-row--item">
-                <Label>
-                  Column
-                </Label>
-                <Select
-                  options={arrayToSelectOptions(features)}
-                  value={column}
-                  onChange={(value: string) => handleSelectChange(value, column)}
-                />
-              </div>
-              <div className="form-row--item">
-                <FieldText
-                  value={form.class_weights[column] || ''}
-                  onChange={(e: any) => handleTextChange(e, column)}
-                  onKeyPress={floatOnly}
-                  description={<span>Float only</span>}
-                  label="Weight"
-                />
-              </div>
-              <IconButton icon={<Delete/>} onClick={() => handleRemove(column)} label="Remove Class Weight" size="large"/>
+        (Object.keys(classWeights)).map((column, i) => (
+          <div className="form-row" key={i}>
+            <div className="form-row--item">
+              <Label>
+                Column
+              </Label>
+              <Select
+                options={arrayToSelectOptions(features)}
+                value={column}
+                onChange={(value: string) => handleSelectChange(value, column)}
+              />
             </div>
-          )
-        })
+            <div className="form-row--item">
+              <FieldText
+                value={form.class_weights[column] || ''}
+                onChange={(e: any) => handleTextChange(e, column)}
+                onKeyPress={floatOnly}
+                description={<span>Float only</span>}
+                label="Weight"
+              />
+            </div>
+            <IconButton icon={<Delete/>} onClick={() => handleRemove(column)} label="Remove Class Weight" size="large"/>
+          </div>
+        ))
       }
       <div className="form-row">
-        {/* <div className="form-row--item">
-          <Label>
-            Add a class weight
-          </Label>
-          <Select
-            placeholder="Select a column"
-            value=''
-            options={[{ value: '', label: '' }, ...arrayToSelectOptions(features)]}
-            onChange={(value: string) => handleSelectChange(value)}
-          />
-        </div> */}
         <IconButton icon={<Add />} onClick={handleAdd}  label="Add Class Weight" size='large'/>
       </div>
     </div>

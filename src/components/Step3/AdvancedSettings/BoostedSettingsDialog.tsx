@@ -1,8 +1,9 @@
 import { Button, ButtonTransparent, Checkbox, DialogContent, DialogFooter, DialogHeader, FieldText, Label, Select } from '@looker/components'
 import { Save } from '@styled-icons/material'
 import { values } from 'lodash'
-import React, { useState } from 'react'
-import { BOOSTED_SETTINGS_DEFAULTS, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, TREE_METHOD } from '../../../services/advancedSettings'
+import React, { useEffect, useState } from 'react'
+import { useStore } from '../../../contexts/StoreProvider'
+import { advancedSettingsSql, BOOSTED_SETTINGS_DEFAULTS, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, showClassWeights, showDataSplitCol, showDataSplitEvalFraction, TREE_METHOD } from '../../../services/advancedSettings'
 import { alphaNumericOnly, arrayToSelectOptions, floatOnly, numericOnly } from '../../../services/common'
 import Spinner from '../../Spinner'
 import { ClassWeights } from './ClassWeights'
@@ -12,12 +13,25 @@ type BoostedSettingsDialogProps = {
 }
 
 export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ closeDialog }) => {
-  const [ form, setForm ] = useState<any>(BOOSTED_SETTINGS_DEFAULTS)
-  console.log({ form })
+  const { state, dispatch } = useStore()
+  const [ form, setForm ] = useState<any>({...BOOSTED_SETTINGS_DEFAULTS, ...state.wizard.steps.step3.advancedSettings})
+
+  useEffect(() => {
+    console.log(advancedSettingsSql(state.wizard.steps.step3.advancedSettings))
+  })
 
   const handleSave = () => {
+    dispatch({
+      type: 'addToStepData',
+      step: 'step3',
+      data: {
+        advancedSettings: {
+          ...state.wizard.steps.step3.advancedSettings,
+          ...form
+        }
+      }
+    })
     closeDialog()
-    return true
   }
 
   const handleSelectChange = (value: string, formKey: string) => {
@@ -39,6 +53,10 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
       ...form,
       [formKey]: !form[formKey]
     })
+  }
+
+  const resetDefaults = () => {
+    setForm(BOOSTED_SETTINGS_DEFAULTS)
   }
 
   return (
@@ -178,7 +196,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 </div>
               </div>
               {
-                !form.auto_class_weights && (
+                showClassWeights(form.auto_class_weights) && (
                   <div className="form-row">
                     <ClassWeights form={form} setForm={setForm} />
                   </div>
@@ -261,7 +279,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               {
-                (form.data_split_method === 'RANDOM' || form.data_split_method === 'SEQ') &&
+                showDataSplitEvalFraction(form.data_split_method) &&
                 (<div className="form-row">
                   <Label>
                     Data split eval fraction
@@ -275,16 +293,15 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 </div>)
               }
               {
-                (form.data_split_method === 'CUSTOM' || form.data_split_method === 'SEQ') &&
+                showDataSplitCol(form.data_split_method) &&
                 (<div className="form-row">
                   <Label>
                     Data split col
                   </Label>
-                  <FieldText
-                    value={form.data_split_eval_fraction}
-                    onChange={(e: any) => handleTextChange(e, 'data_split_eval_fraction')}
-                    onKeyPress={floatOnly}
-                    description={<span>Float only</span>}
+                  <Select
+                    options={arrayToSelectOptions(state.wizard.steps.step3.selectedFeatures || [])}
+                    value={form.data_split_col}
+                    onChange={(value: string) => handleSelectChange(value, 'data_split_col')}
                   />
                 </div>)
               }
@@ -294,7 +311,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 </Label>
                 <div className="settings-form-checkbox">
                   <Checkbox
-                    checked={form.early_stop}
+                    checked={form.enable_global_explain}
                     onChange={() => handleCheckboxChange('enable_global_explain')}
                   />
                 </div>
@@ -304,43 +321,33 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
         </div>
       </DialogContent>
       <DialogFooter className="settings-dialog--footer">
-        <div className="settings-dialog--buttons">
+        <div className="settings-dialog--footer-content">
+          <div className="settings-dialog--buttons">
+            <ButtonTransparent
+              color="neutral"
+              onClick={closeDialog}
+              className="cancel-button"
+            >
+                Cancel
+            </ButtonTransparent>
+            <Button
+              className="action-button"
+              color="key"
+              iconBefore={<Save />}
+              onClick={handleSave}
+            >
+              Save
+            </Button>
+          </div>
           <ButtonTransparent
             color="neutral"
-            onClick={closeDialog}
+            onClick={resetDefaults}
             className="cancel-button"
           >
-              Cancel
+              Reset Defaults
           </ButtonTransparent>
-          <Button
-            className="action-button"
-            color="key"
-            iconBefore={<Save />}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
         </div>
       </DialogFooter>
     </>
   )
 }
-
-// type AdvancedSettingsSelectProps = {
-//   options: string[],
-//   value: string | number,
-//   placeHolder:
-// }
-
-// export const AdvancedSettingsSelect: React.FC<AdvancedSettingsSelectProps> = ({ options, value }) => {
-
-//   return (
-//     <Select
-//       options={options}
-//       value={value}
-//       placeholder="Target"
-//       onChange={handleTargetChange}
-//       className="wizard-card-select"
-//     />
-//   )
-// }

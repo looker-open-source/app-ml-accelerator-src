@@ -80,3 +80,8 @@ export const floatOnly = (e: any) => {
     e.preventDefault();
   }
 }
+
+export const isFloat = (float: string) => {
+  const re = /\d+(\.\d+)?$/g;
+  return re.test(float)
+}

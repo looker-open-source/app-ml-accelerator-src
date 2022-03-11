@@ -23,8 +23,6 @@ export const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ objective })
   }
 
   const buildAdvancedSettingsForm = () => {
-    console.log({ isBoostedTree: isBoostedTree(objective)})
-    console.log({ objective })
     if (isBoostedTree(objective)) {
       return (<BoostedSettingsDialog closeDialog={closeDialog} />)
     }

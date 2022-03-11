@@ -1,3 +1,52 @@
+import { isFloat } from "./common"
+
+export const advancedSettingsSql = (advancedSettings: any) => {
+  let sql = ''
+  for (const key in advancedSettings) {
+    let clause = ''
+    if (key === 'class_weights') {
+      if (showClassWeights(advancedSettings.auto_class_weights)) {
+        clause = `, ${key.toUpperCase()} = ${classWeightSql(advancedSettings[key])}`
+      }
+    } else if (key === 'data_split_eval_fraction' &&
+      !showDataSplitEvalFraction(advancedSettings.data_split_method)) {
+        continue
+    } else if (key === 'data_split_col' &&
+      !showDataSplitCol(advancedSettings.data_split_method)) {
+        continue
+    } else if (advancedSettings[key] !== undefined) {
+      const value = quotedSettings.includes(key) ?
+        `'${advancedSettings[key]}'` :
+        `${advancedSettings[key]}`
+      clause = `, ${key.toUpperCase()} = ${value} `
+    }
+    sql = sql + clause
+  }
+
+  if (!advancedSettings.booster_type) {
+    sql = sql + ", BOOSTER_TYPE = 'GBTREE'"
+  }
+
+  return sql
+}
+
+const classWeightSql = (classWeights: any): string => {
+  let sql = ''
+  for (const key in classWeights) {
+    if (!isFloat(classWeights[key])) { continue }
+    sql = sql ? sql + `, STRUCT('${key}', ${classWeights[key]})` : `STRUCT('${key}', ${classWeights[key]})`
+  }
+  return '[' + sql + '] '
+}
+
+const quotedSettings = [
+  "data_split_method",
+  "data_split_col",
+  "booster_type",
+  "dart_normalize_type",
+  "tree_method"
+]
+
 // BOOSTED TREE ADVANCED SETTINGS
 export const BOOSTER_TYPE = ['GBTREE', 'DART']
 // parameter: booster_type {
@@ -128,6 +177,10 @@ export const BOOSTED_SETTINGS_DEFAULTS = {
   data_split_col: undefined,
   enable_global_explain: false
 }
+
+export const showClassWeights = (auto_class_weights: boolean) => (!auto_class_weights)
+export const showDataSplitEvalFraction = (data_split_method: string) => (data_split_method === 'RANDOM' || data_split_method === 'SEQ')
+export const showDataSplitCol = (data_split_method: string) => (data_split_method === 'CUSTOM' || data_split_method === 'SEQ')
 
 
 // ARIMA ADVANCED SETTINGS

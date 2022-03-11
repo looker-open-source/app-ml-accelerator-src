@@ -1,3 +1,5 @@
+import { advancedSettingsSql } from "./advancedSettings"
+
 export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
   trainingInfo: 'trainingInfo',
   evaluate: 'evaluate',
@@ -103,13 +105,16 @@ const formBoostedTreeSQL = ({
   bqModelName,
   target,
   features,
-  boostedType
+  boostedType,
+  advancedSettings
 }: IFormBoostedTreeTypeSQLProps): string => {
+  const settingsSql = advancedSettingsSql(advancedSettings)
+  console.log({ settingsSql })
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
-          OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}',
-          BOOSTER_TYPE = 'GBTREE',
-          INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])
+          OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
+          , INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])
+          ${settingsSql}
     AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`;
   `
 }
