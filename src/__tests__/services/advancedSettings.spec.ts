@@ -53,7 +53,7 @@ test(`
 advancedSettings
 - undefined Settings
 `, () => {
-  expect(advancedSettingsSql({ ...BOOSTED_SETTINGS_DEFAULTS, num_parallel_tree: undefined, colsample_bylevel: undefined)).toEqual(
+  expect(advancedSettingsSql({ ...BOOSTED_SETTINGS_DEFAULTS, num_parallel_tree: undefined, colsample_bylevel: undefined })).toEqual(
     ", BOOSTER_TYPE = 'GBTREE' , DART_NORMALIZE_TYPE = 'TREE' , TREE_METHOD = 'AUTO' , MIN_TREE_CHILD_WEIGHT = 1 , COLSAMPLE_BYTREE = 1 , COLSAMPLE_BYNODE = 1 , MIN_SPLIT_LOSS = 0 , MAX_TREE_DEPTH = 6 , SUBSAMPLE = 1 , AUTO_CLASS_WEIGHTS = true , L1_REG = 0 , L2_REG = 0 , EARLY_STOP = true , LEARN_RATE = 0.3 , MAX_ITERATIONS = 20 , MIN_REL_PROGRESS = 0.01 , DATA_SPLIT_METHOD = 'AUTO_SPLIT' , ENABLE_GLOBAL_EXPLAIN = false "
   )
 })
