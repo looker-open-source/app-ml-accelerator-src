@@ -34,6 +34,20 @@
       align-items: flex-end;
       flex-direction: row;
       margin-top: 20px;
+      gap: 18px;
+
+      .form-row--item {
+        flex: 1;
+        align-self: flex-start;
+      }
+
+      label {
+        width: 140px;
+        padding-bottom: 0.25rem;
+        display: block;
+        line-height: 1rem;
+        align-self: center;
+      }
 
       p {
         font-size: 10px !important;
@@ -44,6 +58,18 @@
     .settings-form-checkbox {
       width: 100%;
       justify-content: flex-start;
+    }
+
+    .advanced-settings-class-weights {
+      width: 100%;
+      background-color: #f7f7f7;
+      padding: 12px 18px;
+
+      .small-text {
+        font-size: 12px;
+        color: #adadad;
+        margin-top: 12px;
+      }
     }
   }
 }

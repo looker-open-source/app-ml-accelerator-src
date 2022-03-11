@@ -116,7 +116,7 @@ export const BOOSTED_SETTINGS_DEFAULTS = {
   max_tree_depth: 6,
   subsample: 1.0,
   auto_class_weights: true,
-  class_weights: undefined,
+  class_weights: {},
   l1_reg: 0,
   l2_reg: 0,
   early_stop: true,

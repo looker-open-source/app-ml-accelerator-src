@@ -5,13 +5,13 @@ import React, { useState } from 'react'
 import { BOOSTED_SETTINGS_DEFAULTS, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, TREE_METHOD } from '../../../services/advancedSettings'
 import { alphaNumericOnly, arrayToSelectOptions, floatOnly, numericOnly } from '../../../services/common'
 import Spinner from '../../Spinner'
+import { ClassWeights } from './ClassWeights'
 
 type BoostedSettingsDialogProps = {
   closeDialog: () => void
 }
 
 export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ closeDialog }) => {
-  const [ isSaving, setIsSaving ] = useState<boolean>(false)
   const [ form, setForm ] = useState<any>(BOOSTED_SETTINGS_DEFAULTS)
   console.log({ form })
 
@@ -30,7 +30,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
   const handleTextChange = (e: any, formKey: string) => {
     setForm({
       ...form,
-      [formKey]: e.target.currentValue
+      [formKey]: e.target.value
     })
   }
 
@@ -43,22 +43,11 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
 
   return (
     <>
-      <DialogHeader hideClose="true" borderBottom="transparent">Save Segment</DialogHeader>
+      <DialogHeader hideClose="true" borderBottom="transparent">Advanced Settings</DialogHeader>
       <DialogContent className="settings-dialog--content">
         <div className="settings-dialog--container modal-pane">
           <form className="settings-dialog-form">
             <div className="form-content">
-              {/*
-              <FieldText
-                id="segment-title-input"
-                label="Segment Title"
-                className="segment-title-input"
-                // value={segmentTitle}
-                // onChange={handleSegmentTitleChange}
-                // onKeyPress={alphaNumericOnly}
-                description={<span>Alpha-numeric only</span>}
-                required
-              /> */}
               <div className="form-row">
                 <Label>
                   Booster Type
@@ -191,7 +180,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               {
                 !form.auto_class_weights && (
                   <div className="form-row">
-                    AUTO CLASS WEIGHTS
+                    <ClassWeights form={form} setForm={setForm} />
                   </div>
                 )
               }
@@ -329,11 +318,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
             iconBefore={<Save />}
             onClick={handleSave}
           >
-            {isSaving ? (
-              <Spinner size={23} markers={9} />
-            ) : (
-              "Save"
-            )}
+            Save
           </Button>
         </div>
       </DialogFooter>
