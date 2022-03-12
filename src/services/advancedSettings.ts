@@ -1,4 +1,5 @@
 import { isFloat } from "./common"
+import { MODEL_TYPES } from "./modelTypes"
 
 export const advancedSettingsSql = (advancedSettings: any) => {
   let sql = ''
@@ -23,7 +24,7 @@ export const advancedSettingsSql = (advancedSettings: any) => {
     sql = sql + clause
   }
 
-  if (!advancedSettings.booster_type) {
+  if (!advancedSettings || !advancedSettings.booster_type) {
     sql = sql + ", BOOSTER_TYPE = 'GBTREE'"
   }
 
@@ -152,7 +153,7 @@ export const DATA_SPLIT_METHOD = ['AUTO_SPLIT', 'RANDOM', 'CUSTOM', 'SEQ', 'NO_S
 //   default_value: "FALSE" # { TRUE | FALSE }
 // }
 
-export const BOOSTED_SETTINGS_DEFAULTS = {
+const BOOSTED_CLASSIFIER_SETTINGS_DEFAULTS = {
   booster_type: 'GBTREE',
   num_parallel_tree: 1,
   dart_normalize_type: 'TREE',
@@ -176,6 +177,37 @@ export const BOOSTED_SETTINGS_DEFAULTS = {
   data_split_eval_fraction: 0.2,
   data_split_col: undefined,
   enable_global_explain: false
+}
+
+const BOOSTED_REGRESSOR_SETTINGS_DEFAULTS = {
+  booster_type: 'GBTREE',
+  num_parallel_tree: 1,
+  dart_normalize_type: 'TREE',
+  tree_method: 'AUTO',
+  min_tree_child_weight: 1,
+  colsample_bytree: 1,
+  colsample_bylevel: 1,
+  colsample_bynode: 1,
+  min_split_loss: 0,
+  max_tree_depth: 6,
+  subsample: 1.0,
+  l1_reg: 0,
+  l2_reg: 0,
+  early_stop: true,
+  learn_rate: 0.3,
+  max_iterations: 20,
+  min_rel_progress: 0.01,
+  data_split_method: 'AUTO_SPLIT',
+  data_split_eval_fraction: 0.2,
+  data_split_col: undefined,
+  enable_global_explain: false
+}
+
+export const getBoostedSettingsDefaults = (objective: string) => {
+  if (objective === MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value) {
+    return BOOSTED_REGRESSOR_SETTINGS_DEFAULTS
+  }
+  return BOOSTED_CLASSIFIER_SETTINGS_DEFAULTS
 }
 
 export const showClassWeights = (auto_class_weights: boolean) => (!auto_class_weights)

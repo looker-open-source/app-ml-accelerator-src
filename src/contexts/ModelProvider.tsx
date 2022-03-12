@@ -50,7 +50,7 @@ export const ModelProvider = ({ children }: any) => {
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const { coreSDK } = useContext(ExtensionContext2)
-  const { pollJobStatus, cancelJob } = useContext(BQMLContext)
+  const { pollJobStatus, cancelJob, getJob } = useContext(BQMLContext)
   const { persistWizardState } = useContext(WizardContext)
   const { jobStatus, job } = state.wizard.steps.step4
   const [ polling, setPolling ] = useState(false)
@@ -79,7 +79,12 @@ export const ModelProvider = ({ children }: any) => {
         throw "Missing jobid or failed instantiation of BQMLProvider"
       }
       setPolling(true)
+      // make one initial request to get the current job state before it begins polling
+      const { body: initialJobStatus } = await getJob?.({ jobId: job.jobId })
+      updateJobState(initialJobStatus)
       pollCanceler?.cancel()
+      if (initialJobStatus.status.state === JOB_STATUSES.done) { return }
+
       const { promise, cancel } = pollJobStatus(job.jobId, 20000)
       console.log('setting canceler')
       setPollCanceler({ cancel })
@@ -96,22 +101,26 @@ export const ModelProvider = ({ children }: any) => {
         dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
         throw body.status.errorResult.message
       }
-      dispatch({
-        type: 'addToStepData',
-        step: 'step4',
-        data: {
-          jobStatus: body.status.state,
-          job: {
-            ...body.jobReference,
-            startTime: body.statistics.startTime
-          }
-        }
-      })
+      updateJobState(body)
     } catch (error: any) {
       dispatch({ type: 'addError', error: "An error occurred while fetching the job status: " + error})
     } finally {
       setPolling(false)
     }
+  }
+
+  const updateJobState = (body: any) => {
+    dispatch({
+      type: 'addToStepData',
+      step: 'step4',
+      data: {
+        jobStatus: body.status.state,
+        job: {
+          ...body.jobReference,
+          startTime: body.statistics.startTime
+        }
+      }
+    })
   }
 
   // Query looker for the big query evaluation data for the provided evaluation function

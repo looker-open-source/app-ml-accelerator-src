@@ -3,6 +3,7 @@ import { MODEL_STATE_TABLE_COLUMNS } from "../../../constants"
 import { AdminModelShareForm } from "./AdminModelShareForm"
 import { Icon} from "@looker/components"
 import { ExpandLess, ExpandMore } from "@styled-icons/material"
+import { MODEL_TYPES } from "../../../services/modelTypes"
 
 type AdminModelsListItemProps = {
   model: any
@@ -10,6 +11,11 @@ type AdminModelsListItemProps = {
 
 export const AdminModelsListItem : React.FC<AdminModelsListItemProps> = ({ model }) => {
   const [ isOpen, setIsOpen ] = useState(false)
+  let stateJson
+  try {
+    stateJson = JSON.parse(model[MODEL_STATE_TABLE_COLUMNS.stateJson].value)
+  } catch (e) {}
+  const objective = stateJson ? stateJson.step1.objective : ''
 
   return (
     <li className="admin-model-list-item">
@@ -18,7 +24,8 @@ export const AdminModelsListItem : React.FC<AdminModelsListItemProps> = ({ model
           <span className="modelstate-item--title-label">
             Model Name:
           </span>
-          { model[MODEL_STATE_TABLE_COLUMNS.modelName].value }
+          { model[MODEL_STATE_TABLE_COLUMNS.modelName].value } - { objective && MODEL_TYPES[objective].label }
+
         </div>
         <div className="modelstate-item--actions">
           <Icon icon={ isOpen ? (<ExpandLess />) : (<ExpandMore />) } />

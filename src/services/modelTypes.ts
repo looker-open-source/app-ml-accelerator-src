@@ -109,12 +109,11 @@ const formBoostedTreeSQL = ({
   advancedSettings
 }: IFormBoostedTreeTypeSQLProps): string => {
   const settingsSql = advancedSettingsSql(advancedSettings)
-  console.log({ settingsSql })
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
-          , INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])
-          ${settingsSql}
+          , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
+          ${settingsSql})
     AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`;
   `
 }

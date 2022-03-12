@@ -1,11 +1,10 @@
 import { Button, ButtonTransparent, Checkbox, DialogContent, DialogFooter, DialogHeader, FieldText, Label, Select } from '@looker/components'
 import { Save } from '@styled-icons/material'
-import { values } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useStore } from '../../../contexts/StoreProvider'
-import { advancedSettingsSql, BOOSTED_SETTINGS_DEFAULTS, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, showClassWeights, showDataSplitCol, showDataSplitEvalFraction, TREE_METHOD } from '../../../services/advancedSettings'
-import { alphaNumericOnly, arrayToSelectOptions, floatOnly, numericOnly } from '../../../services/common'
-import Spinner from '../../Spinner'
+import { getBoostedSettingsDefaults, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, showClassWeights, showDataSplitCol, showDataSplitEvalFraction, TREE_METHOD } from '../../../services/advancedSettings'
+import { arrayToSelectOptions, floatOnly, numericOnly } from '../../../services/common'
+import { MODEL_TYPES } from '../../../services/modelTypes'
 import { ClassWeights } from './ClassWeights'
 
 type BoostedSettingsDialogProps = {
@@ -14,10 +13,10 @@ type BoostedSettingsDialogProps = {
 
 export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ closeDialog }) => {
   const { state, dispatch } = useStore()
-  const [ form, setForm ] = useState<any>({...BOOSTED_SETTINGS_DEFAULTS, ...state.wizard.steps.step3.advancedSettings})
-
-  useEffect(() => {
-    console.log(advancedSettingsSql(state.wizard.steps.step3.advancedSettings))
+  const { objective } = state.wizard.steps.step1
+  const [ form, setForm ] = useState<any>({
+    ...getBoostedSettingsDefaults(objective || ''),
+    ...state.wizard.steps.step3.advancedSettings
   })
 
   const handleSave = () => {
@@ -56,7 +55,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
   }
 
   const resetDefaults = () => {
-    setForm(BOOSTED_SETTINGS_DEFAULTS)
+    setForm({...getBoostedSettingsDefaults(objective || '')})
   }
 
   return (
@@ -184,23 +183,27 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   description={<span>Float only</span>}
                 />
               </div>
-              <div className="form-row">
-                <Label>
-                  Auto class weights
-                </Label>
-                <div className="settings-form-checkbox">
-                  <Checkbox
-                    checked={form.auto_class_weights}
-                    onChange={() => handleCheckboxChange('auto_class_weights')}
-                  />
-                </div>
-              </div>
-              {
-                showClassWeights(form.auto_class_weights) && (
+              { objective === MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value &&
+                (<>
                   <div className="form-row">
-                    <ClassWeights form={form} setForm={setForm} />
+                    <Label>
+                      Auto class weights
+                    </Label>
+                    <div className="settings-form-checkbox">
+                      <Checkbox
+                        checked={form.auto_class_weights}
+                        onChange={() => handleCheckboxChange('auto_class_weights')}
+                      />
+                    </div>
                   </div>
-                )
+                  {
+                    showClassWeights(form.auto_class_weights) && (
+                      <div className="form-row">
+                        <ClassWeights form={form} setForm={setForm} />
+                      </div>
+                    )
+                  }
+                </>)
               }
               <div className="form-row">
                 <Label>
