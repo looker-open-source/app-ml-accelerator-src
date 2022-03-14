@@ -80,10 +80,17 @@ export const ModelProvider = ({ children }: any) => {
       }
       setPolling(true)
       // make one initial request to get the current job state before it begins polling
-      const { body: initialJobStatus } = await getJob?.({ jobId: job.jobId })
+      const { ok: jobOk, body: initialJobStatus } = await getJob?.({ jobId: job.jobId })
+      if (!jobOk || initialJobStatus.status.errorResult) {
+        dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
+        dispatch({ type: 'setNeedsSaving', value: true })
+        throw jobOk ? initialJobStatus.status.errorResult.message : 'Failed to retrieve job status'
+      }
       updateJobState(initialJobStatus)
       pollCanceler?.cancel()
-      if (initialJobStatus.status.state === JOB_STATUSES.done) { return }
+      if (initialJobStatus.status.state === JOB_STATUSES.done) {
+        return
+      }
 
       const { promise, cancel } = pollJobStatus(job.jobId, 20000)
       console.log('setting canceler')
@@ -94,12 +101,10 @@ export const ModelProvider = ({ children }: any) => {
       const { ok, body, canceled } = await promise
 
       if (canceled) { return }
-      if (!ok) {
-        throw "Failed to retrieve job status"
-      }
-      if (body.status.errorResult) {
+      if (!ok || body.status.errorResult) {
         dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
-        throw body.status.errorResult.message
+        dispatch({ type: 'setNeedsSaving', value: true })
+        throw ok ? body.status.errorResult.message : "Failed to retrieve job status"
       }
       updateJobState(body)
     } catch (error: any) {

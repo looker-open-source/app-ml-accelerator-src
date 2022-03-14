@@ -18,7 +18,7 @@ export const IncompleteJob: React.FC<IncompleteJobProps> = ({ jobCanceled, setIs
         {/* @ts-ignore */}
         <Icon icon={<Close />} size="large" className="model-job-canceled--icon"/>
         <h2>Model Canceled</h2>
-        <p>You have canceled the creation of this model. Go back to the previous step to re-create the model.</p>
+        <p>The creation of this model has been canceled. Go back to the previous step to re-create the model.</p>
       </div>
     </div>
   ) : (

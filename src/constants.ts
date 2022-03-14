@@ -20,7 +20,8 @@ export const JOB_STATUSES: {[key: string]: string} = {
   canceled: 'CANCELED',
   pending: 'PENDING',
   running: 'RUNNING',
-  done: 'DONE'
+  done: 'DONE',
+  failed: 'FAILED'
 }
 
 export const NAME_CHECK_STATUSES = {

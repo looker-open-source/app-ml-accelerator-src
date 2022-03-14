@@ -39,8 +39,6 @@ export const MODEL_TYPES: {[key: string]: any} = {
     value: 'BOOSTED_TREE_CLASSIFIER',
     detail: 'BOOSTED_TREE_CLASSIFIER',
     description: 'I want to classify something',
-    requiredFieldTypes: ['numeric'],
-    targetDataType: 'numeric',
     exploreName: 'boosted_tree',
     modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
     modelFields: {

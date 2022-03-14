@@ -19,11 +19,11 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<string>('')
   const [evalData, setEvalData] = useState<any>()
+  const [jobComplete, setJobComplete] = useState<any>()
+  const [jobCanceled, setJobCanceled] = useState<any>()
   const { state } = useStore()
   const { needsSaving } = state.wizard
   const { jobStatus, modelInfo, job } = state.wizard.steps.step4
-  const jobComplete = jobStatus === JOB_STATUSES.done
-  const jobCanceled = jobStatus === JOB_STATUSES.canceled
 
   useEffect(() => {
     if (!modelInfo.bqModelObjective) { return }
@@ -35,6 +35,11 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       }
     }
   }, [])
+
+  useEffect(() => {
+    setJobComplete(jobStatus === JOB_STATUSES.done)
+    setJobCanceled(jobStatus === JOB_STATUSES.canceled || jobStatus === JOB_STATUSES.failed)
+  }, [jobStatus])
 
   useEffect(() => {
     fetchModelData()
@@ -49,12 +54,14 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     ) { return }
 
     setIsLoading(true)
-    const { value } = await getModelEvalFuncData?.(
+    const { ok, value } = await getModelEvalFuncData?.(
       modelInfo.bqModelObjective,
       activeTab,
       modelInfo.bqModelName
     )
-    setEvalData(value.data)
+    if (ok) {
+      setEvalData(value.data)
+    }
     setIsLoading(false)
   }
 
