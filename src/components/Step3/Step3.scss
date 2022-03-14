@@ -66,3 +66,16 @@
     min-width: 300px;
   }
 }
+
+.model-validations {
+  display: block;
+  margin-top: 22px;
+  width: 100%;
+
+  .model-validations-msg {
+    background-color: #FFE5E9;
+    border-radius: 16px;
+    font-size: 12px;
+    padding: 6px 20px;
+  }
+}

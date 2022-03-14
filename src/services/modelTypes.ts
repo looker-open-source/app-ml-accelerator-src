@@ -74,6 +74,20 @@ export const MODEL_TYPES: {[key: string]: any} = {
   },
 }
 
+export const MODEL_VALIDATORS: {[key: string]: any} = {
+  BOOSTED_TREE_CLASSIFIER: (data: any[], target: string) => {
+    const validationMsgs = []
+    const formattedTarget = target.replace(/\./g, '_')
+    const targetRow = data.filter((rowData: any) => (
+      rowData["column_name"].value === formattedTarget
+    ))
+    if (targetRow.length > 0 && targetRow[0].count_distinct_values.value > 50) {
+      validationMsgs.push('Target rows Distinct Values must be less than or equal to 50')
+    }
+    return validationMsgs
+  }
+}
+
 export const isArima = (objective: string): boolean => (
   objective === MODEL_TYPES.ARIMA_PLUS.value
 )
