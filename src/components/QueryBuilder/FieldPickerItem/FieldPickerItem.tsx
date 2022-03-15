@@ -15,6 +15,7 @@ import {
 } from '@looker/components'
 import Spinner from '../../Spinner'
 import { useStore } from '../../../contexts/StoreProvider'
+import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
 
 export const HighlightContext = createContext({ term: '' })
 
@@ -38,9 +39,10 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
   hideActions = false,
   isLoading = false
 }) => {
-  const { state, dispatch } = useStore()
+  const { stepData } = useContext(QueryBuilderContext)
+  const { dispatch } = useStore()
   const { term } = useContext(HighlightContext)
-  const { selectedFields } = state.wizard.steps.step2
+  const { selectedFields } = stepData
 
   const toggleField = () => {
     dispatch({ type: selectorAction, field })

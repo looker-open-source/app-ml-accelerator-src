@@ -36,7 +36,14 @@ export const generateModelState = (wizardState: WizardState): SavedModelState =>
       modelInfo: step4.modelInfo
     },
     step5: {
-      look: step5.look
+      look: step5.look,
+      lockedFields: step5.lockedFields,
+      exploreName: step5.exploreName,
+      modelName: step5.modelName,
+      exploreLabel: step5.exploreLabel,
+      limit: step5.limit,
+      selectedFields: step5.selectedFields,
+      sorts: step5.sorts
     }
   }
   return modelStateToSave
@@ -97,7 +104,14 @@ const buildWizardStep4 = (modelStep4: any, wizardStep4: Step4State): Step4State 
 
 const buildWizardStep5 = (modelStep5: any, wizardStep5: Step5State): Step5State => {
   const mappedModelState = {
-    look: modelStep5.look
+    look: modelStep5.look,
+    lockedFields: modelStep5.lockedFields,
+    exploreName: modelStep5.exploreName,
+    modelName: modelStep5.modelName,
+    exploreLabel: modelStep5.exploreLabel,
+    limit: modelStep5.limit,
+    selectedFields: modelStep5.selectedFields,
+    sorts: modelStep5.sorts,
   }
   return {...wizardStep5, ...mappedModelState}
 }
@@ -132,5 +146,12 @@ type SavedModelState = {
   },
   step5: {
     look: any
+    lockedFields?: SelectedFields
+    exploreName?: string
+    modelName?: string
+    exploreLabel?: string
+    limit?: string
+    selectedFields?: SelectedFields
+    sorts?: string[]
   }
 }

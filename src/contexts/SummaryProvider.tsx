@@ -28,6 +28,7 @@ import { formBQViewSQL } from '../services/summary'
 import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
 import { JOB_STATUSES } from '../constants'
+import { wizardInitialState } from '../reducers/wizard'
 
 type ISummaryContext = {
   getSummaryData?: (
@@ -206,7 +207,8 @@ export const SummaryProvider = ({ children }: any) => {
         ...wizard,
         steps: {
           ...wizard.steps,
-          step4: jobState
+          step4: jobState,
+          step5: wizardInitialState.steps.step5
         }
       }
       await persistWizardState?.(wizardState)

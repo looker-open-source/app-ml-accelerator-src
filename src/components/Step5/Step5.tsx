@@ -5,8 +5,10 @@ import { getWizardStepCompleteCallback } from '../../services/wizard'
 import './Step5.scss'
 import { ApplyContext } from '../../contexts/ApplyProvider'
 import { useStore } from '../../contexts/StoreProvider'
-import { isArima } from '../../services/modelTypes'
+import { isArima, isBoostedTree } from '../../services/modelTypes'
 import { ArimaPredict } from './ArimaPredict'
+import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
+import { BoostedTreePredict } from './BoostedTreePredict'
 
 const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { state } = useStore()
@@ -16,6 +18,12 @@ const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const showModelTypePredictComponent = () => {
     if (isArima(objective || "")) {
       return (<ArimaPredict />)
+    } else if (isBoostedTree(objective || "")) {
+      return (
+        <QueryBuilderProvider stepName="step5" lockFields={true}>
+          <BoostedTreePredict />
+        </QueryBuilderProvider>
+      )
     }
   }
 
@@ -23,6 +31,7 @@ const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     <StepContainer
       isLoading={isLoading}
       stepComplete={stepComplete}
+      lastStep={true}
       stepNumber={5}>
         <h2>Apply Your Model</h2>
         <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>

@@ -1,16 +1,19 @@
-import React from "react"
+import React, { useContext } from "react"
 import { useStore } from '../../../contexts/StoreProvider'
 import {
   TreeCollection,
   LkFieldViewTree,
 } from '@looker/components'
+import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 import { FieldsListByType } from "./FieldsListByType"
 import { collapseViewsWithSameLabel } from '../../../services/views'
 import "./FieldsDirectory.scss"
 
+
 export const FieldsDirectory: React.FC = () => {
-  const { state, dispatch } = useStore()
-  const { exploreData, selectedFields } = state.wizard.steps.step2
+  const { stepData } = useContext(QueryBuilderContext)
+  const { dispatch } = useStore()
+  const { exploreData, selectedFields } = stepData
   if (!exploreData?.views) {
     dispatch({ type: 'addError', errorString: 'Explore has incomplete data.'})
     return (<></>)

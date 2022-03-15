@@ -1,11 +1,13 @@
-import React from "react"
+import React, { useContext } from "react"
 import { useStore } from "../../../contexts/StoreProvider"
 import { ButtonOutline } from "@looker/components"
 import "./ExploreFilter.scss"
+import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 
 export const CurrentExplore: React.FC = () => {
-  const { state, dispatch } = useStore()
-  const { exploreData } = state.wizard.steps.step2
+  const { dispatch } = useStore()
+  const { stepData } = useContext(QueryBuilderContext)
+  const { exploreData } = stepData
 
   return (
     <div className="current-explore">

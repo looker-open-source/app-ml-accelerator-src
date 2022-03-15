@@ -1,4 +1,5 @@
-import React from "react"
+import React, { useContext } from "react"
+import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 import { useStore } from "../../../contexts/StoreProvider"
 
 type ExploreItemProps = {
@@ -12,11 +13,12 @@ export const ExploreItem:React.FC<ExploreItemProps> = ({
     modelName,
     exploreName,
 }) => {
-  const { state, dispatch } = useStore()
+  const { stepData, stepName } = useContext(QueryBuilderContext)
+  const { dispatch } = useStore()
   const clickHandle = () => {
     dispatch({
       type: 'addToStepData',
-      step: 'step2',
+      step: stepName,
       data: {
         modelName,
         exploreName,
@@ -24,7 +26,6 @@ export const ExploreItem:React.FC<ExploreItemProps> = ({
       }
     })
   }
-  const stepData = state.wizard.steps.step2
   const isItemMatch = stepData.modelName === modelName
     && stepData.exploreName === exploreName
   const selectedClass = isItemMatch ? 'selected' : ''

@@ -70,7 +70,30 @@ const wizardInitialState: WizardState = {
         bqModelAdvancedSettings: undefined
       }
     },
-    step5: { look: undefined }
+    step5: {
+      look: undefined,
+      lockedFields: {
+        dimensions: [],
+        measures: [],
+        parameters: [],
+        filters: {}
+      },
+      exploreName: undefined,
+      modelName: undefined,
+      exploreLabel: undefined,
+      exploreData: undefined,
+      exploreFilterText: "",
+      limit: "500",
+      selectedFields: {
+        dimensions: [],
+        measures: [],
+        parameters: [],
+        filters: {}
+      },
+      ranQuery: undefined,
+      sorts: [],
+      tableHeaders: []
+    }
   }
 }
 

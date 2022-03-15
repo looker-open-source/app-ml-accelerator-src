@@ -1,13 +1,15 @@
-import React from "react"
+import React, { useContext } from "react"
 import { useStore } from "../../../contexts/StoreProvider"
 import { FieldText } from "@looker/components"
 import { Search } from "@styled-icons/material"
 import { CurrentExplore } from './CurrentExplore'
 import "./ExploreFilter.scss"
+import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 
 export const ExploreFilter: React.FC = () => {
-  const { state, dispatch } = useStore()
-  const { exploreFilterText, exploreData } = state.wizard.steps.step2
+  const { stepData } = useContext(QueryBuilderContext)
+  const { dispatch } = useStore()
+  const { exploreFilterText, exploreData } = stepData
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const filterText = e.target.value

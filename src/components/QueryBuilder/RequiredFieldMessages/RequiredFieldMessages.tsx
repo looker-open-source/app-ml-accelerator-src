@@ -1,22 +1,24 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { useStore } from "../../../contexts/StoreProvider"
 import { getRequiredFieldMessages } from '../../../services/resultsTable'
 import { MODEL_TYPES } from "../../../services/modelTypes"
+import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 
 export const RequiredFieldMessages : React.FC = () => {
+  const { stepData } = useContext(QueryBuilderContext)
   const { state } = useStore()
   const [ requiredFieldMessages, setRequiredFieldMessages ] = useState<string[]>([])
-  const { step1, step2 } = state.wizard.steps
+  const { step1 } = state.wizard.steps
 
   useEffect(() => {
-    if (!step2.exploreData) { return }
+    if (!stepData.exploreData) { return }
     const messages = getRequiredFieldMessages(
-      step2.exploreData?.fieldDetails,
-      [...step2.selectedFields.dimensions, ...step2.selectedFields.measures],
+      stepData.exploreData?.fieldDetails,
+      [...stepData.selectedFields.dimensions, ...stepData.selectedFields.measures],
       getRequiredFieldTypes()
     )
     setRequiredFieldMessages(messages)
-  }, [step2.selectedFields, step2.exploreData])
+  }, [stepData.selectedFields, stepData.exploreData])
 
   const getRequiredFieldTypes = (): string[] => {
     if (!step1.objective) { return [] }
