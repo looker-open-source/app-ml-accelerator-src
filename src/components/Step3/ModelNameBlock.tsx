@@ -4,6 +4,7 @@ import { useStore } from '../../contexts/StoreProvider'
 import { BQMLContext } from '../../contexts/BQMLProvider'
 import { MODEL_STATE_TABLE_COLUMNS, NAME_CHECK_STATUSES } from '../../constants'
 import { Warning, Check, Error } from "@styled-icons/material"
+import { alphaNumericOnly } from '../../services/common'
 import Spinner from '../Spinner'
 
 type ModelNameBlockProps = {
@@ -52,13 +53,6 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
       setNameCheckStatus(NAME_CHECK_STATUSES.error)
     }
     setLoadingNameStatus(false)
-  }
-
-  const alphaNumericOnly = (e: any) => {
-    const re = /[0-9a-zA-Z_]+/g;
-    if (!re.test(e.key)) {
-      e.preventDefault();
-    }
   }
 
   const buildStatusMessage = () => {

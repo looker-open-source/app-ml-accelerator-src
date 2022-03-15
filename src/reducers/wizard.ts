@@ -44,6 +44,9 @@ const wizardInitialState: WizardState = {
       allFeatures: [],
       selectedFeatures: [],
       advancedSettings: {},
+      // The values in summary are a copy of the values that were used when the summary was generated
+      // When changes occur to previous tabs or settings are changed, we can compare those values to what
+      // is in summary to determine if the model is out of sync and needs to be re-created
       summary: {
         exploreName: undefined,
         modelName: undefined,
@@ -58,6 +61,7 @@ const wizardInitialState: WizardState = {
     step4: {
       jobStatus: undefined,
       job: undefined,
+      // modelInfo can be thought of as the source of truth of what values were used to create the model
       modelInfo: {
         bqModelName: undefined,
         bqModelObjective: undefined,

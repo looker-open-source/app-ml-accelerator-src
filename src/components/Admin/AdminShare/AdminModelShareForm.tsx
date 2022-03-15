@@ -29,7 +29,7 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
   }
 
   const addEmail = () => {
-    if (sharedList.includes(emailToAdd)) { return }
+    if (!emailToAdd || sharedList.includes(emailToAdd)) { return }
     setSharedList([
       ...sharedList,
       emailToAdd

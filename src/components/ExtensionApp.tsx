@@ -58,7 +58,7 @@ export const ExtensionApp: React.FC = () => {
   return (
     <OauthProvider clientId={clientId} scopes={GOOGLE_SCOPES}>
       <BQMLProvider>
-        { clientId ? (<LookerBQMLApp />) : <></> }
+        { clientId && state.user.email ? (<LookerBQMLApp />) : <></> }
       </BQMLProvider>
     </OauthProvider>
   )

@@ -13,6 +13,8 @@ import { GenerateSummaryButton } from './GenerateSummaryButton'
 import { ModelNameBlock } from './ModelNameBlock'
 import './Step3.scss'
 import { OptionalParameters } from './OptionalParameters'
+import AdvancedSettings from './AdvancedSettings'
+import { ModelValidation } from './ModelValidation'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -22,6 +24,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [nameCheckStatus, setNameCheckStatus] = useState<string | undefined>()
   const [loadingNameStatus, setLoadingNameStatus] = useState<boolean>(false)
+  const [isInvalid, setIsInvalid] = useState<boolean>(false)
   const { needsSaving } = state.wizard
   const { step1, step2, step3 } = state.wizard.steps
   const { objective } = step1
@@ -133,7 +136,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   return (
     <StepContainer
       isLoading={isLoading}
-      stepComplete={stepComplete}
+      stepComplete={!isInvalid && stepComplete}
       stepNumber={3}
       buttonText={stepCompleteButtonText()}
       handleCompleteClick={buildHandleCompleteClick()}
@@ -174,6 +177,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             )
         }
         <div className="wizard-card">
+          <AdvancedSettings objective={objective}/>
           <h2>Data Summary Statistics</h2>
           <div className="summary-factoid">
             Columns: <span className="factoid-bold">{sourceColumns.length}</span>
@@ -190,6 +194,12 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         </div>
       </div>
       { buildOptionalParameters() }
+      <ModelValidation
+        setIsInvalid={setIsInvalid}
+        data={summary.data}
+        target={summary.target}
+        objective={objective}
+      />
       { summary.data && summary.target &&
         (
           <Summary

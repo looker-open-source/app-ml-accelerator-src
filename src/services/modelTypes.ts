@@ -1,3 +1,5 @@
+import { advancedSettingsSql } from "./advancedSettings"
+
 export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
   trainingInfo: 'trainingInfo',
   evaluate: 'evaluate',
@@ -37,8 +39,6 @@ export const MODEL_TYPES: {[key: string]: any} = {
     value: 'BOOSTED_TREE_CLASSIFIER',
     detail: 'BOOSTED_TREE_CLASSIFIER',
     description: 'I want to classify something',
-    requiredFieldTypes: ['numeric'],
-    targetDataType: 'numeric',
     exploreName: 'boosted_tree',
     modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
     modelFields: {
@@ -74,8 +74,27 @@ export const MODEL_TYPES: {[key: string]: any} = {
   },
 }
 
+export const MODEL_VALIDATORS: {[key: string]: any} = {
+  BOOSTED_TREE_CLASSIFIER: (data: any[], target: string) => {
+    const validationMsgs = []
+    const formattedTarget = target.replace(/\./g, '_')
+    const targetRow = data.filter((rowData: any) => (
+      rowData["column_name"].value === formattedTarget
+    ))
+    if (targetRow.length > 0 && targetRow[0].count_distinct_values.value > 50) {
+      validationMsgs.push('Target rows Distinct Values must be less than or equal to 50')
+    }
+    return validationMsgs
+  }
+}
+
 export const isArima = (objective: string): boolean => (
   objective === MODEL_TYPES.ARIMA_PLUS.value
+)
+
+export const isBoostedTree = (objective: string): boolean => (
+  objective === MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value ||
+  objective === MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value
 )
 
 type IFormSQLProps = {
@@ -98,13 +117,15 @@ const formBoostedTreeSQL = ({
   bqModelName,
   target,
   features,
-  boostedType
+  boostedType,
+  advancedSettings
 }: IFormBoostedTreeTypeSQLProps): string => {
+  const settingsSql = advancedSettingsSql(advancedSettings)
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
-          OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}',
-          BOOSTER_TYPE = 'GBTREE',
-          INPUT_LABEL_COLS = ['${target.replace(".", "_")}'])
+          OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
+          , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
+          ${settingsSql})
     AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`;
   `
 }

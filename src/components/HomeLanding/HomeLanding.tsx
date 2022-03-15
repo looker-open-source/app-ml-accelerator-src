@@ -61,18 +61,6 @@ export const HomeLanding : React.FC = () => {
             Role-based intro message aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat, sed ullamcorper erat commodo. Vestibulum sit amet ipsum vitae mauris mattis vulputate lacinia nec neque. Aenean quis consectetur nisi, ac interdum elit. Aliquam sit amet luctus elit, id tempus purus. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat.
           </p>
         </div>
-        <div className="grid-item-small-right">
-          <label>Select a Model</label>
-          <Select
-            options={filteredModels}
-            placeholder="View/Edit a Model"
-            onChange={handleModelSelect}
-            isLoading={loadingModels}
-            value={filterSearchTerm}
-            onFilter={setFilterSearchTerm}
-            isFilterable
-          />
-        </div>
       </div>
       <h1>Get Started</h1>
       <div className="home-landing-grid">
@@ -81,13 +69,27 @@ export const HomeLanding : React.FC = () => {
           <p>
             Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit.
           </p>
-          <Link to="/ml" onClick={clearState}>Create New Model</Link>
+          <div className="home-landing-model-select">
+            <Link to="/ml" onClick={clearState}>Create New Model</Link>
+          </div>
         </div>
         <div className="grid-item-large-right">
           <h3>Use existing models</h3>
           <p>
             Aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat, sed ullamcorper erat commodo. Vestibulum sit amet ipsum vitae mauris mattis vulputate lacinia nec neque. Aenean quis consectetur nisi, ac interdum elit. Aliquam sit amet luctus elit, id tempus purus.
           </p>
+          <div className="home-landing-model-select">
+            <label>Select a Model</label>
+            <Select
+              options={filteredModels}
+              placeholder="View/Edit a Model"
+              onChange={handleModelSelect}
+              isLoading={loadingModels}
+              value={filterSearchTerm}
+              onFilter={setFilterSearchTerm}
+              isFilterable
+            />
+          </div>
         </div>
       </div>
     </div>
