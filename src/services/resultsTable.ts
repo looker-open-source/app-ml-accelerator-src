@@ -1,4 +1,4 @@
-import { SelectedFields, ResultsTableHeaderItem, ExploreData, Field } from '../types'
+import { SelectedFields, ResultsTableHeaderItem, ExploreData } from '../types'
 import { find, some } from 'lodash'
 import { buildFieldSelectOptions } from './summary'
 import { REQUIRE_FIELD_MESSAGES } from '../constants'
@@ -17,8 +17,8 @@ export const getHeaderColumns = (
   ) {
     return []
   }
-  const ranDimensions = ranQuery?.dimensions || []
-  const ranMeasures = ranQuery?.measures || []
+  const ranDimensions = ranQuery?.selectedFields.dimensions || []
+  const ranMeasures = ranQuery?.selectedFields.measures || []
   const { dimensions: exploreDimensions, measures: exploreMeasures } = exploreData.fieldDetails
 
   const dimensionHeaders = [...selectedFields.dimensions.map((dimension) => (

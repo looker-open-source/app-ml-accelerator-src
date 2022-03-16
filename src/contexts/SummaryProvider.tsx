@@ -29,6 +29,7 @@ import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
 import { JOB_STATUSES } from '../constants'
 import { wizardInitialState } from '../reducers/wizard'
+import { WizardState } from '../types'
 
 type ISummaryContext = {
   getSummaryData?: (
@@ -144,12 +145,39 @@ export const SummaryProvider = ({ children }: any) => {
         throw "Failed to fetch summary."
       }
       saveSummary?.(value, state.wizard)
+      saveBQModel(state.wizard)
       return { ok, value }
     } catch(error) {
       setPreviousBQValues({ sql: null, model: null })
       dispatch({type: 'addError', error: "Failed to fetch summary.  Please try again."})
       return { ok: false }
     }
+  }
+
+  // update bqModel state
+  // we need a record of the source data when the summary was generated that isn't tied to the UI
+  // since the user can change the UI values at any time and make it out of sync with what the model was created with
+  const saveBQModel = (wizardState: WizardState) => {
+    const { step1, step2, step3 } = wizardState.steps
+    dispatch({
+      type: 'setBQModel',
+      data: {
+        sourceQuery: {
+          exploreName: step2.ranQuery?.exploreName,
+          modelName: step2.ranQuery?.modelName,
+          exploreLabel: step2.ranQuery?.exploreLabel,
+          limit: step2.ranQuery?.limit,
+          selectedFields: step2.ranQuery?.selectedFields,
+          sorts: step2.ranQuery?.sorts,
+        },
+        objective: step1.objective,
+        name: step3.bqModelName,
+        target: step3.targetField,
+        arimaTimeColumn: step3.arimaTimeColumn,
+        advancedSettings: step3.advancedSettings || {},
+        selectedFeatures: step3.selectedFeatures
+      }
+    })
   }
 
   const createBQMLModel = async (
@@ -193,29 +221,24 @@ export const SummaryProvider = ({ children }: any) => {
       const jobState = {
         jobStatus: JOB_STATUSES.pending,
         job: body.jobReference,
-        modelInfo: {
-          bqModelName: bqModelName,
-          bqModelObjective: objective,
-          bqModelTarget: target,
-          bqModelArimaTimeColumn: arimaTimeColumn,
-          bqModelAdvancedSettings: advancedSettings
-        }
       }
-      // create a copy of the wizard state with the job added
-      const { wizard } = state
-      const wizardState = {
-        ...wizard,
-        steps: {
-          ...wizard.steps,
-          step4: jobState,
-          step5: wizardInitialState.steps.step5
-        }
+      const { wizard, bqModel } = state
+      const tempBQModel = {
+        ...bqModel,
+        ...jobState,
+        selectedFeatures: features,
+        advancedSettings: advancedSettings
       }
-      await persistWizardState?.(wizardState)
+      await persistWizardState?.({ ...wizard }, tempBQModel)
+
+      dispatch({
+        type: 'setBQModel',
+        data: { ...tempBQModel }
+      })
       dispatch({
         type: 'addToStepData',
         step: 'step4',
-        data: jobState
+        data: { complete: false }
       })
       return { ok, body }
     } catch (error) {

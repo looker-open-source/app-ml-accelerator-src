@@ -46,7 +46,7 @@ export const ApplyProvider = ({ children }: any) => {
   const { persistWizardState } = useContext(WizardContext)
   const [ isLoading, setIsLoading ] = useState<boolean>(false)
   const { personalFolderId, looksFolderId, id: userId } = state.user
-  const { step4, step5 } = state.wizard.steps
+  const { bqModel } = state
 
   const initArima = async () => {
     setIsLoading(true)
@@ -54,7 +54,7 @@ export const ApplyProvider = ({ children }: any) => {
     if (!folderId) {
       folderId = await createLooksFolder()
     }
-    if ((!step5.look || !step5.look.id) && folderId) {
+    if ((!bqModel.look || !bqModel.look.id) && folderId) {
       await createLook(folderId)
     }
     setIsLoading(false)
@@ -94,7 +94,7 @@ export const ApplyProvider = ({ children }: any) => {
 
   const getLook = async () => {
     try {
-      const { ok, value } = await coreSDK.look(`${step5.look.id}`)
+      const { ok, value } = await coreSDK.look(`${bqModel.look.id}`)
     } catch (err) {
       dispatch({
         type: 'addError',
@@ -105,12 +105,12 @@ export const ApplyProvider = ({ children }: any) => {
 
   const createQuery = async () => {
     const {
-      bqModelObjective,
-      bqModelName,
-      bqModelTarget,
-      bqModelArimaTimeColumn,
-      bqModelAdvancedSettings
-    } = step4.modelInfo
+      objective: bqModelObjective,
+      name: bqModelName,
+      target: bqModelTarget,
+      arimaTimeColumn: bqModelArimaTimeColumn,
+      advancedSettings: bqModelAdvancedSettings
+    } = bqModel
 
     if (
       !bqModelObjective ||
@@ -150,7 +150,7 @@ export const ApplyProvider = ({ children }: any) => {
 
   const createLook = async (folderId: number) => {
     try {
-      const { bqModelName } = step4.modelInfo
+      const { name: bqModelName } = bqModel
       const queryResult = await createQuery()
       const queryId = queryResult.id
 
@@ -168,24 +168,7 @@ export const ApplyProvider = ({ children }: any) => {
         id: look.value.id,
         embedUrl: look.value.embed_url
       }
-      // save look id to BQ model state table
-      await persistWizardState?.({
-        ...state.wizard,
-        steps: {
-          ...state.wizard.steps,
-          step5: {
-            ...state.wizard.steps.step5,
-            look: lookObj
-          }
-        }
-      })
-      dispatch({
-        type: 'addToStepData',
-        step: 'step5',
-        data: {
-          look: lookObj
-        }
-      })
+      await saveState(lookObj)
     } catch (error) {
       dispatch({
         type: 'addError',
@@ -196,11 +179,11 @@ export const ApplyProvider = ({ children }: any) => {
 
   const updateLook = async () => {
     try {
-      const { bqModelName } = step4.modelInfo
+      const { name: bqModelName } = bqModel
       const queryResult = await createQuery()
       const queryId = queryResult.id
 
-      const look = await coreSDK.update_look(step5.look.id, {
+      const look = await coreSDK.update_look(bqModel.look.id, {
         query_id: queryId,
         title: bqModelName
       })
@@ -213,29 +196,28 @@ export const ApplyProvider = ({ children }: any) => {
         embedUrl: look.value.embed_url
       }
       // save look id to BQ model state table
-      await persistWizardState?.({
-        ...state.wizard,
-        steps: {
-          ...state.wizard.steps,
-          step5: {
-            ...state.wizard.steps.step5,
-            look: lookObj
-          }
-        }
-      })
-      dispatch({
-        type: 'addToStepData',
-        step: 'step5',
-        data: {
-          look: lookObj
-        }
-      })
+      await saveState(lookObj)
     } catch (error) {
       dispatch({
         type: 'addError',
         error: 'Failed to update look - ' + error
       })
     }
+  }
+
+  const saveState = async (lookObj: any) => {
+    const { wizard, bqModel } = state
+    const tempBQModel = { ...bqModel, look: lookObj }
+    await persistWizardState?.({ ...wizard }, tempBQModel)
+    dispatch({
+      type: 'addToStepData',
+      step: 'step5',
+      data: { look: lookObj }
+    })
+    dispatch({
+      type: 'setBQModel',
+      data: { look: lookObj }
+    })
   }
 
   return (

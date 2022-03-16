@@ -3,12 +3,6 @@ import { SummaryField } from './field'
 export type Summary = {
   fields?: SummaryField[]
   data?: any[]
-  exploreName?: string
-  modelName?: string
-  target?: string
-  bqModelName?: string
-  advancedSettings?: any
-  arimaTimeColumn?: any
 }
 
 export type SummaryTableHeader = {

@@ -44,43 +44,15 @@ const wizardInitialState: WizardState = {
       allFeatures: [],
       selectedFeatures: [],
       advancedSettings: {},
-      // The values in summary are a copy of the values that were used when the summary was generated
-      // When changes occur to previous tabs or settings are changed, we can compare those values to what
-      // is in summary to determine if the model is out of sync and needs to be re-created
       summary: {
-        exploreName: undefined,
-        modelName: undefined,
         fields: undefined,
         data: undefined,
-        target: undefined,
-        bqModelName: undefined,
-        arimaTimeColumn: undefined,
-        advancedSettings: {},
       }
     },
     step4: {
-      jobStatus: undefined,
-      job: undefined,
-      // modelInfo can be thought of as the source of truth of what values were used to create the model
-      modelInfo: {
-        bqModelName: undefined,
-        bqModelObjective: undefined,
-        bqModelTarget: undefined,
-        bqModelArimaTimeColumn: undefined,
-        bqModelAdvancedSettings: undefined
-      }
+      complete: false
     },
     step5: {
-      look: undefined,
-      lockedFields: {
-        dimensions: [],
-        measures: [],
-        parameters: [],
-        filters: {}
-      },
-      exploreName: undefined,
-      modelName: undefined,
-      exploreLabel: undefined,
       exploreData: undefined,
       exploreFilterText: "",
       limit: "500",
@@ -99,6 +71,7 @@ const wizardInitialState: WizardState = {
 
 const needsSavingSteps = ['step1', 'step2', 'step3']
 
+// the ui state of the wizard
 function wizardReducer(state: WizardState, action: Action): any {
   console.log({ reducer: action.type, action, state})
   switch (action.type) {

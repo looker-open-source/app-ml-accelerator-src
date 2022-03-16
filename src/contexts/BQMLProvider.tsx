@@ -28,7 +28,7 @@ import { useStore } from './StoreProvider'
 import { poll } from '../services/common'
 import { generateModelState } from '../services/modelState'
 import { BQML_LOOKER_MODEL, JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
-import { WizardState } from '../types'
+import { BQModelState, WizardState } from '../types'
 
 type IBQMLContext = {
   expired?: boolean,
@@ -45,7 +45,7 @@ type IBQMLContext = {
     cancel: () => void
   },
   createModelStateTable?: () => Promise<any>,
-  insertOrUpdateModelState?: (wizardState: WizardState) => Promise<any>,
+  insertOrUpdateModelState?: (wizardState: WizardState, bqModel: BQModelState) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
   getAllMySavedModels?: (hideError?: boolean) => Promise<any>,
   getAllAccessibleSavedModels?: (hideError?: boolean) => Promise<any>,
@@ -126,7 +126,7 @@ export const BQMLProvider = ({ children }: any) => {
 
   /**
    * Cancel a job
-   * location param is the location the job returns when fetching it (stored in step4.job.location)
+   * location param is the location the job returns when fetching it (stored in state.bqModel.job.location)
    */
    const cancelJob = async ({ jobId, location }: { jobId: string, location: string }) => {
     if (!jobId) {
@@ -179,10 +179,10 @@ export const BQMLProvider = ({ children }: any) => {
     return queryJob(sql)
   }
 
-  const insertOrUpdateModelState = (wizardState: WizardState) => {
-    const  { bqModelName } = wizardState.steps.step3
+  const insertOrUpdateModelState = (wizardState: WizardState, bqModel: BQModelState) => {
+    const  { name: bqModelName } = bqModel
     const { email: userEmail } = state.user
-    const stateJson = JSON.stringify(generateModelState(wizardState))
+    const stateJson = JSON.stringify(generateModelState(wizardState, bqModel))
 
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
