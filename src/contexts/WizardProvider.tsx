@@ -24,7 +24,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
-import { BQModelState, ResultsTableHeaderItem, Step2State, WizardState } from '../types'
+import { BQModelState, ResultsTableHeaderItem, Step2State, Step5State, WizardState } from '../types'
 import { IQuery } from "@looker/sdk/lib/4.0/models"
 import { BQMLContext } from './BQMLProvider'
 import { useHistory, useParams } from 'react-router-dom'
@@ -38,8 +38,9 @@ import { bqModelInitialState } from '../reducers/bqModel'
 
 type IWizardContext = {
   loadingModel?: boolean,
-  fetchExplore?: (modelName: string, exploreName: string) => Promise<any>,
+  fetchExplore?: (modelName: string, exploreName: string, stepName: string) => Promise<any>,
   saveQueryToState?: (
+    stepName: string,
     stepData: Step2State,
     results: any,
     exploreUrl?: string,
@@ -93,7 +94,7 @@ export const WizardProvider = ({ children }: any) => {
       }
 
       // Fetch and Populate Step2 Data
-      const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName)
+      const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName, 'step2')
       const { ok, results, exploreUrl } = await createAndRunQuery(step2)
       if (!ok) {
         throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
@@ -103,7 +104,7 @@ export const WizardProvider = ({ children }: any) => {
         buildRanQuery(step2, results, exploreUrl),
         exploreData
       )
-      saveQueryToState(step2, results, exploreUrl, headers)
+      saveQueryToState('step2', step2, results, exploreUrl, headers)
 
       // Fetch and Populate Step3 Data
       if (step3.bqModelName && step3.targetField) {
@@ -120,7 +121,7 @@ export const WizardProvider = ({ children }: any) => {
     }
   }
 
-  const buildRanQuery = (stepData: Step2State, results: any, exploreUrl?: string) => {
+  const buildRanQuery = (stepData: Step2State | Step5State, results: any, exploreUrl?: string) => {
     return {
       selectedFields: stepData.selectedFields,
       data: results.data,
@@ -136,14 +137,15 @@ export const WizardProvider = ({ children }: any) => {
   }
 
   const saveQueryToState = (
-    stepData: Step2State,
+    stepName: string,
+    stepData: Step2State | Step5State,
     results: any,
     exploreUrl?: string,
     tableHeaders?: ResultsTableHeaderItem[]
   ) => {
     dispatch({
       type: 'addToStepData',
-      step: 'step2',
+      step: stepName,
       data: {
         tableHeaders: tableHeaders || stepData.tableHeaders,
         ranQuery: buildRanQuery(stepData, results, exploreUrl)
@@ -151,7 +153,7 @@ export const WizardProvider = ({ children }: any) => {
     })
   }
 
-  const fetchExplore = async (modelName: string, exploreName: string) => {
+  const fetchExplore = async (modelName: string, exploreName: string, stepName: string) => {
     try {
       const { ok, value } = await sdk.lookml_model_explore(
         modelName,
@@ -161,7 +163,7 @@ export const WizardProvider = ({ children }: any) => {
       const newExploreData = mapAPIExploreToClientExplore(value)
       dispatch({
         type: 'addToStepData',
-        step: 'step2',
+        step: stepName,
         data: { exploreData: newExploreData }
       })
       return { ok, value: newExploreData }

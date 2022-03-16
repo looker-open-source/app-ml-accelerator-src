@@ -14,6 +14,7 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepComplete={stepComplete}
       stepNumber={2}
       customClass="step2-container">
+      <h2>Select your input data</h2>
       <QueryBuilder setIsLoading={setIsLoading}/>
     </StepContainer>
   )

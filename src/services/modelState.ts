@@ -30,7 +30,15 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
       },
       jobStatus: bqModelState.jobStatus,
       job: bqModelState.job,
-      look: bqModelState.look
+      look: bqModelState.look,
+      applyQuery: {
+        exploreName: bqModelState.applyQuery.exploreName,
+        modelName: bqModelState.applyQuery.modelName,
+        exploreLabel: bqModelState.applyQuery.exploreLabel,
+        limit: bqModelState.applyQuery.limit,
+        sorts: bqModelState.applyQuery.sorts,
+        selectedFields: bqModelState.applyQuery.selectedFields
+      },
     }
   }
   return modelStateToSave
@@ -88,11 +96,9 @@ const buildWizardStep4 = (bqModelState: BQModelState, wizardStep4: Step4State): 
 }
 
 const buildWizardStep5 = (bqModelState: BQModelState, wizardStep5: Step5State): Step5State => {
-  const mappedModelState = {
-    look: bqModelState.look,
-    lockedFields: bqModelState.sourceQuery.selectedFields,
-    ...bqModelState.sourceQuery
-  }
+  const { applyQuery, sourceQuery } = bqModelState
+  const query = applyQuery.exploreName ? applyQuery : sourceQuery
+  const mappedModelState = { ...query }
   return {...wizardStep5, ...mappedModelState}
 }
 

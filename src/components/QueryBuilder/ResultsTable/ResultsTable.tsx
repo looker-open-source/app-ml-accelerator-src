@@ -20,7 +20,9 @@ export const ResultsTable: React.FC = () => {
     // don't run on component mount
     if(firstUpdate.current) {
       firstUpdate.current = false
-      return
+      if ([...selectedFields.dimensions, ...selectedFields.measures].length <= 0) {
+        return
+      }
     }
     const headers = getHeaderColumns(
       selectedFields,

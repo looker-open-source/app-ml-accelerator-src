@@ -25,7 +25,20 @@ const bqModelInitialState = {
   },
   jobStatus: undefined,
   job: undefined,
-  look: undefined
+  look: undefined,
+  applyQuery: {
+    exploreName: undefined,
+    modelName: undefined,
+    exploreLabel: undefined,
+    limit: "500",
+    sorts: [],
+    selectedFields: {
+      dimensions: [],
+      measures: [],
+      parameters: [],
+      filters: {}
+    }
+  },
 }
 
 // The state that was used to generate the model in big query

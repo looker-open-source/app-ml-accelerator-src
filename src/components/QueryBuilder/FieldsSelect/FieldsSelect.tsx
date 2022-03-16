@@ -8,7 +8,7 @@ import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 
 
 export const FieldsSelect: React.FC = () => {
-  const { stepData } = useContext(QueryBuilderContext)
+  const { stepData, stepName } = useContext(QueryBuilderContext)
   const { fetchExplore } = useContext(WizardContext)
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(true)
@@ -26,7 +26,7 @@ export const FieldsSelect: React.FC = () => {
 
   const fetch = async () => {
     if (!modelName || !exploreName) { return }
-    await fetchExplore?.(modelName, exploreName)
+    await fetchExplore?.(modelName, exploreName, stepName)
   }
 
   // in a failure to retrieve the explore,

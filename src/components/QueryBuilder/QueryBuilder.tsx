@@ -46,7 +46,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     }
     setIsLoading(true)
     const {results, exploreUrl} = await createAndRunQuery?.(stepData)
-    saveQueryToState?.(stepData, results, exploreUrl)
+    saveQueryToState?.(stepName, stepData, results, exploreUrl)
     setIsLoading(false)
   }
 

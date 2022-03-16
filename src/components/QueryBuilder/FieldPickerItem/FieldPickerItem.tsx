@@ -39,16 +39,17 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
   hideActions = false,
   isLoading = false
 }) => {
-  const { stepData } = useContext(QueryBuilderContext)
+  const { stepData, stepName } = useContext(QueryBuilderContext)
   const { dispatch } = useStore()
   const { term } = useContext(HighlightContext)
   const { selectedFields } = stepData
 
   const toggleField = () => {
-    dispatch({ type: selectorAction, field })
+    dispatch({ type: selectorAction, field, step: stepName })
   }
+
   const filterToggle = () => {
-    dispatch({ type: 'setSelectedFilter', field })
+    dispatch({ type: 'setSelectedFilter', field, step: stepName })
     dispatch({ type: 'setFiltersOpen', value: true })
   }
 

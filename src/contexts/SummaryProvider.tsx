@@ -240,6 +240,12 @@ export const SummaryProvider = ({ children }: any) => {
         step: 'step4',
         data: { complete: false }
       })
+      // everytime we create/update a model, we rehydrate step5 with the same params as the sourceQuery
+      dispatch({
+        type: 'addToStepData',
+        step: 'step5',
+        data: { ...wizardInitialState.steps.step5, ...bqModel.sourceQuery }
+      })
       return { ok, body }
     } catch (error) {
       console.log({error})

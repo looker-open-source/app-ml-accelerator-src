@@ -16,12 +16,13 @@ export const QueryPane: React.FC = () => {
     dispatch({
       type: 'setFilterValue',
       key: filter,
-      expression
+      expression,
+      step: stepName
     })
   }
 
   const onFilterRemove = (filter: string) => {
-    dispatch({ type: 'setSelectedFilter', field: {name: filter} })
+    dispatch({ type: 'setSelectedFilter', field: {name: filter}, step: stepName })
   }
 
   const limitChange = (value: string) => {

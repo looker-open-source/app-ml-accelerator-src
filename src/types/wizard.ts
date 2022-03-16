@@ -46,8 +46,10 @@ export type Step4State = {
 }
 
 export type Step5State = {
+  exploreName?: string,
+  modelName?: string,
+  exploreLabel?: string,
   exploreData: ExploreData | undefined,
-  exploreFilterText: string,
   limit: string | undefined,
   selectedFields: SelectedFields,
   sorts: string[],

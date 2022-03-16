@@ -18,7 +18,6 @@ export const ExploreFilter: React.FC = () => {
 
   return (
     <div>
-      <h2>Select your input data</h2>
       { exploreData ?
         (<CurrentExplore />) :
         (<div className="explore-search-form">
