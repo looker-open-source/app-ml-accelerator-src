@@ -159,7 +159,6 @@ function wizardReducer(state: WizardState, action: Action): any {
       return newState
     }
     case 'setFilterValue': {
-      // @ts-ignore
       const { filters } = state.steps[action.step].selectedFields
       if (!filters.hasOwnProperty(action.key)) {
         console.error('That filter does not exist')

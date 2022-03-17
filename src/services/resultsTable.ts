@@ -39,13 +39,32 @@ export const getHeaderColumns = (
     }
   ))]
 
-  return [{type: 'rowNumber'}, ...dimensionHeaders, ...measureHeaders]
+
+  let predictionHeaders: any[] = []
+  if (selectedFields.predictions) {
+    predictionHeaders = [...selectedFields.predictions?.map((prediction) => (
+      {
+        title: getPredictionTitle(prediction),
+        name: prediction,
+        type: 'prediction',
+        placeholder: false
+      }
+    ))]
+  }
+
+  return [{type: 'rowNumber'}, ...predictionHeaders, ...dimensionHeaders, ...measureHeaders]
 }
 
 const getFieldTitle = (name: string, exploreFields: any[]) => {
   const found = find(exploreFields, {name: name})
   if (!found) { return name }
   return found.label || found.name
+}
+
+const getPredictionTitle = (name: string) => {
+  const split = name.split('_')
+  const capSplit = split.map((str) => str[0].toUpperCase() + str.substring(1))
+  return capSplit.join(' ')
 }
 
 export const findSortedHeader = (

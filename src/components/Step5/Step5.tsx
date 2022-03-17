@@ -9,6 +9,7 @@ import { ArimaPredict } from './ArimaPredict'
 import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
 import QueryBuilder from '../QueryBuilder'
 import './Step5.scss'
+import { BoostedTreePredict } from './BoostedTreePredict'
 // import { BoostedTreePredict } from './BoostedTreePredict'
 
 const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -25,11 +26,7 @@ const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     if (isArima(step1.objective || "")) {
       return (<ArimaPredict />)
     } else if (isBoostedTree(step1.objective || "")) {
-      return (
-        <QueryBuilderProvider stepName="step5" lockFields={true}>
-          <QueryBuilder setIsLoading={setIsLoading} />
-        </QueryBuilderProvider>
-      )
+      return (<BoostedTreePredict setIsLoading={setIsLoading} />)
     }
   }
 

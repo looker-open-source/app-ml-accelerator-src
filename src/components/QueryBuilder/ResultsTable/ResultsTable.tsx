@@ -33,6 +33,7 @@ export const ResultsTable: React.FC = () => {
   }, [
     selectedFields.dimensions,
     selectedFields.measures,
+    selectedFields.predictions,
     ranQuery
   ])
 

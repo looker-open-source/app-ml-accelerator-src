@@ -1,6 +1,6 @@
 import React, { FC, createContext, useContext } from 'react'
 import {
-  FilterList,
+  FilterList, Lock,
 } from '@styled-icons/material'
 import {
   LkFieldItem,
@@ -16,6 +16,7 @@ import {
 import Spinner from '../../Spinner'
 import { useStore } from '../../../contexts/StoreProvider'
 import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
+import { SelectedFields } from '../../../types'
 
 export const HighlightContext = createContext({ term: '' })
 
@@ -40,11 +41,14 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
   isLoading = false
 }) => {
   const { stepData, stepName } = useContext(QueryBuilderContext)
-  const { dispatch } = useStore()
+  const { state, dispatch } = useStore()
   const { term } = useContext(HighlightContext)
   const { selectedFields } = stepData
+  const { selectedFields: lockedFields } = state.bqModel.sourceQuery
+  const lockedFieldNames = [...lockedFields.dimensions, ...lockedFields.measures, ...lockedFields.parameters]
 
   const toggleField = () => {
+    if (isLocked()) { return }
     dispatch({ type: selectorAction, field, step: stepName })
   }
 
@@ -54,6 +58,10 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
   }
 
   const { height } = listItemDimensions(-3)
+
+  const isLocked = () => (
+    lockedFieldNames.includes(field.name)
+  )
 
   const renderActions = () => {
     if (isLoading) {
@@ -79,6 +87,21 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
           />
         </HoverDisclosure>
       ))
+      if (stepName === "step5" && isLocked()) {
+        actions.push((
+          <HoverDisclosure visible={true} key="filter-lock">
+            <IconButton
+              shape="square"
+              // toggle={isFilter}
+              // toggleBackground
+              // toggleColor={color}
+              icon={<Lock />}
+              label="Source data fields are locked"
+              tooltipPlacement="top"
+            />
+          </HoverDisclosure>
+        ))
+      }
     }
     return actions
   }

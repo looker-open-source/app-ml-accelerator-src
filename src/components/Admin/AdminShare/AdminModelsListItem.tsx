@@ -15,7 +15,8 @@ export const AdminModelsListItem : React.FC<AdminModelsListItemProps> = ({ model
   try {
     stateJson = JSON.parse(model[MODEL_STATE_TABLE_COLUMNS.stateJson].value)
   } catch (e) {}
-  const objective = stateJson ? stateJson.step1.objective : ''
+  if (!stateJson || !stateJson.hasOwnProperty('bqModel')) { return <></> }
+  const objective = stateJson ? stateJson.bqModel.objective : ''
 
   return (
     <li className="admin-model-list-item">

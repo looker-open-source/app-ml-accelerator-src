@@ -25,14 +25,17 @@ import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
 import { getLooksFolderName } from '../services/user'
-import { MODEL_TYPES } from '../services/modelTypes'
+import { createBoostedTreePredictSql, getBoostedTreePredictSql, MODEL_TYPES } from '../services/modelTypes'
 import { buildApplyFilters } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
 import { WizardContext } from './WizardProvider'
+import { BQMLContext } from './BQMLProvider'
 
 type IApplyContext = {
   isLoading?: boolean,
-  initArima?: () => Promise<any>
+  initArima?: () => Promise<any>,
+  createBoostedTreePredictions?: (lookerSql: string) => Promise<any>
+  getBoostedTreePredictions?: () => Promise<any>
 }
 
 export const ApplyContext = createContext<IApplyContext>({})
@@ -44,9 +47,55 @@ export const ApplyProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { coreSDK } = useContext(ExtensionContext2)
   const { persistWizardState } = useContext(WizardContext)
+  const { queryJob } = useContext(BQMLContext)
   const [ isLoading, setIsLoading ] = useState<boolean>(false)
+  const { bqmlModelDatasetName } = state.userAttributes
   const { personalFolderId, looksFolderId, id: userId } = state.user
   const { bqModel } = state
+
+  const createBoostedTreePredictions = async (lookerSql: string) => {
+    try {
+      if (!bqmlModelDatasetName) { throw "No dataset provided" }
+      const sql = createBoostedTreePredictSql({
+        bqmlModelDatasetName,
+        lookerSql,
+        bqModelName: bqModel.name
+      })
+      const { ok, body } = await queryJob?.(sql)
+      if (!ok) {
+        throw "Unable to create table."
+      }
+      return { ok, body }
+    } catch (err: any) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to generate predictions - ' + err
+      })
+      return { ok: false }
+    }
+  }
+
+  const getBoostedTreePredictions = async () => {
+    try {
+      if (!bqmlModelDatasetName) { throw "No dataset provided" }
+      const sql = getBoostedTreePredictSql({
+        bqmlModelDatasetName,
+        bqModelName: bqModel.name,
+        sorts: state.wizard.steps.step5.sorts || []
+      })
+      const { ok, body } = await queryJob?.(sql)
+      if (!ok) {
+        throw "Unable to find table."
+      }
+      return { ok, body }
+    } catch (err: any) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to retrieve predictions - ' + err
+      })
+      return { ok: false }
+    }
+  }
 
   const initArima = async () => {
     setIsLoading(true)
@@ -98,7 +147,7 @@ export const ApplyProvider = ({ children }: any) => {
     } catch (err) {
       dispatch({
         type: 'addError',
-        error: 'Failed to load your segment - ' + err
+        error: 'Failed to load your predictions - ' + err
       })
     }
   }
@@ -224,7 +273,9 @@ export const ApplyProvider = ({ children }: any) => {
     <ApplyContext.Provider
       value={{
         isLoading,
-        initArima
+        initArima,
+        createBoostedTreePredictions,
+        getBoostedTreePredictions
       }}
     >
       {children}
