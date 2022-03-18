@@ -51,7 +51,7 @@ export const ModelProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { coreSDK } = useContext(ExtensionContext2)
   const { pollJobStatus, cancelJob, getJob } = useContext(BQMLContext)
-  const { persistWizardState } = useContext(WizardContext)
+  const { persistModelState } = useContext(WizardContext)
   const { jobStatus, job } = state.bqModel
   const [ polling, setPolling ] = useState(false)
   const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
@@ -182,7 +182,7 @@ export const ModelProvider = ({ children }: any) => {
       const { wizard, bqModel } = state
       // create a copy of the bqModel state with the job added
       const tempBQModel = { ...bqModel, jobStatus: JOB_STATUSES.canceled }
-      await persistWizardState?.({ ...wizard }, tempBQModel)
+      await persistModelState?.({ ...wizard }, tempBQModel)
       dispatch({
         type: 'addToStepData',
         step: 'step4',

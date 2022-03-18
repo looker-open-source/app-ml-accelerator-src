@@ -26,16 +26,17 @@ import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
 import { getLooksFolderName } from '../services/user'
 import { createBoostedTreePredictSql, getBoostedTreePredictSql, MODEL_TYPES } from '../services/modelTypes'
-import { buildApplyFilters } from '../services/apply'
+import { bqResultsToLookerFormat, buildApplyFilters, getLookerColumnName, getPredictedColumnName } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
 import { WizardContext } from './WizardProvider'
 import { BQMLContext } from './BQMLProvider'
+import { BQModelState, WizardState } from '../types'
 
 type IApplyContext = {
   isLoading?: boolean,
   initArima?: () => Promise<any>,
-  createBoostedTreePredictions?: (lookerSql: string) => Promise<any>
-  getBoostedTreePredictions?: () => Promise<any>
+  getBoostedTreePredictions?: () => Promise<any>,
+  generateBoostedTreePredictions?: (lookerSql: string) => Promise<any>
 }
 
 export const ApplyContext = createContext<IApplyContext>({})
@@ -46,12 +47,58 @@ export const ApplyContext = createContext<IApplyContext>({})
 export const ApplyProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { coreSDK } = useContext(ExtensionContext2)
-  const { persistWizardState } = useContext(WizardContext)
+  const { persistModelState } = useContext(WizardContext)
   const { queryJob } = useContext(BQMLContext)
   const [ isLoading, setIsLoading ] = useState<boolean>(false)
   const { bqmlModelDatasetName } = state.userAttributes
   const { personalFolderId, looksFolderId, id: userId } = state.user
   const { bqModel } = state
+  const { step5 } = state.wizard.steps
+
+  const generateBoostedTreePredictions = async (lookerSql: string) => {
+    try {
+      const { ok } = await createBoostedTreePredictions?.(lookerSql)
+      if (!ok) {
+        return { ok: false }
+      }
+      const { ok: getOk, body: data } = await getBoostedTreePredictions?.()
+      if (!getOk || !data.schema) {
+        return { ok: false }
+      }
+
+      const tempBQModel: BQModelState = {
+        ...bqModel,
+        hasPredictions: true,
+        applyQuery: {
+          exploreName: step5.ranQuery?.exploreName,
+          modelName: step5.ranQuery?.modelName,
+          exploreLabel: step5.ranQuery?.exploreLabel,
+          limit: step5.ranQuery?.limit,
+          sorts: step5.ranQuery?.sorts,
+          selectedFields: step5.ranQuery?.selectedFields
+        }
+      }
+      const tempWizardState: WizardState = {
+        ...state.wizard,
+        unlockedStep: 5
+      }
+
+      const { ok: savedOk } = await persistModelState?.(tempWizardState, tempBQModel)
+      if (!savedOk) {
+        throw "Error occurred while saving model state"
+      }
+
+      dispatch ({ type: 'setBQModel', data: tempBQModel })
+      dispatch ({ type: 'setUnlockedStep', step: 5 })
+      return { ok: true }
+    } catch (err) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to generate predictions - ' + err
+      })
+      return { ok: false }
+    }
+  }
 
   const createBoostedTreePredictions = async (lookerSql: string) => {
     try {
@@ -77,16 +124,55 @@ export const ApplyProvider = ({ children }: any) => {
 
   const getBoostedTreePredictions = async () => {
     try {
-      if (!bqmlModelDatasetName) { throw "No dataset provided" }
+      if (!bqmlModelDatasetName || !bqModel.target || !bqModel.sourceQuery.exploreName) {
+        throw "This model does not have a dataset, target, or an explore, please try reloading."
+      }
+
       const sql = getBoostedTreePredictSql({
         bqmlModelDatasetName,
         bqModelName: bqModel.name,
         sorts: state.wizard.steps.step5.sorts || []
       })
+
       const { ok, body } = await queryJob?.(sql)
       if (!ok) {
         throw "Unable to find table."
       }
+
+      const formattedResults = bqResultsToLookerFormat(body, bqModel.sourceQuery.exploreName)
+
+      // Handles two different code paths.
+      // 1. When there isn't a ran query, its loading an existing model so the ranQuery doesnt exist yet.
+      // 2. When there is a ranQuery, you are generating the predictions for an existing query.
+      const ranQuery = step5.ranQuery ? {
+          ...step5.ranQuery,
+          data: formattedResults
+        } : {
+          data: formattedResults,
+          rowCount: formattedResults.length,
+          sql: '',
+          exploreUrl: '',
+          exploreName: step5.exploreName,
+          modelName: step5.modelName,
+          exploreLabel: step5.exploreLabel,
+          limit: step5.limit,
+          selectedFields: step5.selectedFields,
+          sorts: step5.sorts,
+        }
+
+      // add the predictedColumn so headers will be regenerated
+      dispatch({
+        type: 'addToStepData',
+        step: 'step5',
+        data: {
+          ...step5,
+          selectedFields: {
+            ...step5.selectedFields,
+            predictions: [getPredictedColumnName(bqModel.target)]
+          },
+          ranQuery
+        }
+      })
       return { ok, body }
     } catch (err: any) {
       dispatch({
@@ -217,7 +303,7 @@ export const ApplyProvider = ({ children }: any) => {
         id: look.value.id,
         embedUrl: look.value.embed_url
       }
-      await saveState(lookObj)
+      await saveArimaState(lookObj)
     } catch (error) {
       dispatch({
         type: 'addError',
@@ -245,7 +331,7 @@ export const ApplyProvider = ({ children }: any) => {
         embedUrl: look.value.embed_url
       }
       // save look id to BQ model state table
-      await saveState(lookObj)
+      await saveArimaState(lookObj)
     } catch (error) {
       dispatch({
         type: 'addError',
@@ -254,15 +340,10 @@ export const ApplyProvider = ({ children }: any) => {
     }
   }
 
-  const saveState = async (lookObj: any) => {
+  const saveArimaState = async (lookObj: any) => {
     const { wizard, bqModel } = state
     const tempBQModel = { ...bqModel, look: lookObj }
-    await persistWizardState?.({ ...wizard }, tempBQModel)
-    dispatch({
-      type: 'addToStepData',
-      step: 'step5',
-      data: { look: lookObj }
-    })
+    await persistModelState?.({ ...wizard }, tempBQModel)
     dispatch({
       type: 'setBQModel',
       data: { look: lookObj }
@@ -274,8 +355,8 @@ export const ApplyProvider = ({ children }: any) => {
       value={{
         isLoading,
         initArima,
-        createBoostedTreePredictions,
-        getBoostedTreePredictions
+        getBoostedTreePredictions,
+        generateBoostedTreePredictions
       }}
     >
       {children}

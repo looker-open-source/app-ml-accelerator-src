@@ -30,6 +30,7 @@ import { WizardContext } from './WizardProvider'
 import { JOB_STATUSES } from '../constants'
 import { wizardInitialState } from '../reducers/wizard'
 import { WizardState } from '../types'
+import { bqModelInitialState } from '../reducers/bqModel'
 
 type ISummaryContext = {
   getSummaryData?: (
@@ -55,7 +56,7 @@ export const SummaryContext = createContext<ISummaryContext>({})
  */
 export const SummaryProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
-  const { fetchSummary, saveSummary, persistWizardState } = useContext(WizardContext)
+  const { fetchSummary, saveSummary, persistModelState } = useContext(WizardContext)
   const {
     queryJob,
     pollJobStatus,
@@ -223,13 +224,19 @@ export const SummaryProvider = ({ children }: any) => {
         job: body.jobReference,
       }
       const { wizard, bqModel } = state
+      const tempWizard = {
+        ...wizard,
+        unlockedStep: 4
+      }
       const tempBQModel = {
         ...bqModel,
         ...jobState,
+        hasPredictions: false,
         selectedFeatures: features,
-        advancedSettings: advancedSettings
+        advancedSettings: advancedSettings,
+        applyQuery: { ...bqModelInitialState.applyQuery }
       }
-      await persistWizardState?.({ ...wizard }, tempBQModel)
+      await persistModelState?.(tempWizard, tempBQModel)
 
       dispatch({
         type: 'setBQModel',
@@ -240,6 +247,7 @@ export const SummaryProvider = ({ children }: any) => {
         step: 'step4',
         data: { complete: false }
       })
+      dispatch({ type: 'setUnlockedStep', step: 4 })
       // everytime we create/update a model, we rehydrate step5 with the same params as the sourceQuery
       dispatch({
         type: 'addToStepData',

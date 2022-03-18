@@ -15,6 +15,15 @@ export const FieldsSelect: React.FC = () => {
   const { exploreName, modelName, exploreData } = stepData
 
   useEffect(() => {
+    // in a failure to retrieve the explore,
+    // clear all selected explore data to return user to explore select screen
+    if (!isLoading && !exploreData) {
+      dispatch({ type: 'addError', error: 'Failed to load explore, please try again' })
+      dispatch({ type: 'clearExplore' })
+    }
+  }, [exploreData, isLoading])
+
+  useEffect(() => {
     if (exploreName === exploreData?.exploreName) {
       setIsLoading(false)
       return
@@ -29,11 +38,8 @@ export const FieldsSelect: React.FC = () => {
     await fetchExplore?.(modelName, exploreName, stepName)
   }
 
-  // in a failure to retrieve the explore,
-  // clear all selected explore data to return user to explore select screen
   if (!isLoading && !exploreData) {
-    dispatch({ type: 'clearExplore' })
-    return (<></>)
+    return <></>
   }
 
   return (

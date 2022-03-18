@@ -35,3 +35,29 @@ export const buildApplyFilters = ({
 
   return filters
 }
+
+export const getLookerColumnName = (exploreName: string, fieldName: string) => {
+  if (fieldName.indexOf(`${exploreName}_`) === 0) {
+    return fieldName.replace(`${exploreName}_`, `${exploreName}.`)
+  }
+  return fieldName
+}
+
+export const getPredictedColumnName = (target: string) => (
+  `predicted_${target.replace(/\./g, '_')}`
+)
+
+export const bqResultsToLookerFormat = (data: any, exploreName: string) => (
+  data.rows.map((row: any) => {
+    const rowObj: any = {}
+    const arr = row.f
+    arr.forEach((col: any, i: number) => {
+      const columnName = getLookerColumnName(
+        exploreName || '',
+        data.schema.fields[i].name
+      )
+      rowObj[columnName] = { value: col.v }
+    })
+    return rowObj
+  })
+)

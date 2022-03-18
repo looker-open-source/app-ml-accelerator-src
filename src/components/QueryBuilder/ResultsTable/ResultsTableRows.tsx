@@ -16,7 +16,7 @@ export const ResultsTableRows: React.FC<ResultsTableRowsProps> = ({ data, header
         return (<td key={j}><i>?</i></td>)
       }
       if (col.type === 'rowNumber') {
-        return (<td className={col.type} key={j}>{ i }</td>)
+        return (<td className={col.type} key={j}>{ i + 1 }</td>)
       }
       let value
       let className = col.type

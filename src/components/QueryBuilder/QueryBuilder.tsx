@@ -12,10 +12,11 @@ import RequiredFieldMessages from "./RequiredFieldMessages"
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 
 type QueryBuilderProps = {
-  setIsLoading: (isLoading: boolean) => void
+  setIsLoading: (isLoading: boolean) => void,
+  runCallback?: () => void
 }
 
-export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => {
+export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading, runCallback }) => {
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
   const { stepData, stepName } = useContext(QueryBuilderContext)
   const { dispatch } = useStore()
@@ -47,6 +48,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
     setIsLoading(true)
     const {results, exploreUrl} = await createAndRunQuery?.(stepData)
     saveQueryToState?.(stepName, stepData, results, exploreUrl)
+    runCallback?.()
     setIsLoading(false)
   }
 
@@ -64,7 +66,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
         </div>
         <div className="query-header-actions">
           { stepData.exploreData && (<>
-              <RequiredFieldMessages />
+              { stepName === 'step2' && <RequiredFieldMessages /> }
               <Button
                 onClick={runQuery}
                 className="action-button">

@@ -48,7 +48,7 @@ type IWizardContext = {
   createAndRunQuery?: (stepData: Step2State) => Promise<any>,
   fetchSummary?: (bqModelName: string, targetField: string) => Promise<any>,
   saveSummary?: (rawSummary: any, wizardState: WizardState) => void,
-  persistWizardState?: (wizardState: WizardState, bqModel: BQModelState, retry?: boolean) => Promise<any>
+  persistModelState?: (wizardState: WizardState, bqModel: BQModelState, retry?: boolean) => Promise<any>
 }
 
 export const WizardContext = createContext<IWizardContext>({})
@@ -88,7 +88,7 @@ export const WizardProvider = ({ children }: any) => {
       dispatch({ type: 'populateWizard', wizardState: loadedWizardState })
       dispatch({ type: 'setBQModel', data: { ...savedModelState.bqModel }})
 
-      const { step2, step3 } = loadedWizardState.steps
+      const { step2, step3, step5 } = loadedWizardState.steps
       if (!step2.modelName || !step2.exploreName) {
         throw "Failed to load model"
       }
@@ -111,6 +111,9 @@ export const WizardProvider = ({ children }: any) => {
         const { ok, value } = await fetchSummary(step3.bqModelName, step3.targetField)
         if (!ok || !value) { throw "Failed to load summmary" }
         saveSummary(value, loadedWizardState, step3.selectedFeatures)
+      }
+      if (bqModel.hasPredictions && step5.modelName && step5.exploreName) {
+        await fetchExplore(step5.modelName, step5.exploreName, 'step5')
       }
 
       if (bqModel.jobStatus !== JOB_STATUSES.canceled) {
@@ -263,9 +266,9 @@ export const WizardProvider = ({ children }: any) => {
     })
   }
 
-  // Save key information from the wizards state associated with the bqModelName
+  // Save bqModel state associated with the bqModelName
   // into a BQ table so we can reload past models
-  const persistWizardState = async (wizardState: WizardState, bqModel: BQModelState, retry: boolean = false) => {
+  const persistModelState = async (wizardState: WizardState, bqModel: BQModelState, retry: boolean = false) => {
     try {
       {
         const { ok, body } = await createModelStateTable?.()
@@ -282,10 +285,10 @@ export const WizardProvider = ({ children }: any) => {
     } catch (error) {
       if (retry) {
         console.error("Failed to save model to BQ model state")
-        return
+        return { ok: false }
       }
       // retry once
-      persistWizardState(wizardState, bqModel, true)
+      persistModelState(wizardState, bqModel, true)
     }
   }
 
@@ -298,7 +301,7 @@ export const WizardProvider = ({ children }: any) => {
         createAndRunQuery,
         fetchSummary,
         saveSummary,
-        persistWizardState
+        persistModelState
       }}
     >
       {children}

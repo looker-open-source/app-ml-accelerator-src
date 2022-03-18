@@ -18,12 +18,13 @@ export type BQModelState = {
   jobStatus?: string,
   job?: any,
   look?: any,
+  hasPredictions: boolean,
   applyQuery: {
     exploreName?: string,
     modelName?: string,
     exploreLabel?: string,
-    limit: string,
-    sorts: string[],
-    selectedFields: SelectedFields
+    limit?: string,
+    sorts?: string[],
+    selectedFields?: SelectedFields
   }
 }

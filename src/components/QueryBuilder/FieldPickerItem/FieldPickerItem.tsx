@@ -60,7 +60,7 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
   const { height } = listItemDimensions(-3)
 
   const isLocked = () => (
-    lockedFieldNames.includes(field.name)
+    stepName === 'step5' && lockedFieldNames.includes(field.name)
   )
 
   const renderActions = () => {
@@ -87,7 +87,7 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
           />
         </HoverDisclosure>
       ))
-      if (stepName === "step5" && isLocked()) {
+      if (isLocked()) {
         actions.push((
           <HoverDisclosure visible={true} key="filter-lock">
             <IconButton

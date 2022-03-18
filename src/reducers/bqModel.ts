@@ -26,6 +26,7 @@ const bqModelInitialState = {
   jobStatus: undefined,
   job: undefined,
   look: undefined,
+  hasPredictions: undefined,
   applyQuery: {
     exploreName: undefined,
     modelName: undefined,

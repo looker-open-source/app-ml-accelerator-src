@@ -12,7 +12,7 @@ import { initialStates } from '../reducers'
 export const generateModelState = (wizardState: WizardState, bqModelState: BQModelState): SavedModelState => {
   const { unlockedStep } = wizardState
   const modelStateToSave = {
-    unlockedStep: unlockedStep > 3 ? unlockedStep : 4,
+    unlockedStep,
     bqModel: {
       objective: bqModelState.objective,
       name: bqModelState.name,
@@ -31,6 +31,7 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
       jobStatus: bqModelState.jobStatus,
       job: bqModelState.job,
       look: bqModelState.look,
+      hasPredictions: bqModelState.hasPredictions,
       applyQuery: {
         exploreName: bqModelState.applyQuery.exploreName,
         modelName: bqModelState.applyQuery.modelName,
