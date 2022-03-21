@@ -142,11 +142,12 @@ export const ApplyProvider = ({ children }: any) => {
       const formattedResults = bqResultsToLookerFormat(body, bqModel.sourceQuery.exploreName)
 
       // Handles two different code paths.
-      // 1. When there isn't a ran query, its loading an existing model so the ranQuery doesnt exist yet.
+      // 1. When there isn't a ran query, its loading an existing model for the first time.
       // 2. When there is a ranQuery, you are generating the predictions for an existing query.
       const ranQuery = step5.ranQuery ? {
           ...step5.ranQuery,
-          data: formattedResults
+          data: formattedResults,
+          rowCount: formattedResults.length
         } : {
           data: formattedResults,
           rowCount: formattedResults.length,

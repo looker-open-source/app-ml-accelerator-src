@@ -4,7 +4,7 @@ import { initialStates } from '../reducers'
 // ****************************
 // WARNING:           READ THIS
 // ****************************
-// CHANGING ANY OF THE KEY NAMES ON THE `modelStateToSave` OBJECT COUDL RESULT IN BACKWARDS COMPATIBILITY ISSUES WITH OLD MODELS
+// CHANGING ANY OF THE KEY NAMES ON THE `modelStateToSave` OBJECT COULD RESULT IN BACKWARDS COMPATIBILITY ISSUES WITH OLD MODELS
 //
 // This object is saved in bigquery and used to load
 // previously created models, changing these keys will

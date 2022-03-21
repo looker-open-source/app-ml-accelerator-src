@@ -92,9 +92,6 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
           <HoverDisclosure visible={true} key="filter-lock">
             <IconButton
               shape="square"
-              // toggle={isFilter}
-              // toggleBackground
-              // toggleColor={color}
               icon={<Lock />}
               label="Source data fields are locked"
               tooltipPlacement="top"
