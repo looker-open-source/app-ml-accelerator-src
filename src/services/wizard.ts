@@ -1,4 +1,4 @@
-import { Step2State, Step3State, WizardSteps } from '../types'
+import { Step2State, Step3State, Step4State, WizardSteps } from '../types'
 import { isArima } from "./modelTypes"
 
 export const hasNoEmptyValues = (obj: any, ignoreKeys?: string[]) => {
@@ -12,7 +12,10 @@ export const hasNoEmptyValues = (obj: any, ignoreKeys?: string[]) => {
 }
 
 const step2Validation = (stepData: Step2State) => (
-  hasNoEmptyValues(stepData.ranQuery)
+  hasNoEmptyValues({
+    sql: stepData.ranQuery?.sql,
+    data: stepData.ranQuery?.data
+  })
 )
 
 const step3Validation = (stepData: Step3State, objective: string) => {
@@ -27,12 +30,16 @@ const step3Validation = (stepData: Step3State, objective: string) => {
   return hasNoEmptyValues(stepData.summary, ignoreKeys)
 }
 
+const step4Validation = (stepData: Step4State) => (
+  stepData.complete
+)
+
 export const getWizardStepCompleteCallback = (stepName: keyof WizardSteps): any => {
   const callbacks: any = {
     step1: hasNoEmptyValues,
     step2: step2Validation,
     step3: step3Validation,
-    step4: hasNoEmptyValues,
+    step4: step4Validation,
     step5: hasNoEmptyValues
   }
 

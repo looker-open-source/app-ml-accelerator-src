@@ -42,19 +42,19 @@ export type Step3State = {
 }
 
 export type Step4State = {
-  jobStatus?: string,
-  job?: any,
-  modelInfo: {
-    bqModelName?: string,
-    bqModelObjective?: string
-    bqModelTarget?: string
-    bqModelArimaTimeColumn?: string
-    bqModelAdvancedSettings?: any
-  }
+  complete?: boolean
 }
 
 export type Step5State = {
-  look?: any
+  exploreName?: string,
+  modelName?: string,
+  exploreLabel?: string,
+  exploreData: ExploreData | undefined,
+  limit: string | undefined,
+  selectedFields: SelectedFields,
+  sorts: string[],
+  tableHeaders: ResultsTableHeaderItem[] | undefined,
+  ranQuery: RanQuery | undefined
 }
 
 export type GenericStepState = Step1State | Step2State | Step3State | Step4State | Step5State

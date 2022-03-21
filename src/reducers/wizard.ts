@@ -7,11 +7,11 @@ type Action = { type: 'clearState' } |
   { type: 'setUnlockedStep', step: number } |
   { type: 'setNeedsSaving', value: boolean } |
   { type: 'addToStepData', step: keyof WizardSteps, data: any } |
-  { type: 'setSelectedDimension', field: Field } |
-  { type: 'setSelectedMeasure', field: Field } |
-  { type: 'setSelectedParameter', field: Field } |
-  { type: 'setSelectedFilter', field: Field } |
-  { type: 'setFilterValue', key: string, expression: string } |
+  { type: 'setSelectedDimension', field: Field, step: 'step2' | 'step5'  } |
+  { type: 'setSelectedMeasure', field: Field, step: 'step2' | 'step5' } |
+  { type: 'setSelectedParameter', field: Field, step: 'step2' | 'step5' } |
+  { type: 'setSelectedFilter', field: Field, step: 'step2' | 'step5' } |
+  { type: 'setFilterValue', key: string, expression: string, step: 'step2' | 'step5' } |
   { type: 'setExploreFilterText', filterText: string } |
   { type: 'clearExplore' }
 
@@ -44,38 +44,33 @@ const wizardInitialState: WizardState = {
       allFeatures: [],
       selectedFeatures: [],
       advancedSettings: {},
-      // The values in summary are a copy of the values that were used when the summary was generated
-      // When changes occur to previous tabs or settings are changed, we can compare those values to what
-      // is in summary to determine if the model is out of sync and needs to be re-created
       summary: {
-        exploreName: undefined,
-        modelName: undefined,
         fields: undefined,
         data: undefined,
-        target: undefined,
-        bqModelName: undefined,
-        arimaTimeColumn: undefined,
-        advancedSettings: {},
       }
     },
     step4: {
-      jobStatus: undefined,
-      job: undefined,
-      // modelInfo can be thought of as the source of truth of what values were used to create the model
-      modelInfo: {
-        bqModelName: undefined,
-        bqModelObjective: undefined,
-        bqModelTarget: undefined,
-        bqModelArimaTimeColumn: undefined,
-        bqModelAdvancedSettings: undefined
-      }
+      complete: false
     },
-    step5: { look: undefined }
+    step5: {
+      exploreData: undefined,
+      limit: "500",
+      selectedFields: {
+        dimensions: [],
+        measures: [],
+        parameters: [],
+        filters: {}
+      },
+      ranQuery: undefined,
+      sorts: [],
+      tableHeaders: []
+    }
   }
 }
 
 const needsSavingSteps = ['step1', 'step2', 'step3']
 
+// the ui state of the wizard
 function wizardReducer(state: WizardState, action: Action): any {
   console.log({ reducer: action.type, action, state})
   switch (action.type) {
@@ -109,45 +104,45 @@ function wizardReducer(state: WizardState, action: Action): any {
       }
     }
     case 'setSelectedDimension': {
-      const { selectedFields } = state.steps.step2
+      const { selectedFields } = state.steps[action.step]
       const dimensions = toggleArrayEntry(selectedFields.dimensions, action.field.name)
-      const newState = getStepStateClone(state, 'step2', true)
-      newState.steps.step2.selectedFields = {
-        ...newState.steps.step2.selectedFields,
+      const newState = getStepStateClone(state, action.step, true)
+      newState.steps[action.step].selectedFields = {
+        ...newState.steps[action.step].selectedFields,
         dimensions
       }
       return newState
     }
     case 'setSelectedMeasure': {
-      const { selectedFields } = state.steps.step2
+      const { selectedFields } = state.steps[action.step]
       const measures = toggleArrayEntry(selectedFields.measures, action.field.name)
-      const newState = getStepStateClone(state, 'step2', true)
-      newState.steps.step2.selectedFields = {
-        ...newState.steps.step2.selectedFields,
+      const newState = getStepStateClone(state, action.step, true)
+      newState.steps[action.step].selectedFields = {
+        ...newState.steps[action.step].selectedFields,
         measures
       }
       return newState
     }
     case 'setSelectedParameter': {
-      const { selectedFields } = state.steps.step2
+      const { selectedFields } = state.steps[action.step]
       const parameters = toggleArrayEntry(selectedFields.parameters, action.field.name)
-      const newState = getStepStateClone(state, 'step2', true)
-      newState.steps.step2.selectedFields = {
-        ...newState.steps.step2.selectedFields,
+      const newState = getStepStateClone(state, action.step, true)
+      newState.steps[action.step].selectedFields = {
+        ...newState.steps[action.step].selectedFields,
         parameters
       }
       return newState
     }
     case 'setSelectedFilter': {
-      const { filters } = state.steps.step2.selectedFields
-      const newState = getStepStateClone(state, 'step2', true)
+      const { filters } = state.steps[action.step].selectedFields
+      const newState = getStepStateClone(state, action.step, true)
 
       // if passing in a filter that already exists
       // remove it from list of selected filters
       if (filters[action.field.name] || filters[action.field.name] == '') {
         delete filters[action.field.name]
-        newState.steps.step2.selectedFields = {
-          ...newState.steps.step2.selectedFields,
+        newState.steps[action.step].selectedFields = {
+          ...newState.steps[action.step].selectedFields,
           filters
         }
         return newState
@@ -157,14 +152,14 @@ function wizardReducer(state: WizardState, action: Action): any {
         ...filters,
         [action.field.name]: ""
       }
-      newState.steps.step2.selectedFields = {
-        ...newState.steps.step2.selectedFields,
+      newState.steps[action.step].selectedFields = {
+        ...newState.steps[action.step].selectedFields,
         filters: newFilters
       }
       return newState
     }
     case 'setFilterValue': {
-      const { filters } = state.steps.step2.selectedFields
+      const { filters } = state.steps[action.step].selectedFields
       if (!filters.hasOwnProperty(action.key)) {
         console.error('That filter does not exist')
       }
@@ -173,9 +168,9 @@ function wizardReducer(state: WizardState, action: Action): any {
         ...filters,
         [action.key]: action.expression
       }
-      const newState = getStepStateClone(state, 'step2', true)
-      newState.steps.step2.selectedFields = {
-        ...state.steps.step2.selectedFields,
+      const newState = getStepStateClone(state, action.step, true)
+      newState.steps[action.step].selectedFields = {
+        ...state.steps[action.step].selectedFields,
         filters: newFilters
       }
       return newState;

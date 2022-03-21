@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react'
+import React, {useContext, useEffect, useRef} from 'react'
 import { getHeaderColumns, findSortedHeader } from '../../../services/resultsTable'
 import { useStore } from '../../../contexts/StoreProvider'
 import { ResultsTableHeaderItem } from '../../../types'
@@ -7,28 +7,33 @@ import { without, compact } from 'lodash'
 import { ResultsTableRows } from './ResultsTableRows'
 import { DESC_STRING } from '../../../constants'
 import Spinner from '../../Spinner'
+import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
 
 
 export const ResultsTable: React.FC = () => {
+  const { stepData, stepName } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
-  const { selectedFields, exploreData, ranQuery, sorts, tableHeaders } = state.wizard.steps.step2
+  const { selectedFields, exploreData, ranQuery, sorts, tableHeaders } = stepData
   const firstUpdate = useRef(true)
 
   useEffect(() => {
     // don't run on component mount
     if(firstUpdate.current) {
       firstUpdate.current = false
-      return
+      if ([...selectedFields.dimensions, ...selectedFields.measures].length <= 0) {
+        return
+      }
     }
     const headers = getHeaderColumns(
       selectedFields,
       ranQuery,
       exploreData
     )
-    dispatch({ type: 'addToStepData', step: 'step2', data: { tableHeaders: headers } })
+    dispatch({ type: 'addToStepData', step: stepName, data: { tableHeaders: headers } })
   }, [
     selectedFields.dimensions,
     selectedFields.measures,
+    selectedFields.predictions,
     ranQuery
   ])
 
@@ -53,7 +58,7 @@ export const ResultsTable: React.FC = () => {
       ? [...without(sorts, sortedHeader), newSort]
       : [newSort]
     // remove any null'd out sorts (which happens when toggling back to default state)
-    dispatch({ type: 'addToStepData', step: 'step2', data: { sorts: compact(rawSorts) }})
+    dispatch({ type: 'addToStepData', step: stepName, data: { sorts: compact(rawSorts) }})
   }
 
   return (

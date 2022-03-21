@@ -29,19 +29,33 @@
     filterExploresByConn,
     mapExploresByModel
   } from '../services/explores'
-  import { Step2State } from '../types'
-  import { IQuery } from "@looker/sdk/lib/4.0/models"
+import { WizardSteps } from '../types'
+import { wizardInitialState } from '../reducers/wizard'
 
   type IQueryBuilderContext = {
+    stepData: any,
+    stepName: keyof WizardSteps,
+    lockFields: boolean,
     fetchSortedModelsAndExplores?: () => Promise<any>
   }
 
-  export const QueryBuilderContext = createContext<IQueryBuilderContext>({})
+  export const QueryBuilderContext = createContext<IQueryBuilderContext>({
+    stepData: wizardInitialState.steps.step2,
+    stepName: 'step2',
+    lockFields: false
+  })
 
-  export const QueryBuilderProvider = ({ children }: any) => {
+  type QueryBuilderProps = {
+    children: any
+    stepName: keyof WizardSteps,
+    lockFields?: boolean
+  }
+
+  export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBuilderProps) => {
     const { state, dispatch } = useStore()
     const { coreSDK: sdk } = useContext(ExtensionContext2)
     const { bigQueryConn } = state.userAttributes
+    const stepData = state.wizard.steps[stepName]
 
     /*
     * Fetch all explores and associated models and sort them
@@ -71,6 +85,9 @@
     return (
       <QueryBuilderContext.Provider
         value={{
+          stepData,
+          stepName,
+          lockFields: !!lockFields,
           fetchSortedModelsAndExplores
         }}
       >

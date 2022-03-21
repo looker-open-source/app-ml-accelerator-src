@@ -45,7 +45,7 @@ export const _MLWizard: React.FC = () => {
           </Route>
           <Route
             path={`${path}/${WIZARD_STEPS.step2}`}>
-              <QueryBuilderProvider>
+              <QueryBuilderProvider stepName="step2">
                 <Step2 />
               </QueryBuilderProvider>
           </Route>

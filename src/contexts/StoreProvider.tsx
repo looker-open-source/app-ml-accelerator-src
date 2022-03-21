@@ -1,7 +1,7 @@
 import * as React from 'react'
 import useCombinedReducers from 'use-combined-reducers';
 import { reducers, initialStates } from '../reducers'
-import { UIState, UserAttributesState, WizardState, UserState } from '../types'
+import { UIState, UserAttributesState, WizardState, UserState, BQModelState } from '../types'
 
 type StoreProviderProps = {children: React.ReactNode}
 type StoreState = {
@@ -9,6 +9,7 @@ type StoreState = {
   ui: UIState,
   user: UserState,
   userAttributes: UserAttributesState,
+  bqModel: BQModelState,
   wizard: WizardState
 }
 
@@ -18,6 +19,7 @@ const StoreContext = React.createContext<
 
 function StoreProvider({children}: StoreProviderProps) {
   const [state, dispatch] = useCombinedReducers<any, any>({
+    bqModel: React.useReducer(reducers.bqModelReducer, initialStates.bqModelInitialState),
     errors: React.useReducer(reducers.errorsReducer, initialStates.errorsInitialState),
     ui: React.useReducer(reducers.uiReducer, initialStates.uiInitialState),
     user: React.useReducer(reducers.userReducer, initialStates.userInitialState),

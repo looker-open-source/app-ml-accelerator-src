@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { ExtensionContext2 } from "@looker/extension-sdk-react"
+import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
 import { findFieldDetail } from '../../../services/common'
-import { useStore } from '../../../contexts/StoreProvider'
 import { Filter, useSuggestable } from '@looker/filter-components'
 import { IconButton } from '@looker/components'
 import { Close } from '@styled-icons/material/Close'
@@ -18,11 +18,10 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   onChange,
   onRemove
 }) => {
-  const { state } = useStore()
-  const { step2 } = state.wizard.steps
+  const { stepData } = useContext(QueryBuilderContext)
 
-  if (!step2.exploreData || !step2.modelName) { return null }
-  const fieldDetails = step2.exploreData.fieldDetails
+  if (!stepData.exploreData || !stepData.modelName) { return null }
+  const fieldDetails = stepData.exploreData.fieldDetails
   if (!fieldDetails) { return null }
 
   const filterItem = (filter: string, field: any, expression?: string) => (
@@ -37,7 +36,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         <FilterItem
           onChange={onChange}
           filter={filter}
-          modelName={step2.modelName}
+          modelName={stepData.modelName || ""}
           expression={expression || ""}
           field={field}
           key={filter}

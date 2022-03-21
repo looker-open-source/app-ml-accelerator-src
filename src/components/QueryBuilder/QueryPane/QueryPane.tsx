@@ -1,29 +1,32 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './QueryPane.scss'
 import ExpanderBar from '../Expander'
 import FilterPanel from '../FilterPanel'
 import QueryLimitField from '../QueryLimitField'
 import ResultsTable from '../ResultsTable'
 import { useStore } from '../../../contexts/StoreProvider'
+import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
 
 export const QueryPane: React.FC = () => {
+  const { stepData, stepName } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
-  const { selectedFields, limit } = state.wizard.steps.step2
+  const { selectedFields, limit } = stepData
 
   const onFilterChange = (filter: string, expression: string) => {
     dispatch({
       type: 'setFilterValue',
       key: filter,
-      expression
+      expression,
+      step: stepName
     })
   }
 
   const onFilterRemove = (filter: string) => {
-    dispatch({ type: 'setSelectedFilter', field: {name: filter} })
+    dispatch({ type: 'setSelectedFilter', field: {name: filter}, step: stepName })
   }
 
   const limitChange = (value: string) => {
-    dispatch({ type: 'addToStepData', step: 'step2', data: { limit: value }})
+    dispatch({ type: 'addToStepData', step: stepName, data: { limit: value }})
   }
 
   return (

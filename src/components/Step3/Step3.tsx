@@ -44,7 +44,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     advancedSettings
   } = step3
   const arima = isArima(objective || "")
-  const sourceColumns = [...ranQuery?.dimensions || [], ...ranQuery?.measures || []]
+  const ranQueryFields = ranQuery?.selectedFields
+  const sourceColumns = [...ranQueryFields?.dimensions || [], ...ranQueryFields?.measures || []]
   const sourceColumnsFormatted = sourceColumns.map((col) => col.replace(/\./g, '_')).sort()
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
@@ -92,6 +93,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const summaryUpToDate = () => (
     hasSummaryData({
+      bqModel: state.bqModel,
       step3Data: step3,
       exploreName,
       modelName,
@@ -197,14 +199,14 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <ModelValidation
         setIsInvalid={setIsInvalid}
         data={summary.data}
-        target={summary.target}
+        target={state.bqModel.target}
         objective={objective}
       />
-      { summary.data && summary.target &&
+      { summary.data && state.bqModel.target &&
         (
           <Summary
-            targetField={summary.target}
-            arimaTimeColumn={summary.arimaTimeColumn}
+            targetField={state.bqModel.target}
+            arimaTimeColumn={state.bqModel.arimaTimeColumn}
             summaryData={summary.data}
             selectedFeatures={selectedFeatures || []}
             updateSelectedFeatures={updateSelectedFeatures} />

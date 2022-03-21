@@ -1,4 +1,4 @@
-import { SelectedFields, ResultsTableHeaderItem, ExploreData, Field } from '../types'
+import { SelectedFields, ResultsTableHeaderItem, ExploreData } from '../types'
 import { find, some } from 'lodash'
 import { buildFieldSelectOptions } from './summary'
 import { REQUIRE_FIELD_MESSAGES } from '../constants'
@@ -17,8 +17,8 @@ export const getHeaderColumns = (
   ) {
     return []
   }
-  const ranDimensions = ranQuery?.dimensions || []
-  const ranMeasures = ranQuery?.measures || []
+  const ranDimensions = ranQuery?.selectedFields.dimensions || []
+  const ranMeasures = ranQuery?.selectedFields.measures || []
   const { dimensions: exploreDimensions, measures: exploreMeasures } = exploreData.fieldDetails
 
   const dimensionHeaders = [...selectedFields.dimensions.map((dimension) => (
@@ -39,13 +39,32 @@ export const getHeaderColumns = (
     }
   ))]
 
-  return [{type: 'rowNumber'}, ...dimensionHeaders, ...measureHeaders]
+
+  let predictionHeaders: any[] = []
+  if (selectedFields.predictions) {
+    predictionHeaders = [...selectedFields.predictions?.map((prediction) => (
+      {
+        title: getPredictionTitle(prediction),
+        name: prediction,
+        type: 'prediction',
+        placeholder: false
+      }
+    ))]
+  }
+
+  return [{type: 'rowNumber'}, ...predictionHeaders, ...dimensionHeaders, ...measureHeaders]
 }
 
 const getFieldTitle = (name: string, exploreFields: any[]) => {
   const found = find(exploreFields, {name: name})
   if (!found) { return name }
   return found.label || found.name
+}
+
+const getPredictionTitle = (name: string) => {
+  const split = name.split('_')
+  const capSplit = split.map((str) => str[0].toUpperCase() + str.substring(1))
+  return capSplit.join(' ')
 }
 
 export const findSortedHeader = (

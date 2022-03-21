@@ -9,15 +9,17 @@ import { hasOrphanedSorts } from '../../services/resultsTable'
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
 import RequiredFieldMessages from "./RequiredFieldMessages"
+import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 
 type QueryBuilderProps = {
-  setIsLoading: (isLoading: boolean) => void
+  setIsLoading: (isLoading: boolean) => void,
+  runCallback?: () => void
 }
 
-export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => {
+export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading, runCallback }) => {
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
-  const { state, dispatch } = useStore()
-  const { step2 } = state.wizard.steps
+  const { stepData, stepName } = useContext(QueryBuilderContext)
+  const { dispatch } = useStore()
   const firstUpdate = useRef(true)
 
   // re-run the query when a sort is applied
@@ -27,32 +29,33 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
       firstUpdate.current = false
       return
     }
-    if (!step2.ranQuery?.data) { return }
+    if (!stepData.ranQuery?.data) { return }
     setIsLoading(true)
     runQuery()
       .finally(() => setIsLoading(false))
-  }, [step2.sorts])
+  }, [stepData.sorts])
 
   const runQuery = async() => {
     if (
-      step2.tableHeaders &&
-      hasOrphanedSorts(step2.tableHeaders, step2.sorts || [])
+      stepData.tableHeaders &&
+      hasOrphanedSorts(stepData.tableHeaders, stepData.sorts || [])
     ) {
       // case when a sort is applied to a column that no longer exists in the query
       // clearing the sorts will trigger another runQuery execution in the useEffect above
-      dispatch({type: 'addToStepData', step: 'step2', data: { sorts: [] }})
+      dispatch({type: 'addToStepData', step: stepName, data: { sorts: [] }})
       return
     }
     setIsLoading(true)
-    const {results, exploreUrl} = await createAndRunQuery?.(step2)
-    saveQueryToState?.(step2, results, exploreUrl)
+    const {results, exploreUrl} = await createAndRunQuery?.(stepData)
+    saveQueryToState?.(stepName, stepData, results, exploreUrl)
+    runCallback?.()
     setIsLoading(false)
   }
 
-  const directoryPaneContents = step2.exploreName ?
+  const directoryPaneContents = stepData.exploreName ?
     (<FieldsSelect/>) : (<ExploreSelect />)
 
-  const queryPaneContents = step2.exploreName && step2.exploreData ?
+  const queryPaneContents = stepData.exploreName && stepData.exploreData ?
     (<QueryPane/>) : (<NoExplorePlaceHolder />)
 
   return (
@@ -62,8 +65,8 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading }) => 
           <ExploreFilter />
         </div>
         <div className="query-header-actions">
-          { step2.exploreData && (<>
-              <RequiredFieldMessages />
+          { stepData.exploreData && (<>
+              { stepName === 'step2' && <RequiredFieldMessages /> }
               <Button
                 onClick={runQuery}
                 className="action-button">

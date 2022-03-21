@@ -8,7 +8,9 @@ import { UIState } from './uiState'
 import { UserState } from './userState'
 import { ResultsTableHeaderItem, RanQuery } from './resultsTable'
 import { UserAttributesState } from './userAttributes'
+import { BQModelState } from './bqModelState'
 export type {
+  BQModelState,
   WizardState,
   WizardSteps,
   Step1State,

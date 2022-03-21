@@ -23,11 +23,12 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [jobCanceled, setJobCanceled] = useState<any>()
   const { state } = useStore()
   const { needsSaving } = state.wizard
-  const { jobStatus, modelInfo, job } = state.wizard.steps.step4
+  const { jobStatus, job } = state.bqModel
+  const bqModel = state.bqModel
 
   useEffect(() => {
-    if (!modelInfo.bqModelObjective) { return }
-    const MODEL_TYPE = MODEL_TYPES[modelInfo.bqModelObjective]
+    if (!bqModel.objective) { return }
+    const MODEL_TYPE = MODEL_TYPES[bqModel.objective]
     if (MODEL_TYPE) {
       const { modelTabs } = MODEL_TYPE
       if (!activeTab || modelTabs.indexOf(activeTab) < 0) {
@@ -48,16 +49,16 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const fetchModelData = async () => {
     if (
       !jobComplete ||
-      !modelInfo.bqModelName ||
-      !modelInfo.bqModelObjective ||
+      !bqModel.name ||
+      !bqModel.objective ||
       !activeTab
     ) { return }
 
     setIsLoading(true)
     const { ok, value } = await getModelEvalFuncData?.(
-      modelInfo.bqModelObjective,
+      bqModel.objective,
       activeTab,
-      modelInfo.bqModelName
+      bqModel.name
     )
     if (ok) {
       setEvalData(value.data)
@@ -91,7 +92,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
               <ModelSidebar
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                bqModelObjective={modelInfo.bqModelObjective || ''}
+                bqModelObjective={bqModel.objective || ''}
               />
             </div>
             <div className="model-grid--body">

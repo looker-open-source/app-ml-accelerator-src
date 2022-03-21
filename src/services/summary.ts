@@ -1,5 +1,5 @@
 import { keyBy, compact } from 'lodash'
-import { Field, Step3State, SummaryTableHeaders } from '../types'
+import { BQModelState, Field, Step3State, SummaryTableHeaders } from '../types'
 import { titilize, splitFieldName } from './string'
 
 export const formBQViewSQL = (
@@ -43,6 +43,7 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
 }
 
 type hasSummaryProps = {
+  bqModel: BQModelState,
   step3Data: Step3State,
   exploreName: string,
   modelName: string,
@@ -53,7 +54,10 @@ type hasSummaryProps = {
   arimaTimeColumn?: string
 }
 
+// This method determines whether the summary has been ran with the current ui state.
+// The summary needs to be reran when the ui state has changed since the last time they ran the summary.
 export const hasSummaryData = ({
+  bqModel,
   step3Data,
   exploreName,
   modelName,
@@ -63,13 +67,14 @@ export const hasSummaryData = ({
   sourceColumns,
   arimaTimeColumn
 }: hasSummaryProps): boolean => {
+  const { sourceQuery } = bqModel
   const { summary, allFeatures } = step3Data
-  return Boolean(summary.exploreName === exploreName
-    && summary.modelName === modelName
-    && summary.target === target
-    && summary.bqModelName === bqModelName
-    && (arimaTimeColumn ? summary.arimaTimeColumn === arimaTimeColumn : true)
-    && summary.advancedSettings === advancedSettings
+  return Boolean(sourceQuery.exploreName === exploreName
+    && sourceQuery.modelName === modelName
+    && bqModel.target === target
+    && bqModel.name === bqModelName
+    && (arimaTimeColumn ? bqModel.arimaTimeColumn === arimaTimeColumn : true)
+    && bqModel.advancedSettings === advancedSettings
     && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data
     && summary.data.length > 0)

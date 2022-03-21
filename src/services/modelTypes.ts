@@ -164,3 +164,37 @@ export const MODEL_TYPE_CREATE_METHOD: { [key: string]: (props: IFormSQLProps) =
   BOOSTED_TREE_CLASSIFIER: formBoostedTreeClassifierSQL,
   ARIMA_PLUS: formArimaSQL
 }
+
+type BoostedTreePredictProps = {
+  lookerSql: string,
+  bqmlModelDatasetName: string,
+  bqModelName: string
+}
+
+export const createBoostedTreePredictSql = ({
+  lookerSql,
+  bqmlModelDatasetName,
+  bqModelName
+}: BoostedTreePredictProps) => {
+  return `
+    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
+    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${lookerSql})))
+  `
+}
+
+type GetBoostedTreePredictProps = {
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  sorts: string[]
+}
+
+export const getBoostedTreePredictSql = ({
+  bqmlModelDatasetName,
+  bqModelName,
+  sorts
+}: GetBoostedTreePredictProps) => {
+  const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => s.replace(/\./g, '_')).join(', ')} ` : ''
+  return `
+    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString}
+  `
+}

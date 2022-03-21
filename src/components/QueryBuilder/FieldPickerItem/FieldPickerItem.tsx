@@ -1,6 +1,6 @@
 import React, { FC, createContext, useContext } from 'react'
 import {
-  FilterList,
+  FilterList, Lock,
 } from '@styled-icons/material'
 import {
   LkFieldItem,
@@ -15,6 +15,8 @@ import {
 } from '@looker/components'
 import Spinner from '../../Spinner'
 import { useStore } from '../../../contexts/StoreProvider'
+import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
+import { SelectedFields } from '../../../types'
 
 export const HighlightContext = createContext({ term: '' })
 
@@ -38,19 +40,28 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
   hideActions = false,
   isLoading = false
 }) => {
+  const { stepData, stepName } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
   const { term } = useContext(HighlightContext)
-  const { selectedFields } = state.wizard.steps.step2
+  const { selectedFields } = stepData
+  const { selectedFields: lockedFields } = state.bqModel.sourceQuery
+  const lockedFieldNames = [...lockedFields.dimensions, ...lockedFields.measures, ...lockedFields.parameters]
 
   const toggleField = () => {
-    dispatch({ type: selectorAction, field })
+    if (isLocked()) { return }
+    dispatch({ type: selectorAction, field, step: stepName })
   }
+
   const filterToggle = () => {
-    dispatch({ type: 'setSelectedFilter', field })
+    dispatch({ type: 'setSelectedFilter', field, step: stepName })
     dispatch({ type: 'setFiltersOpen', value: true })
   }
 
   const { height } = listItemDimensions(-3)
+
+  const isLocked = () => (
+    stepName === 'step5' && lockedFieldNames.includes(field.name)
+  )
 
   const renderActions = () => {
     if (isLoading) {
@@ -76,6 +87,18 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
           />
         </HoverDisclosure>
       ))
+      if (isLocked()) {
+        actions.push((
+          <HoverDisclosure visible={true} key="filter-lock">
+            <IconButton
+              shape="square"
+              icon={<Lock />}
+              label="Source data fields are locked"
+              tooltipPlacement="top"
+            />
+          </HoverDisclosure>
+        ))
+      }
     }
     return actions
   }

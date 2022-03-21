@@ -11,7 +11,7 @@ export const ArimaPredict: React.FC = () => {
   const { extensionSDK } = useContext(ExtensionContext2)
   const { initArima } = useContext(ApplyContext)
   const { state } = useStore()
-  const { look } = state.wizard.steps.step5
+  const { look } = state.bqModel
 
   useEffect(() => {
     initArima?.()

@@ -6,6 +6,7 @@ import StepComplete from '../StepComplete'
 type StepContainerParams = {
   isLoading?: boolean
   stepComplete?: boolean
+  lastStep?: boolean
   customClass?: string
   stepNumber: number
   children: any,
@@ -17,6 +18,7 @@ type StepContainerParams = {
 export const StepContainer: React.FC<StepContainerParams> = ({
   isLoading,
   stepComplete,
+  lastStep,
   customClass,
   stepNumber,
   children,
@@ -30,16 +32,18 @@ export const StepContainer: React.FC<StepContainerParams> = ({
     <section className={`step-container ${loadingClass} ${customClass}`}>
       <LoadingOverlay isLoading={!!isLoading} />
       { children }
-      <div className="wizard-footer-bar">
-        <StepComplete
-          stepText={stepText}
-          isStepComplete={stepComplete}
-          isLoading={isLoading}
-          stepNumber={stepNumber}
-          buttonText={buttonText}
-          handleCompleteClick={handleCompleteClick}
-        />
-      </div>
+      { !lastStep &&
+        <div className="wizard-footer-bar">
+          <StepComplete
+            stepText={stepText}
+            isStepComplete={stepComplete}
+            isLoading={isLoading}
+            stepNumber={stepNumber}
+            buttonText={buttonText}
+            handleCompleteClick={handleCompleteClick}
+          />
+        </div>
+      }
     </section>
   )
 }

@@ -51,8 +51,8 @@ export const ModelProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { coreSDK } = useContext(ExtensionContext2)
   const { pollJobStatus, cancelJob, getJob } = useContext(BQMLContext)
-  const { persistWizardState } = useContext(WizardContext)
-  const { jobStatus, job } = state.wizard.steps.step4
+  const { persistModelState } = useContext(WizardContext)
+  const { jobStatus, job } = state.bqModel
   const [ polling, setPolling ] = useState(false)
   const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
 
@@ -82,9 +82,7 @@ export const ModelProvider = ({ children }: any) => {
       // make one initial request to get the current job state before it begins polling
       const { ok: jobOk, body: initialJobStatus } = await getJob?.({ jobId: job.jobId })
       if (!jobOk || initialJobStatus.status.errorResult) {
-        dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
-        dispatch({ type: 'setNeedsSaving', value: true })
-        throw jobOk ? initialJobStatus.status.errorResult.message : 'Failed to retrieve job status'
+        handleJobError(jobOk, initialJobStatus.status.errorResult)
       }
       updateJobState(initialJobStatus)
       pollCanceler?.cancel()
@@ -102,9 +100,7 @@ export const ModelProvider = ({ children }: any) => {
 
       if (canceled) { return }
       if (!ok || body.status.errorResult) {
-        dispatch({ type: 'addToStepData', step: 'step4', data: { jobStatus: "FAILED" }})
-        dispatch({ type: 'setNeedsSaving', value: true })
-        throw ok ? body.status.errorResult.message : "Failed to retrieve job status"
+        handleJobError(ok, body.status.errorResult)
       }
       updateJobState(body)
     } catch (error: any) {
@@ -114,10 +110,16 @@ export const ModelProvider = ({ children }: any) => {
     }
   }
 
+  const handleJobError = (jobOk: boolean, error: any) => {
+    dispatch({ type: 'addToStepData', step: 'step4', data: { complete: false }})
+    dispatch({ type: 'setBQModel', data: { jobStatus: "FAILED" }})
+    dispatch({ type: 'setNeedsSaving', value: true })
+    throw jobOk ? error.message : 'Failed to retrieve job status'
+  }
+
   const updateJobState = (body: any) => {
     dispatch({
-      type: 'addToStepData',
-      step: 'step4',
+      type: 'setBQModel',
       data: {
         jobStatus: body.status.state,
         job: {
@@ -158,6 +160,7 @@ export const ModelProvider = ({ children }: any) => {
       if (value.errors && value.errors.length >= 1) {
         throw value.errors[0].message
       }
+      dispatch({ type: 'addToStepData', step: 'step4', data: { complete: true }})
       return { ok, value }
     } catch (error) {
       dispatch({type: 'addError', error: "Error fetching evaluation data: " + error})
@@ -175,24 +178,17 @@ export const ModelProvider = ({ children }: any) => {
       if (!ok) { throw "Refresh and try again."}
       stopPolling()
 
-      // create a copy of the wizard state with the job added
-      const { wizard } = state
-      const wizardState = {
-        ...wizard,
-        steps: {
-          ...wizard.steps,
-          step4: {
-            ...wizard.steps.step4,
-            jobStatus: JOB_STATUSES.canceled
-          }
-        }
-      }
-      await persistWizardState?.(wizardState)
+
+      const { wizard, bqModel } = state
+      // create a copy of the bqModel state with the job added
+      const tempBQModel = { ...bqModel, jobStatus: JOB_STATUSES.canceled }
+      await persistModelState?.({ ...wizard }, tempBQModel)
       dispatch({
         type: 'addToStepData',
         step: 'step4',
-        data: { jobStatus: JOB_STATUSES.canceled }
+        data: { complete: false }
       })
+      dispatch({ type: 'setBQModel', data: { jobStatus: JOB_STATUSES.canceled }})
       dispatch({ type: 'setNeedsSaving', value: true })
     } catch(error) {
       dispatch({type: 'addError', error: "Failed to cancel model creation: " + error})
