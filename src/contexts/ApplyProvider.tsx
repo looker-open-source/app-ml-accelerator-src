@@ -161,7 +161,7 @@ export const ApplyProvider = ({ children }: any) => {
           sorts: step5.sorts,
         }
 
-      // add the predictedColumn so headers will be regenerated
+      // add the predictedColumn so table headers will be regenerated
       dispatch({
         type: 'addToStepData',
         step: 'step5',

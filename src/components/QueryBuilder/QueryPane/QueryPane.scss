@@ -1,0 +1,22 @@
+.chart-viz-container {
+  height: 300px;
+  overflow: hidden;
+}
+
+.viz-button-container {
+  width: 100%;
+  margin-left: 34px;
+  height: 28px;
+
+  .viz-button {
+
+    border-radius: 0;
+    height: 100%;
+    width: 30px;
+
+    &.active {
+      color: whitesmoke;
+      background-color: rgba(255, 255, 255, .2);
+    }
+  }
+}

@@ -126,7 +126,10 @@ export const WizardProvider = ({ children }: any) => {
 
   const buildRanQuery = (stepData: Step2State | Step5State, results: any, exploreUrl?: string) => {
     return {
-      selectedFields: stepData.selectedFields,
+      selectedFields: {
+        ...stepData.selectedFields,
+        predictions: []
+      },
       data: results.data,
       rowCount: results.data.length,
       sql: results.sql,
