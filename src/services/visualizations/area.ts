@@ -2,17 +2,19 @@ import { ChartConfiguration } from "chart.js";
 import { RanQuery } from "../../types";
 import { buildVizDataSets, buildVizLabels, truncateLabels } from "./visualizations";
 
-export const barChartObj = (ranQuery: RanQuery, data: any, target: string): ChartConfiguration => {
+export const areaChartObj = (ranQuery: RanQuery, data: any, target: string): ChartConfiguration => {
   const labels = buildVizLabels(ranQuery, data, target)
-  const datasets = buildVizDataSets({ ranQuery, data, target, datasetMapper, labels, colorSolid: true })
+  const datasets = buildVizDataSets({ ranQuery, data, target, datasetMapper, labels })
+  const filledDatasets = datasets.map((dataset) => ({ ...dataset, fill: true }))
+
+  console.log({ filledDatasets })
   return {
-    type: 'bar',
-    data: { labels, datasets },
+    type: 'line',
+    data: { labels, datasets: filledDatasets },
     options: {
-      indexAxis: 'y',
       maintainAspectRatio: false,
       scales: {
-        y: {
+        x: {
           ticks: {
             callback: truncateLabels
           }

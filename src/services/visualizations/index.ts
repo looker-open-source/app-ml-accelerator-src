@@ -2,14 +2,19 @@ import { lineChartObj } from "./line"
 import { scatterPlotChartObj } from "./scatterplot"
 import { barChartObj } from "./bar"
 import { columnChartObj } from "./column"
-import { truncateLabels, buildVizDataSets, buildVizLabels } from "./visualizations"
+import { areaChartObj } from "./area"
+import { pieChartObj } from "./pie"
+import { truncateLabels, buildVizDataSets, buildVizLabels, buildPieDataSets } from "./visualizations"
 
 export {
   truncateLabels,
   buildVizDataSets,
   buildVizLabels,
+  buildPieDataSets,
   lineChartObj,
   scatterPlotChartObj,
+  areaChartObj,
   barChartObj,
-  columnChartObj
+  columnChartObj,
+  pieChartObj
 }

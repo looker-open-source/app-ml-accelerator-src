@@ -4,7 +4,7 @@ import { buildVizDataSets, buildVizLabels, truncateLabels } from "./visualizatio
 
 export const columnChartObj = (ranQuery: RanQuery, data: any, target: string): ChartConfiguration => {
   const labels = buildVizLabels(ranQuery, data, target)
-  const datasets = buildVizDataSets({ ranQuery, data, target, datasetMapper, labels })
+  const datasets = buildVizDataSets({ ranQuery, data, target, datasetMapper, labels, colorSolid: true })
   return {
     type: 'bar',
     data: { labels, datasets },

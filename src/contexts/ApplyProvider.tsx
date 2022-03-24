@@ -147,7 +147,12 @@ export const ApplyProvider = ({ children }: any) => {
       const ranQuery = step5.ranQuery ? {
           ...step5.ranQuery,
           data: formattedResults,
-          rowCount: formattedResults.length
+          rowCount: formattedResults.length,
+          selectedFields: {
+            ...step5.selectedFields,
+            // add the predictedColumn so table headers will be regenerated
+            predictions: [getPredictedColumnName(bqModel.target)]
+          }
         } : {
           data: formattedResults,
           rowCount: formattedResults.length,
@@ -157,11 +162,14 @@ export const ApplyProvider = ({ children }: any) => {
           modelName: step5.modelName,
           exploreLabel: step5.exploreLabel,
           limit: step5.limit,
-          selectedFields: step5.selectedFields,
+          selectedFields: {
+            ...step5.selectedFields,
+            // add the predictedColumn so table headers will be regenerated
+            predictions: [getPredictedColumnName(bqModel.target)]
+          },
           sorts: step5.sorts,
         }
 
-      // add the predictedColumn so table headers will be regenerated
       dispatch({
         type: 'addToStepData',
         step: 'step5',
@@ -169,6 +177,7 @@ export const ApplyProvider = ({ children }: any) => {
           ...step5,
           selectedFields: {
             ...step5.selectedFields,
+            // add the predictedColumn so table headers will be regenerated
             predictions: [getPredictedColumnName(bqModel.target)]
           },
           ranQuery

@@ -7,7 +7,7 @@ import { useStore } from '../../../contexts/StoreProvider'
 import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
 import { VizChart } from '../../Visualizations/VizChart'
 import { VizButtons } from './VizButtons'
-import { AllChartTypes } from '../../Visualizations/vizConstants'
+import { AllChartTypes } from '../../../services/visualizations/vizConstants'
 import './QueryPane.scss'
 
 export const QueryPane: React.FC = () => {
@@ -59,7 +59,7 @@ export const QueryPane: React.FC = () => {
           fields={[<VizButtons chartType={chartType} setChartType={setChartType} />]}
         >
           <div className="chart-viz-container">
-            <VizChart data={stepData.ranQuery?.data} type={chartType}/>
+            <VizChart ranQuery={stepData.ranQuery} type={chartType}/>
           </div>
         </ExpanderBar>
       }
