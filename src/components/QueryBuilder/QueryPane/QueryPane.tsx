@@ -5,7 +5,7 @@ import QueryLimitField from '../QueryLimitField'
 import ResultsTable from '../ResultsTable'
 import { useStore } from '../../../contexts/StoreProvider'
 import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
-import { VizChart } from '../../Visualizations/VizChart'
+import { VizContainer } from '../../Visualizations/VizContainer'
 import { VizButtons } from './VizButtons'
 import { AllChartTypes } from '../../../services/visualizations/vizConstants'
 import './QueryPane.scss'
@@ -59,7 +59,7 @@ export const QueryPane: React.FC = () => {
           fields={[<VizButtons chartType={chartType} setChartType={setChartType} />]}
         >
           <div className="chart-viz-container">
-            <VizChart ranQuery={stepData.ranQuery} type={chartType}/>
+            <VizContainer ranQuery={stepData.ranQuery} type={chartType}/>
           </div>
         </ExpanderBar>
       }

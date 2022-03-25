@@ -1,6 +1,10 @@
 .chart-viz-container {
   height: 300px;
   overflow: hidden;
+
+  .ag-row-hover {
+    background-color: #e0e1e1 !important;
+  }
 }
 
 .viz-button-container {

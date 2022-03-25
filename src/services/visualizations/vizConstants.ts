@@ -8,4 +8,4 @@ export const VIZ_COLORS = [
   "rgb(78,205,62)"
 ]
 export const VIZ_HEIGHT = 300
-export type AllChartTypes = 'line' | 'column' | 'scatter' | 'bar' | 'area' | 'pie'
+export type AllChartTypes = 'line' | 'column' | 'scatter' | 'bar' | 'area' | 'pie' | 'table'
