@@ -1,16 +1,20 @@
-import React, { useContext } from 'react'
-import './QueryPane.scss'
+import React, { useContext, useState } from 'react'
 import ExpanderBar from '../Expander'
 import FilterPanel from '../FilterPanel'
 import QueryLimitField from '../QueryLimitField'
 import ResultsTable from '../ResultsTable'
 import { useStore } from '../../../contexts/StoreProvider'
 import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
+import { VizContainer } from '../../Visualizations/VizContainer'
+import { VizButtons } from './VizButtons'
+import { AllChartTypes } from '../../../services/visualizations/vizConstants'
+import './QueryPane.scss'
 
 export const QueryPane: React.FC = () => {
   const { stepData, stepName } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
   const { selectedFields, limit } = stepData
+  const [ chartType, setChartType ] = useState<AllChartTypes>('line')
 
   const onFilterChange = (filter: string, expression: string) => {
     dispatch({
@@ -46,6 +50,19 @@ export const QueryPane: React.FC = () => {
           />
         </div>
       </ExpanderBar>
+      { stepName === 'step5' &&
+        <ExpanderBar
+          title="Visualization"
+          expanderBodyClasses="filter-expander"
+          isOpen={state.ui.vizOpen}
+          setIsOpen={() => dispatch({type: 'setVizOpen', value: !state.ui.vizOpen})}
+          fields={[<VizButtons chartType={chartType} setChartType={setChartType} />]}
+        >
+          <div className="chart-viz-container">
+            <VizContainer ranQuery={stepData.ranQuery} type={chartType}/>
+          </div>
+        </ExpanderBar>
+      }
       <ExpanderBar
         title="Data"
         expanderBodyClasses="filter-expander"

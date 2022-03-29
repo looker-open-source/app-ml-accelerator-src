@@ -15,6 +15,7 @@ import './Step3.scss'
 import { OptionalParameters } from './OptionalParameters'
 import AdvancedSettings from './AdvancedSettings'
 import { ModelValidation } from './ModelValidation'
+import { noDot } from '../../services/string'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -46,7 +47,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const arima = isArima(objective || "")
   const ranQueryFields = ranQuery?.selectedFields
   const sourceColumns = [...ranQueryFields?.dimensions || [], ...ranQueryFields?.measures || []]
-  const sourceColumnsFormatted = sourceColumns.map((col) => col.replace(/\./g, '_')).sort()
+  const sourceColumnsFormatted = sourceColumns.map((col) => noDot(col)).sort()
   const targetFieldOptions = buildFieldSelectOptions(
     exploreData?.fieldDetails,
     sourceColumns,

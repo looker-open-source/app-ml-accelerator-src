@@ -1674,6 +1674,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/chroma-js@^2.1.3":
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.1.3.tgz#0b03d737ff28fad10eb884e0c6cedd5ffdc4ba0a"
+  integrity sha512-1xGPhoSGY1CPmXLCBcjVZSQinFjL26vlR8ZqprsBWiFyED4JacJJ9zHhh5aaUXqbY9B37mKQ73nlydVAXmr1+g==
+
 "@types/eslint-scope@^3.7.0":
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.2.tgz#11e96a868c67acf65bf6f11d10bb89ea71d5e473"
@@ -2084,6 +2089,18 @@ acorn@^8.0.4, acorn@^8.2.4, acorn@^8.4.1:
   version "8.7.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.7.0.tgz#90951fde0f8f09df93549481e5fc141445b791cf"
   integrity sha512-V/LGr1APy+PXIwKebEWrkZPwoeoF+w1jiOBUmuxuiUIaOHtob8Qc9BTrYo7VuI5fR8tqsy+buA2WFooR5olqvQ==
+
+ag-grid-community@^27.1.0:
+  version "27.1.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-27.1.0.tgz#17f73173444a9efc4faea0f0cd6c5090e698f7ee"
+  integrity sha512-SWzIJTNa7C6Vinizelcoc1FAJQRt1pDn+A8XHQDO2GTQT+VjBnPL8fg94fLJy0EEvqaN5IhDybNS0nD07SKIQw==
+
+ag-grid-react@^27.1.0:
+  version "27.1.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-27.1.0.tgz#3b08203b9731a2b2d5431dddd69d68dc640c311e"
+  integrity sha512-AfRwH6BL/LribvLJ2594Fq0/MfZf/17WebjGj927bM3vABDr2OBX3qgMIaQE+kpV9mABPb51rlWLMmbCvltv2g==
+  dependencies:
+    prop-types "^15.8.1"
 
 agent-base@6:
   version "6.0.2"
@@ -2690,6 +2707,11 @@ char-regex@^1.0.2:
   resolved "https://registry.yarnpkg.com/char-regex/-/char-regex-1.0.2.tgz#d744358226217f981ed58f479b1d6bcc29545dcf"
   integrity sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==
 
+chart.js@^3.7.1:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-3.7.1.tgz#0516f690c6a8680c6c707e31a4c1807a6f400ada"
+  integrity sha512-8knRegQLFnPQAheZV8MjxIXc5gQEfDFD897BJgv/klO/vtIyFFmgMXrNfgrXpbTr/XbTturxRgxIXx/Y+ASJBA==
+
 "chokidar@>=3.0.0 <4.0.0", chokidar@^3.4.0, chokidar@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.2.tgz#dba3976fcadb016f66fd365021d91600d01c1e75"
@@ -2723,6 +2745,11 @@ chokidar@^2.1.8:
     upath "^1.1.1"
   optionalDependencies:
     fsevents "^1.2.7"
+
+chroma-js@^2.4.2:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.4.2.tgz#dffc214ed0c11fa8eefca2c36651d8e57cbfb2b0"
+  integrity sha512-U9eDw6+wt7V8z5NncY2jJfZa+hUH8XEj8FQHgFJTrUFnJfXYf4Ml4adI2vXZOjqRDpFWtYVWypDfZwnJ+HIR4A==
 
 chrome-trace-event@^1.0.2:
   version "1.0.3"
@@ -6275,7 +6302,7 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
