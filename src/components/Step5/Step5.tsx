@@ -26,7 +26,7 @@ const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     if (isArima(step1.objective || "")) {
       return (<ArimaPredict />)
     } else if (isBoostedTree(step1.objective || "")) {
-      return (<BoostedTreePredict setIsLoading={setIsLoading} />)
+      return (<BoostedTreePredict isLoading={contextLoading || isLoading} setIsLoading={setIsLoading} />)
     }
   }
 

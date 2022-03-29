@@ -28,7 +28,7 @@ export const StepContainer: React.FC<StepContainerParams> = ({
   const loadingClass = isLoading ? 'loading' : ''
 
   return (
-    <section className={`step-container ${loadingClass} ${customClass}`}>
+    <section className={`step-container ${loadingClass} ${customClass || ''}`}>
       <LoadingOverlay isLoading={!!isLoading} />
       { children }
       { !lastStep &&
