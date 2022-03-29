@@ -7,7 +7,6 @@ export const areaChartObj = (ranQuery: RanQuery, data: any, target: string): Cha
   const datasets = buildVizDataSets({ ranQuery, data, target, datasetMapper, labels })
   const filledDatasets = datasets.map((dataset) => ({ ...dataset, fill: true }))
 
-  console.log({ filledDatasets })
   return {
     type: 'line',
     data: { labels, datasets: filledDatasets },

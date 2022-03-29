@@ -25,6 +25,7 @@ export const buildVizDataSets = ({ ranQuery, data, target, labels, datasetMapper
   }
   const targetIndex = chartMeasures.indexOf(target)
   if (targetIndex < 0) {
+    // insert the target if its a dimension
     chartMeasures.splice(1, 0, target)
   }
 

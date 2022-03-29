@@ -36,7 +36,7 @@ export const VizTable : React.FC<VizTableProps> = ({ ranQuery }) => {
 
   const getRowStyle = (params: any) => {
     if (params.node.rowIndex % 2 === 0) {
-        return { background: '#f0f1f1' };
+      return { background: '#f0f1f1' };
     }
   }
 
