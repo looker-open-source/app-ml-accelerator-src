@@ -30,6 +30,12 @@ body,
     z-index: 9999;
   }
 
+  .bqml-app--header-placeholder {
+    display: block;
+    width: 100%;
+    height: 0;
+  }
+
   .bqml-app-container {
     padding: 100px 30px;
   }

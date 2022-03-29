@@ -10,11 +10,14 @@ import HomeLanding from './HomeLanding'
 import Admin from './Admin'
 import './ExtensionApp.scss'
 import { AdminProvider } from '../contexts/AdminProvider'
+import { useStore } from '../contexts/StoreProvider'
 
 
 export const _LookerBQMLApp: React.FC = () => {
   const { loggingIn, token, signIn, signOut } = useContext(OauthContext)
   const { expired, setExpired } = useContext(BQMLContext)
+  const { state } = useStore()
+  const errorsCount = state.errors.length
 
   useEffect(() => {
     if (signOut && expired && token) {
@@ -33,6 +36,7 @@ export const _LookerBQMLApp: React.FC = () => {
         <ErrorBar></ErrorBar>
         <TitleBar></TitleBar>
       </div>
+      <div className="bqml-app--header-placeholder" style={{ marginBottom: 52 * errorsCount }}></div>
       <div className="bqml-app-container">
         { !loggingIn && token && (
           <Switch>
