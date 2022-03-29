@@ -40,7 +40,7 @@ export const ExtensionApp: React.FC = () => {
         looksFolderId: spaces[0] ? spaces[0].id : null
       }})
     } catch (err) {
-      dispatch({ type: 'addError', error: 'Failed to retrieve User' })
+      dispatch({ type: 'addError', error: 'Failed to retrieve User - ' + err })
     } finally {
     }
   }
