@@ -1,9 +1,17 @@
 .chart-viz-container {
-  height: 300px;
+  height: 212px;
   overflow: hidden;
 
   .ag-row-hover {
     background-color: #e0e1e1 !important;
+  }
+
+  .viz-single-value {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    font-weight: 500;
   }
 }
 
@@ -13,10 +21,19 @@
   height: 28px;
 
   .viz-button {
-
     border-radius: 0;
     height: 100%;
     width: 30px;
+
+    &.viz-button-text {
+      width: auto;
+      padding: 9px 4px;
+      display: inline-block;
+
+      & > div {
+        width: auto;
+      }
+    }
 
     &.active {
       color: whitesmoke;

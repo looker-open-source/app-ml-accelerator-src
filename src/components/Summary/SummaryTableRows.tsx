@@ -2,6 +2,7 @@ import React from 'react'
 import { SummaryTableHeaders } from '../../types'
 import { Checkbox, Icon } from "@looker/components"
 import { TrackChanges, AccessTime } from '@styled-icons/material'
+import { noDot } from '../../services/string'
 
 type SummaryTableRows = {
   data: any[] | undefined
@@ -17,14 +18,14 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
 
   const checkBoxCell = (rowData: any) => {
     const rowColumnName = rowData["column_name"].value
-    if (targetField.replace(/\./g, '_') === rowColumnName) {
+    if (noDot(targetField) === rowColumnName) {
       return (
         <td className="checkbox">
           <Icon icon={<TrackChanges />} className="target-icon" />
         </td>
       )
     }
-    if (arimaTimeColumn && arimaTimeColumn.replace(/\./g, '_') === rowColumnName) {
+    if (arimaTimeColumn && noDot(arimaTimeColumn) === rowColumnName) {
       return (
         <td className="checkbox">
           <Icon icon={<AccessTime />} className="target-icon" />

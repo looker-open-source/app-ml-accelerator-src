@@ -40,7 +40,6 @@ export const buildVizDataSets = ({ ranQuery, data, target, labels, datasetMapper
       backgroundColor: colorSolid ? color : bgColor,
     }
   })
-  console.log({ datasets })
   return datasets
 }
 
@@ -63,7 +62,7 @@ export const buildVizLabels = (ranQuery: RanQuery, data: any, target: string) =>
   })
 }
 
-const isPrediction = (fieldName: string, predictions?: string[]) => {
+export const isPrediction = (fieldName: string, predictions?: string[]) => {
   if (!predictions) { return false }
   return predictions[0] === fieldName
 }
@@ -104,6 +103,5 @@ export const buildPieDataSets = ({ ranQuery, data, target, labels, datasetMapper
       backgroundColor: chroma.scale([chroma(color).darken(2.5), color]).mode('lch').colors(data.length),
     }
   })
-  console.log({ datasets })
   return datasets
 }

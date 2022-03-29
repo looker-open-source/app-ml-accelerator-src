@@ -1,5 +1,5 @@
 import { isArima } from "./modelTypes"
-import { formatParameterFilter } from "./string"
+import { formatParameterFilter, noDot } from "./string"
 
 type buildApplyFiltersProps = {
   modelType: any,
@@ -44,7 +44,7 @@ export const getLookerColumnName = (exploreName: string, fieldName: string) => {
 }
 
 export const getPredictedColumnName = (target: string) => (
-  `predicted_${target.replace(/\./g, '_')}`
+  `predicted_${noDot(target)}`
 )
 
 export const bqResultsToLookerFormat = (data: any, exploreName: string) => (

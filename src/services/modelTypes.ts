@@ -1,4 +1,5 @@
 import { advancedSettingsSql } from "./advancedSettings"
+import { noDot } from "./string"
 
 export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
   trainingInfo: 'trainingInfo',
@@ -77,7 +78,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
 export const MODEL_VALIDATORS: {[key: string]: any} = {
   BOOSTED_TREE_CLASSIFIER: (data: any[], target: string) => {
     const validationMsgs = []
-    const formattedTarget = target.replace(/\./g, '_')
+    const formattedTarget = noDot(target)
     const targetRow = data.filter((rowData: any) => (
       rowData["column_name"].value === formattedTarget
     ))
@@ -193,7 +194,7 @@ export const getBoostedTreePredictSql = ({
   bqModelName,
   sorts
 }: GetBoostedTreePredictProps) => {
-  const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => s.replace(/\./g, '_')).join(', ')} ` : ''
+  const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => noDot(s)).join(', ')} ` : ''
   return `
     SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString}
   `

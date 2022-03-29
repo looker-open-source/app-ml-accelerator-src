@@ -1,5 +1,5 @@
 import { IconButton } from '@looker/components'
-import { VisArea, VisBar, VisColumn, VisLine, VisPie, VisScatter, VisTable } from '@looker/icons'
+import { VisArea, VisBar, VisColumn, VisLine, VisPie, VisScatter, VisSingleValue, VisTable } from '@looker/icons'
 import React from 'react'
 import { AllChartTypes } from '../../../services/visualizations/vizConstants'
 import './QueryPane.scss'
@@ -30,6 +30,8 @@ export const VizButtons: React.FC<VizButtonsProps> = ({ chartType, setChartType 
       <IconButton icon={<VisLine />} onClick={handleClick('line')} label="Line" className={`viz-button ${activeClass('line')}`}/>
       <IconButton icon={<VisArea />} onClick={handleClick('area')} label="Area" className={`viz-button ${activeClass('area')}`}/>
       <IconButton icon={<VisPie />} onClick={handleClick('pie')} label="Pie" className={`viz-button ${activeClass('pie')}`}/>
+      <IconButton icon={<VisSingleValue />} onClick={handleClick('singleValue')} label="Single Value" className={`viz-button ${activeClass('singleValue')}`}/>
+      <IconButton icon={<span>Single Record</span>} onClick={handleClick('singleRecord')} label="Single Record" className={`viz-button viz-button-text ${activeClass('singleRecord')}`}/>
     </div>
   )
 }

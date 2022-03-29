@@ -29,3 +29,7 @@ export const splitFieldName = (fieldName: string) => {
 export const formatParameterFilter = (fieldName: string) => (
   fieldName.replace(/\.|_+/g, '^_')
 )
+
+export const noDot = (fieldName: string) => (
+  fieldName.replace(/\./g, '_')
+)

@@ -7,5 +7,5 @@ export const VIZ_COLORS = [
   "rgb(205,118,62)",
   "rgb(78,205,62)"
 ]
-export const VIZ_HEIGHT = 300
-export type AllChartTypes = 'line' | 'column' | 'scatter' | 'bar' | 'area' | 'pie' | 'table'
+export const VIZ_HEIGHT = 212
+export type AllChartTypes = 'line' | 'column' | 'scatter' | 'bar' | 'area' | 'pie' | 'table' | 'singleValue' | 'singleRecord'

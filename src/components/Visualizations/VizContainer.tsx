@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react"
 import { AllChartTypes, VIZ_HEIGHT } from "../../services/visualizations/vizConstants";
 import { RanQuery } from "../../types";
 import { VizChart } from "./VizChart";
+import { VizSingleRecord } from "./VizSingleRecord";
+import { VizSingleValue } from "./VizSingleValue";
 import { VizTable } from "./VizTable";
 
 type VizContainerProps = {
@@ -15,6 +17,10 @@ export const VizContainer : React.FC<VizContainerProps> = ({ ranQuery, type }) =
   switch (type) {
     case 'table':
       return <VizTable ranQuery={ranQuery} />
+    case 'singleValue':
+      return <VizSingleValue ranQuery={ranQuery} />
+    case 'singleRecord':
+      return <VizSingleRecord ranQuery={ranQuery} />
     default:
       return <VizChart ranQuery={ranQuery} type={type} />
   }
