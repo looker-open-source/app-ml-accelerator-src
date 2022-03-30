@@ -112,7 +112,7 @@ export const WizardProvider = ({ children }: any) => {
         if (!ok || !value) { throw "Failed to load summmary" }
         saveSummary(value, loadedWizardState, step3.selectedFeatures)
       }
-      if (bqModel.hasPredictions && step5.modelName && step5.exploreName) {
+      if (step5.showPredictions && step5.modelName && step5.exploreName) {
         await fetchExplore(step5.modelName, step5.exploreName, 'step5')
       }
 
@@ -240,6 +240,7 @@ export const WizardProvider = ({ children }: any) => {
       const { ok, value } = await sdk.run_query({
         query_id: query.id,
         result_format: "json_detail",
+        cache: false
       })
       if (!ok) { throw "Failed to run query" }
       return { ok, value }

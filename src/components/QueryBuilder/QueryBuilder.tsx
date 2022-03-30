@@ -36,20 +36,23 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading, runCa
   }, [stepData.sorts])
 
   const runQuery = async() => {
-    if (
-      stepData.tableHeaders &&
-      hasOrphanedSorts(stepData.tableHeaders, stepData.sorts || [])
-    ) {
-      // case when a sort is applied to a column that no longer exists in the query
-      // clearing the sorts will trigger another runQuery execution in the useEffect above
-      dispatch({type: 'addToStepData', step: stepName, data: { sorts: [] }})
-      return
+    try {
+      if (
+        stepData.tableHeaders &&
+        hasOrphanedSorts(stepData.tableHeaders, stepData.sorts || [])
+      ) {
+        // case when a sort is applied to a column that no longer exists in the query
+        // clearing the sorts will trigger another runQuery execution in the useEffect above
+        dispatch({type: 'addToStepData', step: stepName, data: { sorts: [] }})
+        return
+      }
+      setIsLoading(true)
+      const {results, exploreUrl} = await createAndRunQuery?.(stepData)
+      saveQueryToState?.(stepName, stepData, results, exploreUrl)
+      runCallback?.()
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(true)
-    const {results, exploreUrl} = await createAndRunQuery?.(stepData)
-    saveQueryToState?.(stepName, stepData, results, exploreUrl)
-    runCallback?.()
-    setIsLoading(false)
   }
 
   const directoryPaneContents = stepData.exploreName ?

@@ -1,3 +1,4 @@
+import { ExploreData } from "../types"
 import { isArima } from "./modelTypes"
 import { formatParameterFilter, noDot } from "./string"
 
@@ -36,28 +37,35 @@ export const buildApplyFilters = ({
   return filters
 }
 
-export const getLookerColumnName = (exploreName: string, fieldName: string) => {
-  if (fieldName.indexOf(`${exploreName}_`) === 0) {
-    return fieldName.replace(`${exploreName}_`, `${exploreName}.`)
+export const getLookerColumnName = (views: string[], fieldName: string) => {
+  let name: string = ''
+  for (const view of views) {
+    if (fieldName.indexOf(`${view}_`) === 0) {
+      name = fieldName.replace(`${view}_`, `${view}.`)
+      break
+    }
   }
-  return fieldName
+  return name || fieldName
 }
 
 export const getPredictedColumnName = (target: string) => (
   `predicted_${noDot(target)}`
 )
 
-export const bqResultsToLookerFormat = (data: any, exploreName: string) => (
-  data.rows.map((row: any) => {
+export const bqResultsToLookerFormat = (data: any, exploreName: string, exploreData: ExploreData) => {
+  const iteratorKeys = Array.from(exploreData.views.keys())
+  const exploreViews = iteratorKeys.length > 0 ? iteratorKeys : [exploreName]
+
+  return data.rows.map((row: any) => {
     const rowObj: any = {}
     const arr = row.f
     arr.forEach((col: any, i: number) => {
       const columnName = getLookerColumnName(
-        exploreName || '',
+        exploreViews,
         data.schema.fields[i].name
       )
       rowObj[columnName] = { value: col.v }
     })
     return rowObj
   })
-)
+}

@@ -53,6 +53,7 @@ const wizardInitialState: WizardState = {
       complete: false
     },
     step5: {
+      showPredictions: false,
       exploreData: undefined,
       limit: "500",
       selectedFields: {

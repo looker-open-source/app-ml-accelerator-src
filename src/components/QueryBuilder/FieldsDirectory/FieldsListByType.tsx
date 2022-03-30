@@ -81,11 +81,11 @@ export const FieldsListByType: React.FC<FieldsListByTypeProps> = ({
   })
 
   return (
-    <>
+    <div className="fields-section">
       <TreeBranch>
         <FieldGroupHeading color={color}>{name}</FieldGroupHeading>
       </TreeBranch>
       { fieldItems }
-    </>
+    </div>
   )
 }

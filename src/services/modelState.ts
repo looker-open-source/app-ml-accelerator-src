@@ -100,7 +100,11 @@ const buildWizardStep5 = (bqModelState: BQModelState, wizardStep5: Step5State): 
   const { applyQuery, sourceQuery } = bqModelState
   const query = applyQuery.exploreName ? applyQuery : sourceQuery
   const mappedModelState = { ...query }
-  return {...wizardStep5, ...mappedModelState}
+  return {
+    ...wizardStep5,
+    ...mappedModelState,
+    showPredictions: bqModelState.hasPredictions
+  }
 }
 
 type SavedModelState = {

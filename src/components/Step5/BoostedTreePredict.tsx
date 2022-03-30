@@ -14,10 +14,9 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoadin
   const { state, dispatch } = useStore()
   const { generateBoostedTreePredictions, getBoostedTreePredictions } = useContext(ApplyContext)
   const { step5 } = state.wizard.steps
-  const { hasPredictions } = state.bqModel
 
   useEffect(() => {
-    if (hasPredictions) {
+    if (step5.showPredictions) {
       setIsLoading(true)
       getBoostedTreePredictions?.().finally(() =>
         setIsLoading(false)
@@ -41,6 +40,7 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoadin
       type: 'addToStepData',
       step: 'step5',
       data: {
+        showPredictions: false,
         selectedFields: {
           ...step5.selectedFields,
           predictions: []

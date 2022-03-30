@@ -14,4 +14,8 @@
   > li > ul {
     margin-top: -14px;
   }
+
+  .fields-section:not(:first-child) {
+    margin-top: 16px;
+  }
 }
