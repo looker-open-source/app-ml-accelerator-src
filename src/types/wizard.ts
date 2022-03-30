@@ -46,6 +46,7 @@ export type Step4State = {
 }
 
 export type Step5State = {
+  showPredictions: boolean,
   exploreName?: string,
   modelName?: string,
   exploreLabel?: string,

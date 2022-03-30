@@ -8,6 +8,7 @@ import './ExtensionApp.scss'
 import { useStore } from '../contexts/StoreProvider'
 import { BQMLProvider } from '../contexts/BQMLProvider'
 import { getLooksFolderName } from '../services/user'
+import ErrorBar from './ErrorBar'
 
 export const ExtensionApp: React.FC = () => {
   const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
@@ -58,7 +59,11 @@ export const ExtensionApp: React.FC = () => {
   return (
     <OauthProvider clientId={clientId} scopes={GOOGLE_SCOPES}>
       <BQMLProvider>
-        { clientId && state.user.email ? (<LookerBQMLApp />) : <></> }
+        {
+          clientId && state.user.email ?
+            (<LookerBQMLApp />) :
+            <ErrorBar />
+        }
       </BQMLProvider>
     </OauthProvider>
   )

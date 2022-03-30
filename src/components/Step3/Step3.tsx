@@ -143,6 +143,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepNumber={3}
       buttonText={stepCompleteButtonText()}
       handleCompleteClick={buildHandleCompleteClick()}
+      stepInfo={(<AdvancedSettings objective={objective}/>)}
     >
       <div className="model-blocks">
         <ModelNameBlock
@@ -180,7 +181,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             )
         }
         <div className="wizard-card">
-          <AdvancedSettings objective={objective}/>
           <h2>Data Summary Statistics</h2>
           <div className="summary-factoid">
             Columns: <span className="factoid-bold">{sourceColumns.length}</span>

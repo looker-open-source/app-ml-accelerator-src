@@ -26,7 +26,6 @@ export const FieldsDirectory: React.FC = () => {
         <LkFieldViewTree defaultOpen={!index} label={<strong>{view.label}</strong>} className="field-directory">
           <FieldsListByType
             fields={view.parameters}
-            hideActions={true}
             name="Filter-Only Fields"
             selectorAction="setSelectedParameter"
             selectedFields={selectedFields.parameters}

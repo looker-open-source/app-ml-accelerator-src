@@ -9,7 +9,6 @@ type StepCompleteParams = {
   isStepComplete?: boolean
   isLoading?: boolean,
   stepNumber: number,
-  stepText?: string,
   buttonText?: string,
   handleCompleteClick?: () => Promise<any>
 }
@@ -18,7 +17,6 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
   isStepComplete,
   isLoading,
   stepNumber,
-  stepText,
   buttonText,
   handleCompleteClick
 }) => {
@@ -54,7 +52,6 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
 
   return (
     <>
-      <p>{stepText}</p>
       <Button
         className={`wizard-next-step-btn ${btnClass}`}
         onClick={handleClick}

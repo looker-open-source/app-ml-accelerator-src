@@ -252,7 +252,11 @@ export const SummaryProvider = ({ children }: any) => {
       dispatch({
         type: 'addToStepData',
         step: 'step5',
-        data: { ...wizardInitialState.steps.step5, ...bqModel.sourceQuery }
+        data: {
+          ...wizardInitialState.steps.step5,
+          ...bqModel.sourceQuery,
+          showPredictions: false
+        }
       })
       return { ok, body }
     } catch (error) {

@@ -1,6 +1,5 @@
 import React from 'react'
 import LoadingOverlay from '../LoadingOverlay'
-import Spinner from '../Spinner'
 import StepComplete from '../StepComplete'
 
 type StepContainerParams = {
@@ -10,7 +9,7 @@ type StepContainerParams = {
   customClass?: string
   stepNumber: number
   children: any,
-  stepText?: string,
+  stepInfo?: any,
   buttonText?: string,
   handleCompleteClick?: () => Promise<boolean>
 }
@@ -22,20 +21,20 @@ export const StepContainer: React.FC<StepContainerParams> = ({
   customClass,
   stepNumber,
   children,
-  stepText,
+  stepInfo,
   buttonText,
   handleCompleteClick
 }) => {
   const loadingClass = isLoading ? 'loading' : ''
 
   return (
-    <section className={`step-container ${loadingClass} ${customClass}`}>
+    <section className={`step-container ${loadingClass} ${customClass || ''}`}>
       <LoadingOverlay isLoading={!!isLoading} />
       { children }
       { !lastStep &&
         <div className="wizard-footer-bar">
+          {stepInfo}
           <StepComplete
-            stepText={stepText}
             isStepComplete={stepComplete}
             isLoading={isLoading}
             stepNumber={stepNumber}

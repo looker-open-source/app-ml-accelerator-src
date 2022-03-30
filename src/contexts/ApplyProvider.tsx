@@ -80,6 +80,13 @@ export const ApplyProvider = ({ children }: any) => {
       }
       const tempWizardState: WizardState = {
         ...state.wizard,
+        steps: {
+          ...state.wizard.steps,
+          step5: {
+            ...state.wizard.steps.step5,
+            showPredictions: true
+          },
+        },
         unlockedStep: 5
       }
 
@@ -127,11 +134,10 @@ export const ApplyProvider = ({ children }: any) => {
       if (!bqmlModelDatasetName || !bqModel.target || !bqModel.sourceQuery.exploreName) {
         throw "This model does not have a dataset, target, or an explore, please try reloading."
       }
-
       const sql = getBoostedTreePredictSql({
         bqmlModelDatasetName,
         bqModelName: bqModel.name,
-        sorts: state.wizard.steps.step5.sorts || []
+        sorts: step5.sorts || []
       })
 
       const { ok, body } = await queryJob?.(sql)
@@ -139,7 +145,8 @@ export const ApplyProvider = ({ children }: any) => {
         throw "Unable to find table."
       }
 
-      const formattedResults = bqResultsToLookerFormat(body, bqModel.sourceQuery.exploreName)
+      if (!step5.exploreData) { throw 'Failed to format data as no explore data was provided.'}
+      const formattedResults = bqResultsToLookerFormat(body, bqModel.sourceQuery.exploreName, step5.exploreData)
 
       // Handles two different code paths.
       // 1. When there isn't a ran query, its loading an existing model for the first time.

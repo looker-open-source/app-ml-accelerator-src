@@ -57,7 +57,7 @@ export const buildVizLabels = (ranQuery: RanQuery, data: any, target: string) =>
     let label = ""
     dimensions.forEach((dim) => {
       if (label) { label += " - "}
-      label += datum[dim].value
+      label += datum[dim] ? datum[dim].value : ''
     })
     return label
   })

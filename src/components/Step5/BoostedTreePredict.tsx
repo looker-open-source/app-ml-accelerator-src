@@ -6,17 +6,17 @@ import QueryBuilder from '../QueryBuilder'
 import { Button } from '@looker/components'
 
 type BoostedTreePredictProps = {
+  isLoading: boolean,
   setIsLoading: (isLoading: boolean) => void
 }
 
-export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ setIsLoading }) => {
+export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoading, setIsLoading }) => {
   const { state, dispatch } = useStore()
   const { generateBoostedTreePredictions, getBoostedTreePredictions } = useContext(ApplyContext)
   const { step5 } = state.wizard.steps
-  const { hasPredictions } = state.bqModel
 
   useEffect(() => {
-    if (hasPredictions) {
+    if (step5.showPredictions) {
       setIsLoading(true)
       getBoostedTreePredictions?.().finally(() =>
         setIsLoading(false)
@@ -32,7 +32,7 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ setIsLoa
   }
 
   const disablePredictButton = () => (
-    !step5.ranQuery || !step5.ranQuery.sql
+    !step5.ranQuery || !step5.ranQuery.sql || isLoading
   )
 
   const removePredictions = () => {
@@ -40,6 +40,7 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ setIsLoa
       type: 'addToStepData',
       step: 'step5',
       data: {
+        showPredictions: false,
         selectedFields: {
           ...step5.selectedFields,
           predictions: []
@@ -50,15 +51,18 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ setIsLoa
 
   return (
     <>
-      <Button
-        className="action-button"
-        onClick={generatePredictions}
-        disabled={disablePredictButton()}>
-          Generate Predictions
-      </Button>
+
       <QueryBuilderProvider stepName="step5" lockFields={true}>
         <QueryBuilder setIsLoading={setIsLoading} runCallback={removePredictions} />
       </QueryBuilderProvider>
+      <div className="wizard-footer-bar">
+        <Button
+          className="action-button generate-predictions-button"
+          onClick={generatePredictions}
+          disabled={disablePredictButton()}>
+            Generate Predictions
+        </Button>
+      </div>
     </>
   )
 }
