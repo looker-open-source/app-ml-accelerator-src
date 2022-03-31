@@ -44,7 +44,7 @@ export const FieldPickerItem: FC<FieldPickerItemProps> = ({
   const { state, dispatch } = useStore()
   const { term } = useContext(HighlightContext)
   const { selectedFields } = stepData
-  const { selectedFields: lockedFields } = state.bqModel.sourceQuery
+  const { selectedFields: lockedFields } = state.bqModel.inputDataQuery
   const lockedFieldNames = [...lockedFields.dimensions, ...lockedFields.measures, ...lockedFields.parameters]
 
   const toggleField = () => {

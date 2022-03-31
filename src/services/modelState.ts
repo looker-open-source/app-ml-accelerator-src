@@ -20,13 +20,14 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
       arimaTimeColumn: bqModelState.arimaTimeColumn,
       selectedFeatures: bqModelState.selectedFeatures,
       advancedSettings: bqModelState.advancedSettings,
-      sourceQuery: {
-        exploreName: bqModelState.sourceQuery.exploreName,
-        modelName: bqModelState.sourceQuery.modelName,
-        exploreLabel: bqModelState.sourceQuery.exploreLabel,
-        limit: bqModelState.sourceQuery.limit,
-        sorts: bqModelState.sourceQuery.sorts,
-        selectedFields: bqModelState.sourceQuery.selectedFields
+      inputDataUID: bqModelState.inputDataUID,
+      inputDataQuery: {
+        exploreName: bqModelState.inputDataQuery.exploreName,
+        modelName: bqModelState.inputDataQuery.modelName,
+        exploreLabel: bqModelState.inputDataQuery.exploreLabel,
+        limit: bqModelState.inputDataQuery.limit,
+        sorts: bqModelState.inputDataQuery.sorts,
+        selectedFields: bqModelState.inputDataQuery.selectedFields
       },
       jobStatus: bqModelState.jobStatus,
       job: bqModelState.job,
@@ -52,7 +53,6 @@ export const buildWizardState = (savedState: SavedModelState): WizardState => {
 
   const wizardState = {
     unlockedStep: savedState.unlockedStep,
-    needsSaving: false,
     steps: {
       step1: { objective: bqModelState.objective },
       step2: buildWizardStep2(bqModelState, wizardInitialState.steps.step2),
@@ -68,12 +68,12 @@ export const buildWizardState = (savedState: SavedModelState): WizardState => {
 
 const buildWizardStep2 = (bqModelState: BQModelState, wizardStep2: Step2State): Step2State => {
   const mappedModelState = {
-    exploreName: bqModelState.sourceQuery?.exploreName,
-    modelName: bqModelState.sourceQuery?.modelName,
-    exploreLabel: bqModelState.sourceQuery?.exploreLabel,
-    limit: bqModelState.sourceQuery?.limit,
-    selectedFields: bqModelState.sourceQuery?.selectedFields,
-    sorts: bqModelState.sourceQuery?.sorts,
+    exploreName: bqModelState.inputDataQuery?.exploreName,
+    modelName: bqModelState.inputDataQuery?.modelName,
+    exploreLabel: bqModelState.inputDataQuery?.exploreLabel,
+    limit: bqModelState.inputDataQuery?.limit,
+    selectedFields: bqModelState.inputDataQuery?.selectedFields,
+    sorts: bqModelState.inputDataQuery?.sorts,
   }
   return {...wizardStep2, ...mappedModelState}
 }
@@ -84,7 +84,19 @@ const buildWizardStep3 = (bqModelState: BQModelState, wizardStep3: Step3State): 
     targetField: bqModelState.target,
     arimaTimeColumn: bqModelState.arimaTimeColumn,
     selectedFeatures: bqModelState.selectedFeatures,
-    advancedSettings: bqModelState.advancedSettings || {}
+    advancedSettings: bqModelState.advancedSettings || {},
+    inputData: {
+      exploreName: bqModelState.inputDataQuery?.exploreName,
+      modelName: bqModelState.inputDataQuery?.modelName,
+      exploreLabel: bqModelState.inputDataQuery?.exploreLabel,
+      limit: bqModelState.inputDataQuery?.limit,
+      selectedFields: bqModelState.inputDataQuery?.selectedFields,
+      sorts: bqModelState.inputDataQuery?.sorts,
+      uid: bqModelState.inputDataUID,
+      bqModelName: bqModelState.name,
+      target: bqModelState.target,
+      arimaTimeColumn: bqModelState.arimaTimeColumn,
+    }
   }
   return {...wizardStep3, ...mappedModelState}
 }
@@ -97,8 +109,8 @@ const buildWizardStep4 = (bqModelState: BQModelState, wizardStep4: Step4State): 
 }
 
 const buildWizardStep5 = (bqModelState: BQModelState, wizardStep5: Step5State): Step5State => {
-  const { applyQuery, sourceQuery } = bqModelState
-  const query = applyQuery.exploreName ? applyQuery : sourceQuery
+  const { applyQuery, inputDataQuery } = bqModelState
+  const query = applyQuery.exploreName ? applyQuery : inputDataQuery
   const mappedModelState = { ...query }
   return {
     ...wizardStep5,

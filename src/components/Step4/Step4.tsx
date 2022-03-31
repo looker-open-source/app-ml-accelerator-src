@@ -12,6 +12,7 @@ import { ModelDataBody } from './ModelDataBody'
 import { IncompleteJob } from './IncompleteJob'
 import './Step4.scss'
 import { titilize } from '../../services/string'
+import { needsModelUpdate } from '../../services/summary'
 
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -22,7 +23,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [jobComplete, setJobComplete] = useState<any>()
   const [jobCanceled, setJobCanceled] = useState<any>()
   const { state } = useStore()
-  const { needsSaving } = state.wizard
+  const { step1, step3 } = state.wizard.steps
   const { jobStatus, job } = state.bqModel
   const bqModel = state.bqModel
 
@@ -71,6 +72,29 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return true
   }
 
+  const needsUpdate = () => (
+    needsModelUpdate({
+      bqModel,
+      uiInputDataUID: step3.inputData.uid,
+      uiAdvancedSettings: step3.advancedSettings,
+      uiObjective: step1.objective,
+      uiFeatures: step3.selectedFeatures,
+      uiTarget: step3.targetField,
+      uiArimaTimeColumn: step3.arimaTimeColumn
+    })
+  )
+
+  const modelChangesMsg = () => {
+    if (jobComplete && needsUpdate()) {
+      return (
+        <div className="minor-error">
+          You have made changes that are not reflected in this model.  Return to the {titilize(WIZARD_STEPS['step3'])} tab and 'ReCreate Model'.
+        </div>
+      )
+    }
+    return <></>
+  }
+
   return (
     <StepContainer
       isLoading={isLoading}
@@ -78,11 +102,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepNumber={4}
       customClass="step4-container">
       <Prompt message={onRouteChange}/>
-      { jobComplete && needsSaving && (
-        <div className="minor-error">
-          You have made changes that are not reflected in this model.  Return to the {titilize(WIZARD_STEPS['step3'])} tab and 'ReCreate Model'.
-        </div>
-      )}
+      { modelChangesMsg() }
       <h2>Model evaluation overview</h2>
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
       { jobComplete?

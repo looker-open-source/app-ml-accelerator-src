@@ -8,14 +8,16 @@ type GenerateSummaryButtonProps = {
   setIsLoading: (value: boolean) => void
   loadingNameStatus: boolean,
   nameCheckStatus?: string,
-  summaryUpToDate: () => boolean
+  summaryUpToDate: () => boolean,
+  targetTimeColumnChanged: () => boolean
 }
 
 export const GenerateSummaryButton: React.FC<GenerateSummaryButtonProps> = ({
   setIsLoading,
   loadingNameStatus,
   nameCheckStatus,
-  summaryUpToDate
+  summaryUpToDate,
+  targetTimeColumnChanged
 }) => {
   const { getSummaryData } = useContext(SummaryContext)
   const { state } = useStore()
@@ -29,7 +31,7 @@ export const GenerateSummaryButton: React.FC<GenerateSummaryButtonProps> = ({
       nameCheckStatus !== NAME_CHECK_STATUSES.error &&
       targetField &&
       bqModelName &&
-      !summaryUpToDate()
+      (!summaryUpToDate() || targetTimeColumnChanged())
     )
   )
 
@@ -47,7 +49,12 @@ export const GenerateSummaryButton: React.FC<GenerateSummaryButtonProps> = ({
 
   const generateSummary = async () => {
     setIsLoading(true)
-    await getSummaryData?.(ranQuery?.sql, bqModelName, targetField)
+    await getSummaryData?.(
+      ranQuery?.sql,
+      bqModelName,
+      targetField,
+      summaryUpToDate()
+    )
     setIsLoading(false)
   }
 

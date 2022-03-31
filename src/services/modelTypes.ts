@@ -1,5 +1,6 @@
 import { advancedSettingsSql } from "./advancedSettings"
 import { noDot } from "./string"
+import { removeLimit } from "./summary"
 
 export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
   trainingInfo: 'trainingInfo',
@@ -99,6 +100,7 @@ export const isBoostedTree = (objective: string): boolean => (
 )
 
 type IFormSQLProps = {
+  uid: string,
   gcpProject: string,
   bqmlModelDatasetName: string,
   bqModelName: string,
@@ -113,6 +115,7 @@ interface IFormBoostedTreeTypeSQLProps extends IFormSQLProps {
 }
 
 const formBoostedTreeSQL = ({
+  uid,
   gcpProject,
   bqmlModelDatasetName,
   bqModelName,
@@ -127,7 +130,7 @@ const formBoostedTreeSQL = ({
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
           , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
           ${settingsSql})
-    AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`;
+    AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`;
   `
 }
 
@@ -140,6 +143,7 @@ const formBoostedTreeRegressorSQL = (props: IFormSQLProps): string => {
 }
 
 const formArimaSQL = ({
+  uid,
   gcpProject,
   bqmlModelDatasetName,
   bqModelName,
@@ -156,7 +160,7 @@ const formArimaSQL = ({
       , HORIZON = ${ advancedSettings.horizon || '1000' }
       ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
       , AUTO_ARIMA = TRUE)
-    AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data\`) ;
+    AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`) ;
   `
 }
 
@@ -182,6 +186,52 @@ export const createBoostedTreePredictSql = ({
     ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${lookerSql})))
   `
 }
+
+type FormBQInputDataSQLProps = {
+  sql: string | undefined,
+  bqmlModelDatasetName: string | undefined,
+  bqModelName: string | undefined,
+  uid: string | undefined
+}
+
+export const formBQInputDataSQL = ({
+  sql,
+  bqmlModelDatasetName,
+  bqModelName,
+  uid
+}: FormBQInputDataSQLProps) => {
+  if (
+    !sql ||
+    !bqmlModelDatasetName ||
+    !bqModelName ||
+    !uid
+  ) {
+    return false
+  }
+  return `CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_input_data_${uid} AS (${removeLimit(sql)})`
+}
+
+type GetBQInputDataSqlProps = {
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  uid: string
+}
+
+export const getBQInputDataSql = ({
+  bqmlModelDatasetName,
+  bqModelName,
+  uid
+}: GetBQInputDataSqlProps) => (
+  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}`
+)
+
+export const getBQInputDataMetaDataSql = ({
+  bqmlModelDatasetName,
+  bqModelName,
+  uid
+}: GetBQInputDataSqlProps) => (
+  `SELECT * FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}_input_data_${uid}'`
+)
 
 type GetBoostedTreePredictProps = {
   bqmlModelDatasetName: string,

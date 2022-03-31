@@ -111,3 +111,13 @@ export const getRequiredFieldMessages = (fieldDetails: any, fieldNames: string[]
   })
   return messages
 }
+
+export const getCreationTimeIndex = (body: any) => {
+  let timeIndex = 0
+  body.schema.fields.forEach((field: any, index: number) => {
+    if (field.name === 'creation_time') {
+      timeIndex = index
+    }
+  })
+  return timeIndex
+}

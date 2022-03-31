@@ -1,26 +1,3 @@
-  /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2021 Looker Data Sciences, Inc.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
@@ -35,6 +12,11 @@ import { getHeaderColumns } from '../services/resultsTable'
 import { renameSummaryDataKeys } from '../services/summary'
 import { formatParameterFilter } from '../services/string'
 import { bqModelInitialState } from '../reducers/bqModel'
+import { getBQInputDataSql } from '../services/modelTypes'
+import { bqResultsToLookerFormat } from '../services/apply'
+import { SaveSummaryProps } from '../types/summary'
+import { SaveInputDataProps } from '../types/inputData'
+import { cloneDeep } from 'lodash'
 
 type IWizardContext = {
   loadingModel?: boolean,
@@ -46,8 +28,9 @@ type IWizardContext = {
     exploreUrl?: string,
     tableHeaders?: ResultsTableHeaderItem[]) => void,
   createAndRunQuery?: (stepData: Step2State) => Promise<any>,
-  fetchSummary?: (bqModelName: string, targetField: string) => Promise<any>,
-  saveSummary?: (rawSummary: any, wizardState: WizardState) => void,
+  fetchSummary?: (bqModelName: string, targetField: string, uid: string) => Promise<any>,
+  saveSummary?: (props: SaveSummaryProps) => void,
+  saveInputData?: (props: SaveInputDataProps) => void,
   persistModelState?: (wizardState: WizardState, bqModel: BQModelState, retry?: boolean) => Promise<any>
 }
 
@@ -56,10 +39,11 @@ export const WizardContext = createContext<IWizardContext>({})
 export const WizardProvider = ({ children }: any) => {
   const history = useHistory()
   const { modelNameParam } = useParams<any>()
-  const { dispatch } = useStore()
+  const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
-  const { getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
+  const { queryJob, getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
   const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
+  const { bqmlModelDatasetName } = state.userAttributes
 
   // on first load
   useEffect(() => {
@@ -83,10 +67,10 @@ export const WizardProvider = ({ children }: any) => {
         history.push(`/ml/create/${WIZARD_STEPS['step1']}`)
         throw `Model does not exist: ${modelNameParam}`
       }
-      const bqModel = { ...bqModelInitialState, ...savedModelState.bqModel }
+      const bqModel = { ...bqModelInitialState, ...cloneDeep(savedModelState.bqModel) }
       const loadedWizardState = buildWizardState(savedModelState)
       dispatch({ type: 'populateWizard', wizardState: loadedWizardState })
-      dispatch({ type: 'setBQModel', data: { ...savedModelState.bqModel }})
+      dispatch({ type: 'setBQModel', data: bqModel })
 
       const { step2, step3, step5 } = loadedWizardState.steps
       if (!step2.modelName || !step2.exploreName) {
@@ -95,29 +79,44 @@ export const WizardProvider = ({ children }: any) => {
 
       // Fetch and Populate Step2 Data
       const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName, 'step2')
-      const { ok, results, exploreUrl } = await createAndRunQuery(step2)
-      if (!ok) {
-        throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
+      if (exploreData) {
+        const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID)
+        const results = {
+          data: bqResultsToLookerFormat(body, step2.exploreName, exploreData),
+          sql: ''
+        }
+        if (!ok) {
+          throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
+        }
+        const headers = getHeaderColumns(
+          step2.selectedFields,
+          buildRanQuery(step2, results),
+          exploreData
+        )
+        saveQueryToState('step2', step2, results, undefined, headers)
+      } else {
+        dispatch({ type: 'addError', error: 'Failed to retrieve explore data' })
       }
-      const headers = getHeaderColumns(
-        step2.selectedFields,
-        buildRanQuery(step2, results, exploreUrl),
-        exploreData
-      )
-      saveQueryToState('step2', step2, results, exploreUrl, headers)
 
       // Fetch and Populate Step3 Data
       if (step3.bqModelName && step3.targetField) {
-        const { ok, value } = await fetchSummary(step3.bqModelName, step3.targetField)
+        const { ok, value } = await fetchSummary(step3.bqModelName, step3.targetField, bqModel.inputDataUID)
         if (!ok || !value) { throw "Failed to load summmary" }
-        saveSummary(value, loadedWizardState, step3.selectedFeatures)
+        saveSummary({
+          rawSummary: value,
+          wizardState: loadedWizardState,
+          selectedFeatures: step3.selectedFeatures
+        })
+        saveInputData({
+          query: bqModel.inputDataQuery,
+          uid: bqModel.inputDataUID,
+          bqModelName: bqModel.name,
+          target: bqModel.target,
+          arimaTimeColumn: bqModel.arimaTimeColumn
+        })
       }
       if (step5.showPredictions && step5.modelName && step5.exploreName) {
         await fetchExplore(step5.modelName, step5.exploreName, 'step5')
-      }
-
-      if (bqModel.jobStatus !== JOB_STATUSES.canceled) {
-        dispatch({ type: 'setNeedsSaving', value: false })
       }
     } catch (error) {
       dispatch({type: 'addError', error: `${error}`})
@@ -221,7 +220,7 @@ export const WizardProvider = ({ children }: any) => {
     }
   }
 
-  const fetchSummary = async (bqModelName: string, targetField: string) => {
+  const fetchSummary = async (bqModelName: string, targetField: string, inputDataUID: string) => {
     try {
       // fetch explore to retrieve all field names
       const { value: explore } = await sdk.lookml_model_explore(BQML_LOOKER_MODEL, SUMMARY_EXPLORE)
@@ -232,7 +231,7 @@ export const WizardProvider = ({ children }: any) => {
         view: SUMMARY_EXPLORE,
         fields: explore.fields.dimensions.map((d: any) => d.name),
         filters: {
-          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data`,
+          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data^_${inputDataUID}`,
           [`${SUMMARY_EXPLORE}.target_field_name`]: formatParameterFilter(targetField || "")
         }
       })
@@ -250,8 +249,12 @@ export const WizardProvider = ({ children }: any) => {
     }
   }
 
-  const saveSummary = (rawSummary: any, wizardState: WizardState, selectedFeatures?: string[]) => {
-    const { step3 } = wizardState.steps
+  const saveSummary = ({
+    rawSummary,
+    wizardState,
+    selectedFeatures
+  }: SaveSummaryProps) => {
+    const { step2, step3 } = wizardState.steps
     const fields = (rawSummary.fields || {})
     const summaryData = renameSummaryDataKeys(rawSummary.data)
     const allFeatures = summaryData.map((d: any) => d["column_name"].value)
@@ -265,6 +268,33 @@ export const WizardProvider = ({ children }: any) => {
         summary: {
           data: summaryData,
           fields: [...fields.dimensions, ...fields.measures]
+        },
+      }
+    })
+  }
+
+  const saveInputData = ({
+    query,
+    uid,
+    bqModelName,
+    target,
+    arimaTimeColumn
+  }: SaveInputDataProps) => {
+    dispatch({
+      type: 'addToStepData',
+      step: 'step3',
+      data: {
+        inputData: {
+          exploreName: query?.exploreName,
+          modelName: query?.modelName,
+          exploreLabel: query?.exploreLabel,
+          limit: query?.limit,
+          selectedFields: query?.selectedFields,
+          sorts: query?.sorts,
+          uid,
+          bqModelName,
+          target,
+          arimaTimeColumn,
         }
       }
     })
@@ -284,7 +314,6 @@ export const WizardProvider = ({ children }: any) => {
       if (!ok) {
         throw "Failed to save your model"
       }
-      dispatch({ type: 'setNeedsSaving', value: false })
       return { ok, body }
     } catch (error) {
       if (retry) {
@@ -293,6 +322,28 @@ export const WizardProvider = ({ children }: any) => {
       }
       // retry once
       persistModelState(wizardState, bqModel, true)
+    }
+  }
+
+  const getBQInputData = async (bqModelName: string, uid: string) => {
+    try {
+      if (!bqmlModelDatasetName) { throw "No dataset provided" }
+      const sql = getBQInputDataSql({
+        bqmlModelDatasetName,
+        bqModelName,
+        uid
+      })
+      const { ok, body } = await queryJob?.(sql)
+      if (!ok) {
+        throw `Unable to fetch from ${bqModelName}_input_data table (uid: ${uid}).`
+      }
+      return { ok, body }
+    } catch (err: any) {
+      dispatch({
+        type: 'addError',
+        error: 'Failed to get data - ' + err
+      })
+      return { ok: false }
     }
   }
 
@@ -305,6 +356,7 @@ export const WizardProvider = ({ children }: any) => {
         createAndRunQuery,
         fetchSummary,
         saveSummary,
+        saveInputData,
         persistModelState
       }}
     >

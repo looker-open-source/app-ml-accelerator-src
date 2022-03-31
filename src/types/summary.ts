@@ -1,4 +1,5 @@
 import { SummaryField } from './field'
+import { WizardState } from './wizard'
 
 export type Summary = {
   fields?: SummaryField[]
@@ -13,3 +14,9 @@ export type SummaryTableHeader = {
 }
 
 export type SummaryTableHeaders = { [key: string]: SummaryTableHeader }
+
+export type SaveSummaryProps = {
+  rawSummary: any,
+  wizardState: WizardState,
+  selectedFeatures?: string[]
+}

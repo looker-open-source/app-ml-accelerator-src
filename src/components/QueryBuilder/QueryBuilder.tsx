@@ -8,8 +8,8 @@ import QueryPane from './QueryPane'
 import { hasOrphanedSorts } from '../../services/resultsTable'
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
-import RequiredFieldMessages from "./RequiredFieldMessages"
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
+import StaticDataTimeStamp from "./StaticDataTimeStamp"
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void,
@@ -69,7 +69,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading, runCa
         </div>
         <div className="query-header-actions">
           { stepData.exploreData && (<>
-              { stepName === 'step2' && <RequiredFieldMessages /> }
+              <StaticDataTimeStamp />
               <Button
                 onClick={runQuery}
                 className="action-button">

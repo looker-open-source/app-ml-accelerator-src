@@ -1,45 +1,24 @@
-  /*
- * The MIT License (MIT)
- *
- * Copyright (c) 2021 Looker Data Sciences, Inc.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 import React, { createContext, useContext, useState } from 'react'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
-import { formBQViewSQL } from '../services/summary'
-import { isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
+import { formBQInputDataSQL, isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
 import { JOB_STATUSES } from '../constants'
 import { wizardInitialState } from '../reducers/wizard'
-import { WizardState } from '../types'
+import { BQModelState, Step4State, WizardState } from '../types'
 import { bqModelInitialState } from '../reducers/bqModel'
+import { v4 as uuidv4 } from 'uuid';
 
 type ISummaryContext = {
   getSummaryData?: (
     sql?: string,
     bqModelName?: string,
-    targetField?: string
+    targetField?: string,
+    summaryUpToDate?: boolean
   ) => Promise<any>,
   createJob?: (sql: string) => Promise<any>,
   createBQMLModel?: (
+    uid?: string,
     objective?: string,
     bqModelName?: string,
     targetField?: string,
@@ -56,7 +35,7 @@ export const SummaryContext = createContext<ISummaryContext>({})
  */
 export const SummaryProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
-  const { fetchSummary, saveSummary, persistModelState } = useContext(WizardContext)
+  const { fetchSummary, saveSummary, saveInputData, persistModelState } = useContext(WizardContext)
   const {
     queryJob,
     pollJobStatus,
@@ -72,16 +51,21 @@ export const SummaryProvider = ({ children }: any) => {
   * private method
   * create or replace BQML view
   */
-  const createBQMLView = async (
+  const createBQInputData = async (
     querySql: string | undefined,
-    bqModelName: string | undefined
+    bqModelName: string | undefined,
+    uid: string | undefined
   ) => {
     try {
       if (!bqmlModelDatasetName) {
         throw "User Attribute 'looker_temp_dataset_name' must be defined"
       }
-
-      const sql = formBQViewSQL(querySql, bqmlModelDatasetName, bqModelName)
+      const sql = formBQInputDataSQL({
+        sql: querySql,
+        bqmlModelDatasetName,
+        bqModelName,
+        uid
+      })
       if (!sql) {
         throw "Failed to create BigQuery View SQL statement"
       }
@@ -124,29 +108,49 @@ export const SummaryProvider = ({ children }: any) => {
   const getSummaryData = async(
     querySql?: string,
     bqModelName?: string,
-    targetField?: string
+    targetField?: string,
+    summaryUpToDate?: boolean
   ): Promise<any> => {
     try {
-      if (!querySql || !bqModelName || !targetField) {
+      if (!bqModelName || !targetField) {
         throw "Failed to fetch summary."
       }
-      // in an effort to limit the number of calls to BigQuery
-      // do not create the BQ view if its alrady been created for this sql and model name
-      if (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model) {
-        setPreviousBQValues({ sql: querySql, model: bqModelName })
-        const result = await createBQMLView(querySql, bqModelName)
 
+      let inputDataUID = state.bqModel.inputDataUID
+      // in an effort to limit the number of calls to BigQuery
+      // do not create the input_data table if its alrady been created for this sql and model name
+      if (querySql &&
+        (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model || !summaryUpToDate)
+      ) {
+        // Using a UID we create a new input data table everytime "Generate Summary" is clicked.
+        // This allows the input_data table (summary table) to be out of sync with the model.
+        // So, when reloading a past model it will grab the correct version of the input_data
+        inputDataUID = uuidv4().replace(/\-/g, '') // generate a new UID (uuid no hyphens) to save a new input_data table
+        setPreviousBQValues({
+          sql: querySql,
+          model: bqModelName
+        })
+        const result = await createBQInputData(querySql, bqModelName, inputDataUID)
         if (!result.ok) {
           throw "Failed to create BQML View"
         }
       }
 
-      const { ok, value } = await fetchSummary?.(bqModelName, targetField)
+      if (!inputDataUID) { throw 'Failed to retrieve UID for this input data table.' }
+
+      const { ok, value } = await fetchSummary?.(bqModelName, targetField, inputDataUID)
       if (!ok || !value || (value.errors && value.errors.length > 0)) {
         throw "Failed to fetch summary."
       }
-      saveSummary?.(value, state.wizard)
-      saveBQModel(state.wizard)
+      const { step2, step3 } = state.wizard.steps
+      saveSummary?.({ rawSummary: value, wizardState: state.wizard })
+      saveInputData?.({
+        query: step2.ranQuery,
+        uid: inputDataUID,
+        bqModelName: step3.bqModelName,
+        target: step3.targetField || '',
+        arimaTimeColumn: step3.arimaTimeColumn
+      })
       return { ok, value }
     } catch(error) {
       setPreviousBQValues({ sql: null, model: null })
@@ -155,33 +159,34 @@ export const SummaryProvider = ({ children }: any) => {
     }
   }
 
-  // update bqModel state
-  // we need a record of the source data when the summary was generated that isn't tied to the UI
-  // since the user can change the UI values at any time and make it out of sync with what the model was created with
-  const saveBQModel = (wizardState: WizardState) => {
-    const { step1, step2, step3 } = wizardState.steps
-    dispatch({
-      type: 'setBQModel',
-      data: {
-        sourceQuery: {
-          exploreName: step2.ranQuery?.exploreName,
-          modelName: step2.ranQuery?.modelName,
-          exploreLabel: step2.ranQuery?.exploreLabel,
-          limit: step2.ranQuery?.limit,
-          selectedFields: step2.ranQuery?.selectedFields,
-          sorts: step2.ranQuery?.sorts,
-        },
-        objective: step1.objective,
-        name: step3.bqModelName,
-        target: step3.targetField,
-        arimaTimeColumn: step3.arimaTimeColumn,
-        advancedSettings: step3.advancedSettings || {},
-        selectedFeatures: step3.selectedFeatures
-      }
-    })
+  // build out the BQ Model state
+  const buildBaseBQModel = (wizardState: WizardState, bqModel: BQModelState, jobState: any, features: string[], advancedSettings: any) => {
+    const { step1, step3 } = wizardState.steps
+    return {
+      ...bqModel,
+      inputDataQuery: {
+        exploreName: step3.inputData?.exploreName,
+        modelName: step3.inputData?.modelName,
+        exploreLabel: step3.inputData?.exploreLabel,
+        limit: step3.inputData?.limit,
+        selectedFields: step3.inputData?.selectedFields,
+        sorts: step3.inputData?.sorts,
+      },
+      inputDataUID: step3.inputData.uid,
+      objective: step1.objective,
+      name: step3.bqModelName,
+      target: step3.targetField,
+      arimaTimeColumn: step3.arimaTimeColumn,
+      hasPredictions: false,
+      selectedFeatures: features,
+      advancedSettings: advancedSettings,
+      applyQuery: { ...bqModelInitialState.applyQuery },
+      ...jobState
+    }
   }
 
   const createBQMLModel = async (
+    uid?: string,
     objective?: string,
     bqModelName?: string,
     target?: string,
@@ -191,6 +196,7 @@ export const SummaryProvider = ({ children }: any) => {
   ) => {
     try {
       if (
+        !uid ||
         !objective ||
         !gcpProject ||
         !bqmlModelDatasetName ||
@@ -202,6 +208,7 @@ export const SummaryProvider = ({ children }: any) => {
       ) { return }
 
       const sql = MODEL_TYPE_CREATE_METHOD[objective]({
+        uid,
         gcpProject,
         bqmlModelDatasetName,
         bqModelName,
@@ -228,14 +235,8 @@ export const SummaryProvider = ({ children }: any) => {
         ...wizard,
         unlockedStep: 4
       }
-      const tempBQModel = {
-        ...bqModel,
-        ...jobState,
-        hasPredictions: false,
-        selectedFeatures: features,
-        advancedSettings: advancedSettings,
-        applyQuery: { ...bqModelInitialState.applyQuery }
-      }
+      const tempBQModel = buildBaseBQModel(wizard, bqModel, jobState, features, advancedSettings)
+
       await persistModelState?.(tempWizard, tempBQModel)
 
       dispatch({
@@ -248,13 +249,13 @@ export const SummaryProvider = ({ children }: any) => {
         data: { complete: false }
       })
       dispatch({ type: 'setUnlockedStep', step: 4 })
-      // everytime we create/update a model, we rehydrate step5 with the same params as the sourceQuery
+      // everytime we create/update a model, we rehydrate step5 with the same params as the inputDataQuery
       dispatch({
         type: 'addToStepData',
         step: 'step5',
         data: {
           ...wizardInitialState.steps.step5,
-          ...bqModel.sourceQuery,
+          ...bqModel.inputDataQuery,
           showPredictions: false
         }
       })

@@ -46,10 +46,9 @@ export const getWizardStepCompleteCallback = (stepName: keyof WizardSteps): any 
   return callbacks[stepName]
 }
 
-export const getStepStateClone = (state: any, stepName: string, needsSaving?: boolean): any => {
+export const getStepStateClone = (state: any, stepName: string): any => {
   return {
     ...state,
-    needsSaving: needsSaving || state.needsSaving,
     steps: {
       ...state.steps,
       [stepName]: {
