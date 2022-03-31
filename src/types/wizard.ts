@@ -1,4 +1,5 @@
 import { ResultsTableHeaderItem, RanQuery, ExploreData, SelectedFields, Summary} from '.'
+import { InputData } from './inputData'
 
 export type WizardState = {
   unlockedStep: number,
@@ -38,7 +39,8 @@ export type Step3State = {
   allFeatures: string[] | undefined,
   selectedFeatures: string[] | undefined,
   advancedSettings: any,
-  summary: Summary
+  summary: Summary,
+  inputData: InputData
 }
 
 export type Step4State = {

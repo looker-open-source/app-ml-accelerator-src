@@ -10,7 +10,10 @@ const bqModelInitialState = {
   arimaTimeColumn: undefined,
   selectedFeatures: undefined,
   advancedSettings: {},
-  sourceQuery: {
+  // The ${model_name}_input_data_${uid} BQML table is created when a summary is generated
+  // The UID tells the model which input_data table was used at the time of model creation/update
+  inputDataUID: undefined,
+  inputDataQuery: {
     exploreName: undefined,
     modelName: undefined,
     exploreLabel: undefined,

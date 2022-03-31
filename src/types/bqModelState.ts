@@ -7,7 +7,8 @@ export type BQModelState = {
   arimaTimeColumn?: string,
   selectedFeatures?: string[],
   advancedSettings?: any,
-  sourceQuery: {
+  inputDataUID?: string,
+  inputDataQuery: {
     exploreName?: string,
     modelName?: string,
     exploreLabel?: string,

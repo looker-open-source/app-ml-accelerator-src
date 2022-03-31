@@ -5,7 +5,7 @@ import { Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { buildFieldSelectOptions, hasSummaryData } from '../../services/summary'
+import { buildFieldSelectOptions, hasSummaryForSourceData } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
 import Summary from '../Summary'
@@ -42,7 +42,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     targetField,
     bqModelName,
     arimaTimeColumn,
-    advancedSettings
+    advancedSettings,
+    inputData
   } = step3
   const arima = isArima(objective || "")
   const ranQueryFields = ranQuery?.selectedFields
@@ -81,11 +82,12 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const createModel = async () => {
     const { ok } = await createBQMLModel?.(
+      inputData.uid,
       objective,
-      bqModelName,
-      targetField,
+      inputData.bqModelName,
+      inputData.target,
       selectedFeatures,
-      arimaTimeColumn,
+      inputData.arimaTimeColumn,
       advancedSettings
     )
     setIsLoading(false)
@@ -93,14 +95,13 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const summaryUpToDate = () => (
-    hasSummaryData({
-      bqModel: state.bqModel,
+    hasSummaryForSourceData({
+      inputData: state.wizard.steps.step3.inputData,
       step3Data: step3,
       exploreName,
       modelName,
       target: targetField || '',
       bqModelName,
-      advancedSettings,
       sourceColumns: sourceColumnsFormatted,
       arimaTimeColumn: arima ? arimaTimeColumn : undefined
     })
@@ -200,14 +201,14 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <ModelValidation
         setIsInvalid={setIsInvalid}
         data={summary.data}
-        target={state.bqModel.target}
+        target={inputData.target}
         objective={objective}
       />
-      { summary.data && state.bqModel.target &&
+      { summary.data && inputData.target &&
         (
           <Summary
-            targetField={state.bqModel.target}
-            arimaTimeColumn={state.bqModel.arimaTimeColumn}
+            targetField={inputData.target}
+            arimaTimeColumn={inputData.arimaTimeColumn}
             summaryData={summary.data}
             selectedFeatures={selectedFeatures || []}
             updateSelectedFeatures={updateSelectedFeatures} />

@@ -1,23 +1,10 @@
 import { keyBy, compact } from 'lodash'
+import { JOB_STATUSES } from '../constants'
 import { BQModelState, Field, Step3State, SummaryTableHeaders } from '../types'
+import { InputData } from '../types/inputData'
 import { titilize, splitFieldName } from './string'
 
-export const formBQViewSQL = (
-  sql: string | undefined,
-  bqmlModelDatasetName: string | undefined,
-  bqModelName: string | undefined
-) => {
-  if (
-    !sql ||
-    !bqmlModelDatasetName ||
-    !bqModelName
-  ) {
-    return false
-  }
-  return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}_input_data AS ${removeLimit(sql)}`
-}
-
-const removeLimit = (sql: string) => {
+export const removeLimit = (sql: string) => {
   const clauses = sql.split("\n")
   let limitIndex = -1
   clauses.forEach((s: string, i: number) =>
@@ -43,42 +30,48 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
 }
 
 type hasSummaryProps = {
-  bqModel: BQModelState,
+  inputData: InputData,
   step3Data: Step3State,
   exploreName: string,
   modelName: string,
   target: string,
   bqModelName: string,
-  advancedSettings: string,
   sourceColumns: string[],
   arimaTimeColumn?: string
 }
 
-// This method determines whether the summary has been ran with the current ui state.
+// This method determines whether the summary has been ran with the current Source tab ui state.
 // The summary needs to be reran when the ui state has changed since the last time they ran the summary.
-export const hasSummaryData = ({
-  bqModel,
+export const hasSummaryForSourceData = ({
+  inputData,
   step3Data,
   exploreName,
   modelName,
   target,
   bqModelName,
-  advancedSettings,
   sourceColumns,
   arimaTimeColumn
 }: hasSummaryProps): boolean => {
-  const { sourceQuery } = bqModel
   const { summary, allFeatures } = step3Data
-  return Boolean(sourceQuery.exploreName === exploreName
-    && sourceQuery.modelName === modelName
-    && bqModel.target === target
-    && bqModel.name === bqModelName
-    && (arimaTimeColumn ? bqModel.arimaTimeColumn === arimaTimeColumn : true)
-    && bqModel.advancedSettings === advancedSettings
+  return Boolean(inputData.exploreName === exploreName
+    && inputData.modelName === modelName
+    && inputData.target === target
+    && inputData.bqModelName === bqModelName
+    && (arimaTimeColumn ? inputData.arimaTimeColumn === arimaTimeColumn : true)
     && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data
     && summary.data.length > 0)
 }
+
+// export const hasModelChanges = ({
+//   bqModel,
+//   advancedSettings,
+//   objective
+// }) => {
+//   return (jobStatus === JOB_STATUSES.failed || jobStatus ===JOB_STATUSES.canceled) ||
+//     modelObjective !== uiObjective ||
+//     modelAdvancedSettings !== uiAdvancedSettings
+//   }
 
 export const toggleSelectedFeature = (selectedFeatures: string[], fieldName: string): string[] => {
   const selectedIndex: number = selectedFeatures.indexOf(fieldName);

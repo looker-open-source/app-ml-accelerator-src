@@ -47,6 +47,23 @@ const wizardInitialState: WizardState = {
       summary: {
         fields: undefined,
         data: undefined,
+      },
+      inputData: {
+        uid: undefined,
+        bqModelName: '',
+        target: undefined,
+        arimaTimeColumn: undefined,
+        exploreName: undefined,
+        modelName: undefined,
+        exploreLabel: undefined,
+        limit: "500",
+        sorts: [],
+        selectedFields: {
+          dimensions: [],
+          measures: [],
+          parameters: [],
+          filters: {}
+        }
       }
     },
     step4: {
