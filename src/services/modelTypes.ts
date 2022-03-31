@@ -225,6 +225,14 @@ export const getBQInputDataSql = ({
   `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}`
 )
 
+export const getBQInputDataMetaDataSql = ({
+  bqmlModelDatasetName,
+  bqModelName,
+  uid
+}: GetBQInputDataSqlProps) => (
+  `SELECT * FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}_input_data_${uid}'`
+)
+
 type GetBoostedTreePredictProps = {
   bqmlModelDatasetName: string,
   bqModelName: string,

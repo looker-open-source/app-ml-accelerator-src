@@ -8,12 +8,17 @@ import {
 } from '../services/explores'
 import { WizardSteps } from '../types'
 import { wizardInitialState } from '../reducers/wizard'
+import { getBQInputDataMetaDataSql } from '../services/modelTypes'
+import { BQMLContext } from './BQMLProvider'
+import Step2 from '../components/Step2'
+import { getCreationTimeIndex } from '../services/resultsTable'
 
 type IQueryBuilderContext = {
   stepData: any,
-  stepName: keyof WizardSteps,
+  stepName: 'step2' | 'step5',
   lockFields: boolean,
-  fetchSortedModelsAndExplores?: () => Promise<any>
+  fetchSortedModelsAndExplores?: () => Promise<any>,
+  getStaticDataCreatedTime?: () => Promise<any>
 }
 
 export const QueryBuilderContext = createContext<IQueryBuilderContext>({
@@ -24,14 +29,15 @@ export const QueryBuilderContext = createContext<IQueryBuilderContext>({
 
 type QueryBuilderProps = {
   children: any
-  stepName: keyof WizardSteps,
+  stepName: 'step2' | 'step5',
   lockFields?: boolean
 }
 
 export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBuilderProps) => {
   const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
-  const { bigQueryConn } = state.userAttributes
+  const { queryJob } = useContext(BQMLContext)
+  const { bigQueryConn, bqmlModelDatasetName } = state.userAttributes
   const stepData = state.wizard.steps[stepName]
 
   /*
@@ -59,13 +65,40 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBu
     }
   }
 
+  // get the input data time stamp to show the user they are viewing not live data
+  const getStaticDataCreatedTime = async (): Promise<any> => {
+    try {
+      // if sql has been generated then were not using static data
+      if (stepData.ranQuery?.sql) { return }
+
+      const bqModelName = state.bqModel.name
+      const uid = state.bqModel.inputDataUID
+      if (!bqmlModelDatasetName || !bqModelName || ! uid) { return }
+
+      const metadataSql = await getBQInputDataMetaDataSql({
+        bqmlModelDatasetName,
+        bqModelName,
+        uid
+      })
+      const { ok, body } = await queryJob?.(metadataSql)
+      if (!ok) { return }
+
+      const timeIndex = getCreationTimeIndex(body)
+      const creationEpoch = body.rows[0].f[timeIndex].v
+      return  new Date(Number(creationEpoch) * 1000) // multiply by milliseconds
+    } catch (err) {
+      console.log('Error fetching static time stamp - ' + err)
+    }
+  }
+
   return (
     <QueryBuilderContext.Provider
       value={{
         stepData,
         stepName,
         lockFields: !!lockFields,
-        fetchSortedModelsAndExplores
+        fetchSortedModelsAndExplores,
+        getStaticDataCreatedTime
       }}
     >
       {children}

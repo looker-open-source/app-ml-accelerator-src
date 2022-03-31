@@ -80,7 +80,6 @@ export const WizardProvider = ({ children }: any) => {
       // Fetch and Populate Step2 Data
       const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName, 'step2')
       if (exploreData) {
-        // const { ok, results, exploreUrl } = await createAndRunQuery(step2)
         const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID)
         const results = {
           data: bqResultsToLookerFormat(body, step2.exploreName, exploreData),

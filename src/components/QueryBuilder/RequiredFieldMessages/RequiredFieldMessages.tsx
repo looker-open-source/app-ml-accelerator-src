@@ -32,7 +32,6 @@ export const RequiredFieldMessages : React.FC = () => {
   return (
     <div className="objective-requirements">
       { requiredFieldMessages.length > 0 ? requiredFieldMessages.join(' ') : 'All field requirements met.'  }
-      <div className={`objective-requirements-indicator ${requiredFieldMessages.length > 0 ? 'warning' : 'success'}`} />
     </div>
   )
 }
