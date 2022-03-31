@@ -34,10 +34,8 @@ type HasSummaryProps = {
   step3Data: Step3State,
   exploreName: string,
   modelName: string,
-  // target: string,
   bqModelName: string,
   sourceColumns: string[],
-  // arimaTimeColumn?: string
 }
 
 // This method determines whether the summary has been ran with the current Source tab ui state.

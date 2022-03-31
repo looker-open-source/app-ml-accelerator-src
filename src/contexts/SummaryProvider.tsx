@@ -122,6 +122,9 @@ export const SummaryProvider = ({ children }: any) => {
       if (querySql &&
         (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model || !summaryUpToDate)
       ) {
+        // Using a UID we create a new input data table everytime "Generate Summary" is clicked.
+        // This allows the input_data table (summary table) to be out of sync with the model.
+        // So, when reloading a past model it will grab the correct version of the input_data
         inputDataUID = uuidv4().replace(/\-/g, '') // generate a new UID (uuid no hyphens) to save a new input_data table
         setPreviousBQValues({
           sql: querySql,
