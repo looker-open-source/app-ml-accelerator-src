@@ -89,8 +89,7 @@ export const ModelProvider = ({ children }: any) => {
 
   const handleJobError = (jobOk: boolean, error: any) => {
     dispatch({ type: 'addToStepData', step: 'step4', data: { complete: false }})
-    dispatch({ type: 'setBQModel', data: { jobStatus: "FAILED" }})
-    dispatch({ type: 'setNeedsSaving', value: true })
+    dispatch({ type: 'setBQModel', data: { jobStatus: JOB_STATUSES.failed }})
     throw jobOk ? error.message : 'Failed to retrieve job status'
   }
 
@@ -166,7 +165,6 @@ export const ModelProvider = ({ children }: any) => {
         data: { complete: false }
       })
       dispatch({ type: 'setBQModel', data: { jobStatus: JOB_STATUSES.canceled }})
-      dispatch({ type: 'setNeedsSaving', value: true })
     } catch(error) {
       dispatch({type: 'addError', error: "Failed to cancel model creation: " + error})
       return { ok: false }

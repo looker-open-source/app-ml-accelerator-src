@@ -53,7 +53,6 @@ export const buildWizardState = (savedState: SavedModelState): WizardState => {
 
   const wizardState = {
     unlockedStep: savedState.unlockedStep,
-    needsSaving: false,
     steps: {
       step1: { objective: bqModelState.objective },
       step2: buildWizardStep2(bqModelState, wizardInitialState.steps.step2),

@@ -16,6 +16,7 @@ import { getBQInputDataSql } from '../services/modelTypes'
 import { bqResultsToLookerFormat } from '../services/apply'
 import { SaveSummaryProps } from '../types/summary'
 import { SaveInputDataProps } from '../types/inputData'
+import { cloneDeep } from 'lodash'
 
 type IWizardContext = {
   loadingModel?: boolean,
@@ -66,10 +67,10 @@ export const WizardProvider = ({ children }: any) => {
         history.push(`/ml/create/${WIZARD_STEPS['step1']}`)
         throw `Model does not exist: ${modelNameParam}`
       }
-      const bqModel = { ...bqModelInitialState, ...savedModelState.bqModel }
+      const bqModel = { ...bqModelInitialState, ...cloneDeep(savedModelState.bqModel) }
       const loadedWizardState = buildWizardState(savedModelState)
       dispatch({ type: 'populateWizard', wizardState: loadedWizardState })
-      dispatch({ type: 'setBQModel', data: { ...savedModelState.bqModel }})
+      dispatch({ type: 'setBQModel', data: bqModel })
 
       const { step2, step3, step5 } = loadedWizardState.steps
       if (!step2.modelName || !step2.exploreName) {
@@ -117,10 +118,6 @@ export const WizardProvider = ({ children }: any) => {
       }
       if (step5.showPredictions && step5.modelName && step5.exploreName) {
         await fetchExplore(step5.modelName, step5.exploreName, 'step5')
-      }
-
-      if (bqModel.jobStatus !== JOB_STATUSES.canceled) {
-        dispatch({ type: 'setNeedsSaving', value: false })
       }
     } catch (error) {
       dispatch({type: 'addError', error: `${error}`})
@@ -318,7 +315,6 @@ export const WizardProvider = ({ children }: any) => {
       if (!ok) {
         throw "Failed to save your model"
       }
-      dispatch({ type: 'setNeedsSaving', value: false })
       return { ok, body }
     } catch (error) {
       if (retry) {

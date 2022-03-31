@@ -3,7 +3,6 @@ import { InputData } from './inputData'
 
 export type WizardState = {
   unlockedStep: number,
-  needsSaving: boolean,
   steps: WizardSteps
 }
 

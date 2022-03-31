@@ -1,4 +1,4 @@
-import { keyBy, compact } from 'lodash'
+import { keyBy, compact, isEqual } from 'lodash'
 import { JOB_STATUSES } from '../constants'
 import { BQModelState, Field, Step3State, SummaryTableHeaders } from '../types'
 import { InputData } from '../types/inputData'
@@ -29,15 +29,15 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
   })
 }
 
-type hasSummaryProps = {
+type HasSummaryProps = {
   inputData: InputData,
   step3Data: Step3State,
   exploreName: string,
   modelName: string,
-  target: string,
+  // target: string,
   bqModelName: string,
   sourceColumns: string[],
-  arimaTimeColumn?: string
+  // arimaTimeColumn?: string
 }
 
 // This method determines whether the summary has been ran with the current Source tab ui state.
@@ -47,31 +47,48 @@ export const hasSummaryForSourceData = ({
   step3Data,
   exploreName,
   modelName,
-  target,
   bqModelName,
   sourceColumns,
-  arimaTimeColumn
-}: hasSummaryProps): boolean => {
+}: HasSummaryProps): boolean => {
   const { summary, allFeatures } = step3Data
   return Boolean(inputData.exploreName === exploreName
     && inputData.modelName === modelName
-    && inputData.target === target
     && inputData.bqModelName === bqModelName
-    && (arimaTimeColumn ? inputData.arimaTimeColumn === arimaTimeColumn : true)
     && allFeatures?.sort().join(',') === sourceColumns.join(',')
     && summary.data
     && summary.data.length > 0)
 }
 
-// export const hasModelChanges = ({
-//   bqModel,
-//   advancedSettings,
-//   objective
-// }) => {
-//   return (jobStatus === JOB_STATUSES.failed || jobStatus ===JOB_STATUSES.canceled) ||
-//     modelObjective !== uiObjective ||
-//     modelAdvancedSettings !== uiAdvancedSettings
-//   }
+type NeedsModelUpdateProps = {
+  bqModel: BQModelState
+  uiInputDataUID?: string
+  uiAdvancedSettings: any
+  uiObjective?: string
+  uiFeatures?: string[]
+  uiTarget?: string
+  uiArimaTimeColumn?: string
+}
+
+export const needsModelUpdate = ({
+  bqModel,
+  uiInputDataUID,
+  uiAdvancedSettings,
+  uiObjective,
+  uiFeatures,
+  uiTarget
+}: NeedsModelUpdateProps) => {
+  return (bqModel.jobStatus === JOB_STATUSES.failed || bqModel.jobStatus ===JOB_STATUSES.canceled) ||
+    bqModel.objective !== uiObjective ||
+    !isEqual(bqModel.advancedSettings, uiAdvancedSettings) ||
+    bqModel.inputDataUID !== uiInputDataUID ||
+    !isEqual(bqModel.selectedFeatures, uiFeatures) ||
+    hasTargetOrTimeColumnChange(bqModel, uiTarget)
+}
+
+export const hasTargetOrTimeColumnChange = (inputData: InputData | BQModelState, uiTarget?: string, uiArimaTimeColumn?: string) => (
+  inputData.target !== uiTarget ||
+  inputData.arimaTimeColumn !== uiArimaTimeColumn
+)
 
 export const toggleSelectedFeature = (selectedFeatures: string[], fieldName: string): string[] => {
   const selectedIndex: number = selectedFeatures.indexOf(fieldName);

@@ -1,5 +1,4 @@
 import { SummaryField } from './field'
-import { SelectedFields } from './selectedFields'
 import { WizardState } from './wizard'
 
 export type Summary = {

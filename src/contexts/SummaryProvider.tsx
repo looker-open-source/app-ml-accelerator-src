@@ -13,7 +13,8 @@ type ISummaryContext = {
   getSummaryData?: (
     sql?: string,
     bqModelName?: string,
-    targetField?: string
+    targetField?: string,
+    summaryUpToDate?: boolean
   ) => Promise<any>,
   createJob?: (sql: string) => Promise<any>,
   createBQMLModel?: (
@@ -107,19 +108,25 @@ export const SummaryProvider = ({ children }: any) => {
   const getSummaryData = async(
     querySql?: string,
     bqModelName?: string,
-    targetField?: string
+    targetField?: string,
+    summaryUpToDate?: boolean
   ): Promise<any> => {
     try {
-      if (!querySql || !bqModelName || !targetField) {
+      if (!bqModelName || !targetField) {
         throw "Failed to fetch summary."
       }
-      let inputDataUID = state.bqModel.inputDataUID
 
+      let inputDataUID = state.bqModel.inputDataUID
       // in an effort to limit the number of calls to BigQuery
-      // do not create the BQ view if its alrady been created for this sql and model name
-      if (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model) {
+      // do not create the input_data table if its alrady been created for this sql and model name
+      if (querySql &&
+        (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model || !summaryUpToDate)
+      ) {
         inputDataUID = uuidv4().replace(/\-/g, '') // generate a new UID (uuid no hyphens) to save a new input_data table
-        setPreviousBQValues({ sql: querySql, model: bqModelName })
+        setPreviousBQValues({
+          sql: querySql,
+          model: bqModelName
+        })
         const result = await createBQInputData(querySql, bqModelName, inputDataUID)
         if (!result.ok) {
           throw "Failed to create BQML View"
@@ -141,7 +148,6 @@ export const SummaryProvider = ({ children }: any) => {
         target: step3.targetField || '',
         arimaTimeColumn: step3.arimaTimeColumn
       })
-      // saveBQModel(state.wizard, inputDataUID)
       return { ok, value }
     } catch(error) {
       setPreviousBQValues({ sql: null, model: null })

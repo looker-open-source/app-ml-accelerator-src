@@ -5,7 +5,7 @@ import { Select } from "@looker/components"
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
-import { buildFieldSelectOptions, hasSummaryForSourceData } from '../../services/summary'
+import { buildFieldSelectOptions, hasSummaryForSourceData, hasTargetOrTimeColumnChange, needsModelUpdate } from '../../services/summary'
 import { SummaryContext } from '../../contexts/SummaryProvider'
 import { isArima, MODEL_TYPES } from '../../services/modelTypes'
 import Summary from '../Summary'
@@ -26,8 +26,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [nameCheckStatus, setNameCheckStatus] = useState<string | undefined>()
   const [loadingNameStatus, setLoadingNameStatus] = useState<boolean>(false)
   const [isInvalid, setIsInvalid] = useState<boolean>(false)
-  const { needsSaving } = state.wizard
-  const { step1, step2, step3 } = state.wizard.steps
+  const { bqModel, wizard } = state
+  const { step1, step2, step3 } = wizard.steps
   const { objective } = step1
   const { exploreData, exploreName, modelName, ranQuery } = step2
 
@@ -94,25 +94,40 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return { ok }
   }
 
+  const targetTimeColumnChanged = () => (
+    hasTargetOrTimeColumnChange(
+      step3.inputData,
+      step3.targetField,
+      step3.arimaTimeColumn
+    )
+  )
+
   const summaryUpToDate = () => (
     hasSummaryForSourceData({
-      inputData: state.wizard.steps.step3.inputData,
+      inputData: step3.inputData,
       step3Data: step3,
       exploreName,
       modelName,
-      target: targetField || '',
       bqModelName,
       sourceColumns: sourceColumnsFormatted,
-      arimaTimeColumn: arima ? arimaTimeColumn : undefined
+    })
+  )
+
+  const modelNeedsUpdate = () => (
+    needsModelUpdate({
+      bqModel,
+      uiInputDataUID: step3.inputData.uid,
+      uiAdvancedSettings: step3.advancedSettings,
+      uiObjective: step1.objective,
+      uiFeatures: step3.selectedFeatures,
+      uiTarget: step3.targetField,
+      uiArimaTimeColumn: step3.arimaTimeColumn
     })
   )
 
   const buildHandleCompleteClick = () => {
-    if (modelNameParam) {
-      if (
-        !needsSaving ||
-        (needsSaving && !summaryUpToDate())
-      ) { return }
+    if (modelNameParam && !modelNeedsUpdate()) {
+      return
     }
 
     // passed into the stepComplete button to be executed
@@ -126,7 +141,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const stepCompleteButtonText = () => (
     modelNameParam ?
-      needsSaving && summaryUpToDate()?
+      modelNeedsUpdate() ?
         "ReCreate Model" :
         "Continue" :
       "Create Model"
@@ -194,6 +209,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             loadingNameStatus={loadingNameStatus}
             nameCheckStatus={nameCheckStatus}
             summaryUpToDate={summaryUpToDate}
+            targetTimeColumnChanged={targetTimeColumnChanged}
           />
         </div>
       </div>
