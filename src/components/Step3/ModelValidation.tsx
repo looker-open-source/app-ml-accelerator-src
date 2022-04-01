@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { MODEL_TYPES, MODEL_VALIDATORS } from '../../services/modelTypes'
+import { MODEL_TYPES } from '../../services/modelTypes'
+import { MODEL_VALIDATORS } from '../../services/modelValidations'
 
 type ModelValidationProps = {
   setIsInvalid: (isValid: boolean) => void,
@@ -21,7 +22,7 @@ export const ModelValidation: React.FC<ModelValidationProps> = ({ setIsInvalid, 
     const msgs = MODEL_VALIDATORS[objective](data, target)
     setIsInvalid(msgs && msgs.length > 0)
     setValidationMsgs(msgs || [])
-  }, [data, target])
+  }, [data, target, objective])
 
   if (validationMsgs.length <= 0) {
     return (<></>)

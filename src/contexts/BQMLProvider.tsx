@@ -81,7 +81,6 @@ export const BQMLProvider = ({ children }: any) => {
       }
       return { ok, body, status }
     } catch (error) {
-      // setExpired(true)
       dispatch({ type: 'addError', error: "Failed to connect to BigQuery. Please refresh and try again." })
       return { ok: false }
     }

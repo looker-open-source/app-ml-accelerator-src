@@ -261,7 +261,6 @@ export const SummaryProvider = ({ children }: any) => {
       })
       return { ok, body }
     } catch (error) {
-      console.log({error})
       dispatch({type: 'addError', error: "Failed to create model: " + error})
       return { ok: false }
     }
