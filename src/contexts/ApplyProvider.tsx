@@ -3,7 +3,7 @@ import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
 import { getLooksFolderName } from '../services/user'
 import { createBoostedTreePredictSql, getBoostedTreePredictSql, MODEL_TYPES } from '../services/modelTypes'
-import { bqResultsToLookerFormat, buildApplyFilters, getLookerColumnName, getPredictedColumnName } from '../services/apply'
+import { bqResultsToLookerFormat, buildApplyFilters, getPredictedColumnName } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
 import { WizardContext } from './WizardProvider'
 import { BQMLContext } from './BQMLProvider'
@@ -13,7 +13,7 @@ type IApplyContext = {
   isLoading?: boolean,
   initArima?: () => Promise<any>,
   getBoostedTreePredictions?: () => Promise<any>,
-  generateBoostedTreePredictions?: (lookerSql: string) => Promise<any>
+  generateBoostedTreePredictions?: (lookerSql: string, getOnly?: boolean) => Promise<any>
 }
 
 export const ApplyContext = createContext<IApplyContext>({})
@@ -32,11 +32,13 @@ export const ApplyProvider = ({ children }: any) => {
   const { bqModel } = state
   const { step5 } = state.wizard.steps
 
-  const generateBoostedTreePredictions = async (lookerSql: string) => {
+  const generateBoostedTreePredictions = async (lookerSql: string, getOnly?: boolean) => {
     try {
-      const { ok } = await createBoostedTreePredictions?.(lookerSql)
-      if (!ok) {
-        return { ok: false }
+      if (!getOnly) {
+        const { ok } = await createBoostedTreePredictions(lookerSql)
+        if (!ok) {
+          return { ok: false }
+        }
       }
       const { ok: getOk, body: data } = await getBoostedTreePredictions?.()
       if (!getOk || !data.schema) {
@@ -51,7 +53,7 @@ export const ApplyProvider = ({ children }: any) => {
           modelName: step5.ranQuery?.modelName,
           exploreLabel: step5.ranQuery?.exploreLabel,
           limit: step5.ranQuery?.limit,
-          sorts: step5.ranQuery?.sorts,
+          sorts: step5.sorts, // don't pull from step5.ranQuery.sorts here.
           selectedFields: step5.ranQuery?.selectedFields
         }
       }
@@ -114,7 +116,8 @@ export const ApplyProvider = ({ children }: any) => {
       const sql = getBoostedTreePredictSql({
         bqmlModelDatasetName,
         bqModelName: bqModel.name,
-        sorts: step5.sorts || []
+        sorts: step5.sorts || [],
+        limit: step5.limit
       })
 
       const { ok, body } = await queryJob?.(sql)

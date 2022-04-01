@@ -169,7 +169,7 @@ export const createBoostedTreePredictSql = ({
 }: BoostedTreePredictProps) => {
   return `
     CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
-    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${lookerSql})))
+    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${removeLimit(lookerSql)})))
   `
 }
 
@@ -222,16 +222,18 @@ export const getBQInputDataMetaDataSql = ({
 type GetBoostedTreePredictProps = {
   bqmlModelDatasetName: string,
   bqModelName: string,
-  sorts: string[]
+  sorts: string[],
+  limit?: string
 }
 
 export const getBoostedTreePredictSql = ({
   bqmlModelDatasetName,
   bqModelName,
-  sorts
+  sorts,
+  limit
 }: GetBoostedTreePredictProps) => {
   const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => noDot(s)).join(', ')} ` : ''
   return `
-    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString}
+    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString} LIMIT ${limit || 500}
   `
 }

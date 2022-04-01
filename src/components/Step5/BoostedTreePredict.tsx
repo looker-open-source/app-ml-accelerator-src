@@ -25,10 +25,10 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoadin
     }
   }, [])
 
-  const generatePredictions = async () => {
+  const generatePredictions = async (getOnly?: boolean) => {
     if (!step5.ranQuery) { return }
     setIsLoading(true)
-    await generateBoostedTreePredictions?.(step5.ranQuery.sql)
+    await generateBoostedTreePredictions?.(step5.ranQuery.sql, getOnly)
     setIsLoading(false)
   }
 
@@ -66,11 +66,12 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoadin
         <QueryBuilder
           setIsLoading={setIsLoading}
           runCallback={removePredictions}
+          getPredictions={() => generatePredictions(true)}
           showPredictionsButton={showPredictionsButton()}
           predictionsButton={
             <Button
               className="action-button generate-predictions-button"
-              onClick={generatePredictions}
+              onClick={() => generatePredictions()}
               disabled={disablePredictButton()}>
                 Generate Predictions
             </Button>

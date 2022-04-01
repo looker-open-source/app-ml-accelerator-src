@@ -15,6 +15,7 @@ import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void,
   runCallback?: () => void
+  getPredictions?: () => void
   showPredictionsButton?: boolean
   predictionsButton?: any
 }
@@ -22,12 +23,14 @@ type QueryBuilderProps = {
 export const QueryBuilder : React.FC<QueryBuilderProps> = ({
   setIsLoading,
   runCallback,
+  getPredictions,
   showPredictionsButton,
   predictionsButton
 }) => {
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
   const { stepData, stepName } = useContext(QueryBuilderContext)
-  const { dispatch } = useStore()
+  const { state, dispatch } = useStore()
+  const { step5 } = state.wizard.steps
   const firstUpdate = useRef(true)
 
   // re-run the query when a sort is applied
@@ -43,21 +46,26 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
       .finally(() => setIsLoading(false))
   }, [stepData.sorts])
 
-  const runQuery = async() => {
+  const runQuery = async(forceLookerQuery?: boolean) => {
     try {
-      if (
-        stepData.tableHeaders &&
-        hasOrphanedSorts(stepData.tableHeaders, stepData.sorts || [])
-      ) {
-        // case when a sort is applied to a column that no longer exists in the query
-        // clearing the sorts will trigger another runQuery execution in the useEffect above
-        dispatch({type: 'addToStepData', step: stepName, data: { sorts: [] }})
+      if (!forceLookerQuery && stepName === 'step5' && step5.showPredictions) {
+        await getPredictions?.()
         return
+      } else {
+        if (
+          stepData.tableHeaders &&
+          hasOrphanedSorts(stepData.tableHeaders, stepData.sorts || [])
+        ) {
+          // case when a sort is applied to a column that no longer exists in the query
+          // clearing the sorts will trigger another runQuery execution in the useEffect above
+          dispatch({type: 'addToStepData', step: stepName, data: { sorts: [] }})
+          return
+        }
+        setIsLoading(true)
+        const {results, exploreUrl} = await createAndRunQuery?.(stepData)
+        saveQueryToState?.(stepName, stepData, results, exploreUrl)
+        runCallback?.()
       }
-      setIsLoading(true)
-      const {results, exploreUrl} = await createAndRunQuery?.(stepData)
-      saveQueryToState?.(stepName, stepData, results, exploreUrl)
-      runCallback?.()
     } finally {
       setIsLoading(false)
     }
@@ -80,7 +88,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
               { stepName === 'step2' && <StaticDataTimeStamp /> }
               { showPredictionsButton ? predictionsButton :
                 <Button
-                  onClick={runQuery}
+                  onClick={() => runQuery(true)}
                   className="action-button">
                     Run
                 </Button>
