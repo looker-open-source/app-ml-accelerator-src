@@ -39,6 +39,7 @@ export const buildVizDataSets = ({ ranQuery, data, target, labels, datasetMapper
       data: data.map(datasetMapper(fieldName, labels)),
       borderColor: color,
       backgroundColor: colorSolid ? color : bgColor,
+      spanGaps: false
     }
   })
   return datasets

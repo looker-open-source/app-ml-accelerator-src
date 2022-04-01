@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore } from "../../contexts/StoreProvider"
 import { Select } from "@looker/components"
@@ -49,16 +49,33 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const ranQueryFields = ranQuery?.selectedFields
   const sourceColumns = [...ranQueryFields?.dimensions || [], ...ranQueryFields?.measures || []]
   const sourceColumnsFormatted = sourceColumns.map((col) => noDot(col)).sort()
-  const targetFieldOptions = buildFieldSelectOptions(
-    exploreData?.fieldDetails,
-    sourceColumns,
-    objective ? MODEL_TYPES[objective].targetDataType : null
+  const [targetFieldOptions, setTargetFieldOptions] = useState<any>()
+  const [timeColumnFieldOptions, setTimeColumnFieldOptions] = useState<any>()
+
+  useEffect(() => {
+    const targetOptions = buildFieldSelectOptions(
+      exploreData?.fieldDetails,
+      sourceColumns,
+      objective ? MODEL_TYPES[objective].targetDataType : null
+    )
+    setTargetFieldOptions(targetOptions)
+    const arimaOptions = arima ? buildFieldSelectOptions(
+      exploreData?.fieldDetails,
+      sourceColumns,
+      'date'
+    ) : undefined
+    setTimeColumnFieldOptions(arimaOptions)
+    if (!fieldOptionExists(step3.targetField || '', targetOptions)) {
+      updateStepData({ targetField: undefined })
+    }
+    if (!fieldOptionExists(step3.arimaTimeColumn || '', arimaOptions)) {
+      updateStepData({ arimaTimeColumn: undefined })
+    }
+  }, [step2.ranQuery, step2.ranQuery?.sql])
+
+  const fieldOptionExists = (target: string, options?: any[]) => (
+    options ? options.filter((option) => option.value === target).length > 0 : false
   )
-  const timeColumnFieldOptions = arima ? buildFieldSelectOptions(
-    exploreData?.fieldDetails,
-    sourceColumns,
-    'date'
-  ) : null
 
   const updateStepData = (data: any) => {
     dispatch({

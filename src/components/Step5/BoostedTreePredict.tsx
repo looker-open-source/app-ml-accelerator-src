@@ -4,6 +4,7 @@ import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
 import { useStore } from '../../contexts/StoreProvider'
 import QueryBuilder from '../QueryBuilder'
 import { Button } from '@looker/components'
+import { isEqual } from 'lodash'
 
 type BoostedTreePredictProps = {
   isLoading: boolean,
@@ -24,10 +25,10 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoadin
     }
   }, [])
 
-  const generatePredictions = async () => {
+  const generatePredictions = async (getOnly?: boolean) => {
     if (!step5.ranQuery) { return }
     setIsLoading(true)
-    await generateBoostedTreePredictions?.(step5.ranQuery.sql)
+    await generateBoostedTreePredictions?.(step5.ranQuery.sql, getOnly)
     setIsLoading(false)
   }
 
@@ -49,20 +50,34 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoadin
     })
   }
 
+  const queryParamsChanged = () => (
+    !isEqual(step5.selectedFields, step5.ranQuery?.selectedFields) ||
+    step5.limit !== step5.ranQuery?.limit ||
+    !isEqual(step5.sorts, step5.ranQuery?.sorts)
+  )
+
+  const showPredictionsButton = () => (
+    Boolean(step5.ranQuery?.sql && !step5.showPredictions && !queryParamsChanged())
+  )
+
   return (
     <>
-
       <QueryBuilderProvider stepName="step5" lockFields={true}>
-        <QueryBuilder setIsLoading={setIsLoading} runCallback={removePredictions} />
+        <QueryBuilder
+          setIsLoading={setIsLoading}
+          runCallback={removePredictions}
+          getPredictions={() => generatePredictions(true)}
+          showPredictionsButton={showPredictionsButton()}
+          predictionsButton={
+            <Button
+              className="action-button generate-predictions-button"
+              onClick={() => generatePredictions()}
+              disabled={disablePredictButton()}>
+                Generate Predictions
+            </Button>
+          }
+        />
       </QueryBuilderProvider>
-      <div className="wizard-footer-bar">
-        <Button
-          className="action-button generate-predictions-button"
-          onClick={generatePredictions}
-          disabled={disablePredictButton()}>
-            Generate Predictions
-        </Button>
-      </div>
     </>
   )
 }

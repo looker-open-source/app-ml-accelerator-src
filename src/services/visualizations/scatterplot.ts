@@ -25,7 +25,7 @@ export const scatterPlotChartObj = (ranQuery: RanQuery, data: any, target: strin
 
 const datasetMapper = (fieldName: string, labels: string[]) => {
   return (datum: any, i: number) => {
-    const y = datum[fieldName] ? Number(datum[fieldName].value) : 0
+    const y = datum[fieldName] && (datum[fieldName].value || datum[fieldName].value === 0) ? Number(datum[fieldName].value) : null
     return { y, x: labels[i] }
   }
 }

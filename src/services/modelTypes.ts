@@ -76,20 +76,6 @@ export const MODEL_TYPES: {[key: string]: any} = {
   },
 }
 
-export const MODEL_VALIDATORS: {[key: string]: any} = {
-  BOOSTED_TREE_CLASSIFIER: (data: any[], target: string) => {
-    const validationMsgs = []
-    const formattedTarget = noDot(target)
-    const targetRow = data.filter((rowData: any) => (
-      rowData["column_name"].value === formattedTarget
-    ))
-    if (targetRow.length > 0 && targetRow[0].count_distinct_values.value > 50) {
-      validationMsgs.push('Target rows Distinct Values must be less than or equal to 50')
-    }
-    return validationMsgs
-  }
-}
-
 export const isArima = (objective: string): boolean => (
   objective === MODEL_TYPES.ARIMA_PLUS.value
 )
@@ -183,7 +169,7 @@ export const createBoostedTreePredictSql = ({
 }: BoostedTreePredictProps) => {
   return `
     CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
-    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${lookerSql})))
+    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${removeLimit(lookerSql)})))
   `
 }
 
@@ -236,16 +222,18 @@ export const getBQInputDataMetaDataSql = ({
 type GetBoostedTreePredictProps = {
   bqmlModelDatasetName: string,
   bqModelName: string,
-  sorts: string[]
+  sorts: string[],
+  limit?: string
 }
 
 export const getBoostedTreePredictSql = ({
   bqmlModelDatasetName,
   bqModelName,
-  sorts
+  sorts,
+  limit
 }: GetBoostedTreePredictProps) => {
   const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => noDot(s)).join(', ')} ` : ''
   return `
-    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString}
+    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString} LIMIT ${limit || 500}
   `
 }

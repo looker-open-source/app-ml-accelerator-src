@@ -25,6 +25,6 @@ export const areaChartObj = (ranQuery: RanQuery, data: any, target: string): Cha
 
 const datasetMapper = (fieldName: string, labels: string[]) => {
   return (datum: any, i: number) => {
-    return datum[fieldName] ? Number(datum[fieldName].value) : 0
+    return datum[fieldName] && (datum[fieldName].value || datum[fieldName].value === 0) ? Number(datum[fieldName].value) : null
   }
 }
