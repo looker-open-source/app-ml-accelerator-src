@@ -5,18 +5,26 @@ import ExploreSelect from './ExploreSelect'
 import ExploreFilter from "./ExploreFilter"
 import FieldsSelect from './FieldsSelect'
 import QueryPane from './QueryPane'
+import StaticDataTimeStamp from './StaticDataTimeStamp'
 import { hasOrphanedSorts } from '../../services/resultsTable'
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
-import StaticDataTimeStamp from "./StaticDataTimeStamp"
+
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void,
   runCallback?: () => void
+  showPredictionsButton?: boolean
+  predictionsButton?: any
 }
 
-export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading, runCallback }) => {
+export const QueryBuilder : React.FC<QueryBuilderProps> = ({
+  setIsLoading,
+  runCallback,
+  showPredictionsButton,
+  predictionsButton
+}) => {
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
   const { stepData, stepName } = useContext(QueryBuilderContext)
   const { dispatch } = useStore()
@@ -69,12 +77,14 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({ setIsLoading, runCa
         </div>
         <div className="query-header-actions">
           { stepData.exploreData && (<>
-              <StaticDataTimeStamp />
-              <Button
-                onClick={runQuery}
-                className="action-button">
-                  Run
-              </Button>
+              { stepName === 'step2' && <StaticDataTimeStamp /> }
+              { showPredictionsButton ? predictionsButton :
+                <Button
+                  onClick={runQuery}
+                  className="action-button">
+                    Run
+                </Button>
+              }
             </>)
           }
         </div>

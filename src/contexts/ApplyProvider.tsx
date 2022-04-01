@@ -159,6 +159,7 @@ export const ApplyProvider = ({ children }: any) => {
         step: 'step5',
         data: {
           ...step5,
+          showPredictions: true,
           selectedFields: {
             ...step5.selectedFields,
             // add the predictedColumn so table headers will be regenerated
