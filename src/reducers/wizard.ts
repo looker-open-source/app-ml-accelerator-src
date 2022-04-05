@@ -14,7 +14,7 @@ type Action = { type: 'clearState' } |
   { type: 'setExploreFilterText', filterText: string } |
   { type: 'clearExplore' }
 
-// The wizard state represents the UI state of the wizard
+// UI state of the wizard
 const wizardInitialState: WizardState = {
   unlockedStep: 1,
   steps: {
@@ -54,7 +54,7 @@ const wizardInitialState: WizardState = {
       // There are three query states:
       // step2 - the query thats being built and hasnt been ran yet
       // step2.ranQuery - the latest ranQuery parameters
-      // step3.inputData - the ranQuery parameters at the time of summary creation
+      // step3.inputData - the ranQuery parameters at the time of summary creation (input_data creation)
       // ***
       // When we generate the summary we copy the step2.ranQuery into this inputData
       // a record of what the query was when the summary (input_data table) was created

@@ -140,9 +140,8 @@ export const ModelProvider = ({ children }: any) => {
       const selectSql = getEvaluateDataSql({ evalFuncName, gcpProject, bqmlModelDatasetName, bqModelName })
       if (!selectSql) { throw 'Failed to generate select sql' }
 
-      let tableResults
       const { ok, body } = await queryJob?.(selectSql)
-      tableResults = body
+      let queryResults = body
 
       if (!ok) {
         // if the evaluate table doesnt exist yet, create it and select from it again
@@ -161,17 +160,17 @@ export const ModelProvider = ({ children }: any) => {
         // fetch table results now that table is created
         const { ok: selectOk, body: selectBody } = await queryJob?.(selectSql)
         if (!selectOk) { throw 'Failed to fetch evaluate table data' }
-        tableResults = selectBody
+        queryResults = selectBody
       }
 
       dispatch({ type: 'addToStepData', step: 'step4', data: {
         evaluateData: {
           ...state.wizard.steps.step4.evaluateData,
-          [evalFuncName]: tableResults
+          [evalFuncName]: queryResults
         },
         complete: true
       }})
-      return { ok: true, body: tableResults }
+      return { ok: true, body: queryResults }
     } catch (error) {
       dispatch({type: 'addError', error: "Error fetching evaluation data: " + error})
       return { ok: false }

@@ -141,7 +141,7 @@ export const isBinaryClassifier = (objective: string, step3: Step3State) => {
   if (objective !== MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value) { return false }
   const inputData = step3.summary.data
   const targetSummaryRow = inputData?.filter((row) => row.column_name.value === noDot(step3.targetField || ''))
-  if (!targetSummaryRow) { return false }
+  if (!targetSummaryRow || targetSummaryRow.length <= 0) { return false }
   return targetSummaryRow[0].count_distinct_values.value === 2
 }
 

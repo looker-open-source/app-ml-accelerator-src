@@ -27,7 +27,7 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
   }
 }
 
-export const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
+const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
   const dataItems = []
   const firstRow = data[0]
   for (const key in firstRow) {
@@ -47,7 +47,7 @@ export const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
   )
 }
 
-export const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
+const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
   const dataItems = []
   const sortedData = sortBy(data, 'expected_label')
   const firstRow = sortedData[0]
@@ -73,10 +73,10 @@ export const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
   for (const rowKey in sortedData) {
     const cells = []
     for (const key in sortedData[rowKey]) {
+      const value = sortedData[rowKey][key]
       if (key === 'expected_label') {
-        cells.push(<td className="model-cm-item--header">{titilize(splitFieldName(sortedData[rowKey][key]))}</td>)
+        cells.push(<td className="model-cm-item--header">{titilize(splitFieldName(value))}</td>)
       } else {
-        const value = sortedData[rowKey][key]
         cells.push(
           <td
             style={{ backgroundColor: matrixColor(Number(value))}}
@@ -110,7 +110,7 @@ export const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
   )
 }
 
-export const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
+const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const columns = Object.keys(data[0]).map((key) => {
     const formattedKey = noDot(key)
     return {
@@ -150,7 +150,7 @@ export const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   )
 }
 
-export const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
+const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
   const chartRef: any = React.createRef();
   const [ chart, setChart ] = useState<any>()
 
