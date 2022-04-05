@@ -122,15 +122,6 @@ export const getBQInputDataMetaDataSql = ({
   `SELECT * FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}_input_data_${uid}'`
 )
 
-type GetBoostedTreePredictProps = {
-  bqmlModelDatasetName: string,
-  bqModelName: string,
-  sorts: string[],
-  limit?: string
-}
-
-
-
 /********************/
 /* MODEL CREATE SQL */
 /********************/
@@ -407,12 +398,40 @@ export const createBoostedTreePredictSql = ({
   `
 }
 
-export const getBoostedTreePredictSql = ({
+type ArimmaPredictProps = {
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  horizon?: number,
+  confidenceLevel?: number
+}
+
+export const createArimaPredictSql = ({
+  bqmlModelDatasetName,
+  bqModelName,
+  horizon = 30,
+  confidenceLevel = 0.95
+}: ArimmaPredictProps) => {
+  return `
+    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
+    ( SELECT * FROM ML.FORECAST(MODEL ${bqmlModelDatasetName}.${bqModelName}
+      , STRUCT(${horizon} AS horizon
+      , ${confidenceLevel} AS confidence_level)))
+  `
+}
+
+type GetPredictProps = {
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  sorts: string[],
+  limit?: string
+}
+
+export const getPredictSql = ({
   bqmlModelDatasetName,
   bqModelName,
   sorts,
   limit
-}: GetBoostedTreePredictProps) => {
+}: GetPredictProps) => {
   const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => noDot(s)).join(', ')} ` : ''
   return `
     SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString} LIMIT ${limit || 500}

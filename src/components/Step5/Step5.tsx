@@ -6,11 +6,8 @@ import { ApplyContext } from '../../contexts/ApplyProvider'
 import { useStore } from '../../contexts/StoreProvider'
 import { isArima, isBoostedTree } from '../../services/modelTypes'
 import { ArimaPredict } from './ArimaPredict'
-import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
-import QueryBuilder from '../QueryBuilder'
-import './Step5.scss'
 import { BoostedTreePredict } from './BoostedTreePredict'
-// import { BoostedTreePredict } from './BoostedTreePredict'
+import './Step5.scss'
 
 const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { state } = useStore()
@@ -24,7 +21,7 @@ const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const showModelTypePredictComponent = () => {
     if (isArima(step1.objective || "")) {
-      return (<ArimaPredict />)
+      return (<ArimaPredict isLoading={contextLoading || isLoading} setIsLoading={setIsLoading} />)
     } else if (isBoostedTree(step1.objective || "")) {
       return (<BoostedTreePredict isLoading={contextLoading || isLoading} setIsLoading={setIsLoading} />)
     }

@@ -7,7 +7,6 @@ import { LookerBQMLApp } from './LookerBQMLApp'
 import './ExtensionApp.scss'
 import { useStore } from '../contexts/StoreProvider'
 import { BQMLProvider } from '../contexts/BQMLProvider'
-import { getLooksFolderName } from '../services/user'
 import ErrorBar from './ErrorBar'
 
 export const ExtensionApp: React.FC = () => {
@@ -28,17 +27,10 @@ export const ExtensionApp: React.FC = () => {
   const getUser = async () => {
     try {
       const { value } = await coreSDK.me()
-      let { value: spaces } = await coreSDK.search_folders({
-        parent_id: value.personal_folder_id,
-        creator_id: `${value.id}`,
-        name: getLooksFolderName(value.id),
-      })
       dispatch({ type: "setUser", user: {
         id: value.id,
         email: value.email,
-        firstName: value.first_name,
-        personalFolderId: value.personal_folder_id,
-        looksFolderId: spaces[0] ? spaces[0].id : null
+        firstName: value.first_name
       }})
     } catch (err) {
       dispatch({ type: 'addError', error: 'Failed to retrieve User - ' + err })

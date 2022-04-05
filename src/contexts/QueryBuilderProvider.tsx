@@ -6,17 +6,16 @@ import {
   filterExploresByConn,
   mapExploresByModel
 } from '../services/explores'
-import { WizardSteps } from '../types'
 import { wizardInitialState } from '../reducers/wizard'
 import { getBQInputDataMetaDataSql } from '../services/modelTypes'
 import { BQMLContext } from './BQMLProvider'
-import Step2 from '../components/Step2'
 import { getCreationTimeIndex } from '../services/resultsTable'
 
 type IQueryBuilderContext = {
   stepData: any,
   stepName: 'step2' | 'step5',
   lockFields: boolean,
+  hideDirectoryPane: boolean,
   fetchSortedModelsAndExplores?: () => Promise<any>,
   getStaticDataCreatedTime?: () => Promise<any>
 }
@@ -24,16 +23,18 @@ type IQueryBuilderContext = {
 export const QueryBuilderContext = createContext<IQueryBuilderContext>({
   stepData: wizardInitialState.steps.step2,
   stepName: 'step2',
-  lockFields: false
+  lockFields: false,
+  hideDirectoryPane: false
 })
 
 type QueryBuilderProps = {
   children: any
   stepName: 'step2' | 'step5',
-  lockFields?: boolean
+  lockFields?: boolean,
+  hideDirectoryPane?: boolean
 }
 
-export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBuilderProps) => {
+export const QueryBuilderProvider = ({ children, stepName, lockFields, hideDirectoryPane }: QueryBuilderProps) => {
   const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
   const { queryJob } = useContext(BQMLContext)
@@ -97,6 +98,7 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBu
         stepData,
         stepName,
         lockFields: !!lockFields,
+        hideDirectoryPane: !!hideDirectoryPane,
         fetchSortedModelsAndExplores,
         getStaticDataCreatedTime
       }}

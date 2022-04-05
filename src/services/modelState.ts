@@ -32,7 +32,6 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
       binaryClassifier: bqModelState.binaryClassifier,
       jobStatus: bqModelState.jobStatus,
       job: bqModelState.job,
-      look: bqModelState.look,
       hasPredictions: bqModelState.hasPredictions,
       applyQuery: {
         exploreName: bqModelState.applyQuery.exploreName,

@@ -29,7 +29,6 @@ const bqModelInitialState = {
   binaryClassifier: false,
   jobStatus: undefined,
   job: undefined,
-  look: undefined,
   hasPredictions: undefined,
   applyQuery: {
     exploreName: undefined,

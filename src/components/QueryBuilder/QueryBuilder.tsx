@@ -28,7 +28,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
   predictionsButton
 }) => {
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
-  const { stepData, stepName } = useContext(QueryBuilderContext)
+  const { stepData, stepName, hideDirectoryPane } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
   const { step5 } = state.wizard.steps
   const firstUpdate = useRef(true)
@@ -98,9 +98,11 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
         </div>
       </div>
       <div className="default-layout">
-        <div className="pane directory-pane">
-          {directoryPaneContents}
-        </div>
+        { !hideDirectoryPane &&
+          <div className="pane directory-pane">
+            {directoryPaneContents}
+          </div>
+        }
         <div className="pane query-pane">
           {queryPaneContents}
         </div>

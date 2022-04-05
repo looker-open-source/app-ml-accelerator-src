@@ -1,60 +1,48 @@
-import { Button } from '@looker/components'
-import { LookerEmbedLook, LookerEmbedSDK } from '@looker/embed-sdk'
-import { ExtensionContext2 } from '@looker/extension-sdk-react'
-import React, { useCallback, useContext, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { ApplyContext } from '../../contexts/ApplyProvider'
+import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
 import { useStore } from '../../contexts/StoreProvider'
+import QueryBuilder from '../QueryBuilder'
+import { Button } from '@looker/components'
 
-export const ArimaPredict: React.FC = () => {
-  const [running, setRunning] = React.useState(true)
-  const [embedLook, setEmbedLook] = React.useState<LookerEmbedLook>()
-  const { extensionSDK } = useContext(ExtensionContext2)
-  const { initArima } = useContext(ApplyContext)
+type ArimaPredictProps = {
+  isLoading: boolean,
+  setIsLoading: (isLoading: boolean) => void
+}
+
+export const ArimaPredict: React.FC<ArimaPredictProps> = ({ isLoading, setIsLoading }) => {
   const { state } = useStore()
-  const { look } = state.bqModel
+  const { getArimaPredictions } = useContext(ApplyContext)
 
   useEffect(() => {
-    initArima?.()
+    getPredictions()
   }, [])
 
-  const updateRunButton = (running: boolean) => {
-    setRunning(running)
-  }
-
-  const setupLook = (alook: LookerEmbedLook) => {
-    setEmbedLook(alook)
-  }
-
-  const embedCtrRef = useCallback((el) => {
-    const hostUrl = extensionSDK?.lookerHostData?.hostUrl
-    if (el && hostUrl) {
-      LookerEmbedSDK.init(hostUrl)
-      LookerEmbedSDK.createLookWithId(look.id as number)
-        .appendTo(el)
-        .on('look:loaded', updateRunButton.bind(null, false))
-        .on('look:run:start', updateRunButton.bind(null, true))
-        .on('look:run:complete', updateRunButton.bind(null, false))
-        .build()
-        .connect()
-        .then(setupLook)
-        .catch((error: Error) => {
-          console.error('Connection error', error)
-        })
-    }
-  }, [look])
-
-  const runLook = () => {
-    if (embedLook) {
-      embedLook.run()
-    }
+  const getPredictions = async () => {
+    setIsLoading(true)
+    await getArimaPredictions?.()
+    setIsLoading(false)
   }
 
   return (
     <>
-      <Button className="action-button" onClick={runLook} disabled={running}>
-        Run Look
-      </Button>
-      <div className="embed-container" ref={embedCtrRef}></div>
+      <QueryBuilderProvider stepName="step5" lockFields={true} hideDirectoryPane={true}>
+        <QueryBuilder
+          setIsLoading={setIsLoading}
+          // runCallback={removePredictions}
+          // getPredictions={() => genPredictions(true)}
+          showPredictionsButton={true}
+          predictionsButton={
+            <Button
+              className="action-button generate-predictions-button"
+              onClick={() => getPredictions()}
+              // disabled={disablePredictButton()}
+              >
+                Generate Predictions
+            </Button>
+          }
+        />
+      </QueryBuilderProvider>
     </>
   )
 }
