@@ -27,10 +27,7 @@ export const VizTable : React.FC<VizTableProps> = ({ ranQuery }) => {
     const formattedKey = noDot(key)
     return {
       field: formattedKey,
-      headerName: titilize(formattedKey),
-      onCellClicked: (event: any) => {
-        console.log({ event })
-      }
+      headerName: titilize(formattedKey)
     }
   })
 

@@ -16,6 +16,7 @@ export type BQModelState = {
     sorts: string[],
     selectedFields: SelectedFields
   },
+  binaryClassifier: boolean,
   jobStatus?: string,
   job?: any,
   look?: any,

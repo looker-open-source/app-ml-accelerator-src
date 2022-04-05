@@ -14,6 +14,7 @@ type Action = { type: 'clearState' } |
   { type: 'setExploreFilterText', filterText: string } |
   { type: 'clearExplore' }
 
+// UI state of the wizard
 const wizardInitialState: WizardState = {
   unlockedStep: 1,
   steps: {
@@ -31,6 +32,8 @@ const wizardInitialState: WizardState = {
         parameters: [],
         filters: {}
       },
+      // ranQuery is a copy of the values that the query was ran with
+      // this allows us to compare the query that was ran with the query that is about to be ran
       ranQuery: undefined,
       sorts: [],
       tableHeaders: []
@@ -42,10 +45,20 @@ const wizardInitialState: WizardState = {
       allFeatures: [],
       selectedFeatures: [],
       advancedSettings: {},
+      // data for the summary table
       summary: {
         fields: undefined,
         data: undefined,
       },
+      // ***
+      // There are three query states:
+      // step2 - the query thats being built and hasnt been ran yet
+      // step2.ranQuery - the latest ranQuery parameters
+      // step3.inputData - the ranQuery parameters at the time of summary creation (input_data creation)
+      // ***
+      // When we generate the summary we copy the step2.ranQuery into this inputData
+      // a record of what the query was when the summary (input_data table) was created
+      // On model creation the model will use these inputData parameters
       inputData: {
         uid: undefined,
         bqModelName: '',
@@ -65,6 +78,7 @@ const wizardInitialState: WizardState = {
       }
     },
     step4: {
+      evaluateData: {},
       complete: false
     },
     step5: {
@@ -77,6 +91,8 @@ const wizardInitialState: WizardState = {
         parameters: [],
         filters: {}
       },
+      // ranQuery is a copy of the values that the query was ran with
+      // this allows us to compare the query that was ran with the query that is about to be ran
       ranQuery: undefined,
       sorts: [],
       tableHeaders: []

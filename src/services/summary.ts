@@ -2,7 +2,8 @@ import { keyBy, compact, isEqual } from 'lodash'
 import { JOB_STATUSES } from '../constants'
 import { BQModelState, Field, Step3State, SummaryTableHeaders } from '../types'
 import { InputData } from '../types/inputData'
-import { titilize, splitFieldName } from './string'
+import { MODEL_TYPES } from './modelTypes'
+import { titilize, splitFieldName, noDot } from './string'
 
 export const removeLimit = (sql: string) => {
   const clauses = sql.split("\n")
@@ -134,6 +135,14 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[],
   })
 
   return compact(options)
+}
+
+export const isBinaryClassifier = (objective: string, step3: Step3State) => {
+  if (objective !== MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value) { return false }
+  const inputData = step3.summary.data
+  const targetSummaryRow = inputData?.filter((row) => row.column_name.value === noDot(step3.targetField || ''))
+  if (!targetSummaryRow || targetSummaryRow.length <= 0) { return false }
+  return targetSummaryRow[0].count_distinct_values.value === 2
 }
 
 export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {

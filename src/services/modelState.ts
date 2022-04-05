@@ -29,6 +29,7 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
         sorts: bqModelState.inputDataQuery.sorts,
         selectedFields: bqModelState.inputDataQuery.selectedFields
       },
+      binaryClassifier: bqModelState.binaryClassifier,
       jobStatus: bqModelState.jobStatus,
       job: bqModelState.job,
       look: bqModelState.look,

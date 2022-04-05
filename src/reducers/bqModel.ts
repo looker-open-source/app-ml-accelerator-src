@@ -26,6 +26,7 @@ const bqModelInitialState = {
       filters: {}
     }
   },
+  binaryClassifier: false,
   jobStatus: undefined,
   job: undefined,
   look: undefined,
