@@ -2,18 +2,14 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
-import { BQML_LOOKER_MODEL, JOB_STATUSES } from '../constants'
-import { ExtensionContext2 } from '@looker/extension-sdk-react'
-import { MODEL_TYPES } from '../services/modelTypes'
-import { formatParameterFilter } from '../services/string'
+import { JOB_STATUSES } from '../constants'
+import { EVALUATE_CREATE_SQL_METHODS, getEvaluateDataSql } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
 
 type IModelContext = {
   stopPolling?: () => void
   getModelEvalFuncData?: (
-    bqModelObjective: string,
-    evalFuncName: string,
-    bqModelName: string,
+    evalFuncName: string
     ) => Promise<any>,
   cancelModelCreate?: () => Promise<any>
 }
@@ -26,12 +22,12 @@ export const ModelContext = createContext<IModelContext>({})
 export const ModelProvider = ({ children }: any) => {
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
-  const { coreSDK } = useContext(ExtensionContext2)
-  const { pollJobStatus, cancelJob, getJob } = useContext(BQMLContext)
+  const { pollJobStatus, cancelJob, getJob, queryJob } = useContext(BQMLContext)
   const { persistModelState } = useContext(WizardContext)
   const { jobStatus, job } = state.bqModel
   const [ polling, setPolling ] = useState(false)
   const [ pollCanceler, setPollCanceler ] = useState<{ cancel: () => void}>()
+  const { gcpProject, bqmlModelDatasetName } = state.userAttributes
 
   // if a job is pending or running,
   // continuously short poll the job until its status is DONE
@@ -106,44 +102,6 @@ export const ModelProvider = ({ children }: any) => {
     })
   }
 
-  // Query looker for the big query evaluation data for the provided evaluation function
-  const getModelEvalFuncData = async (
-    bqModelObjective: string,
-    evalFuncName: string,
-    bqModelName: string
-  ) => {
-    try {
-      const modelType = MODEL_TYPES[bqModelObjective]
-      const evalFuncFields = modelType?.modelFields?.[evalFuncName]
-
-      if (!evalFuncFields || evalFuncFields.length <= 0) {
-        throw "Failed to find fields associated with this evaluate function."
-      }
-      // query the model table filtering on our modelID
-      const { value: query } = await coreSDK.create_query({
-        model:  BQML_LOOKER_MODEL,
-        view: modelType.exploreName,
-        fields: evalFuncFields,
-        filters: {
-          [`${modelType.exploreName}.model_name`]: formatParameterFilter(bqModelName),
-        }
-      })
-      const { ok, value } = await coreSDK.run_query({
-        query_id: query.id,
-        result_format: "json_detail",
-      })
-      if (!ok) { throw "Failed to run query" }
-      if (value.errors && value.errors.length >= 1) {
-        throw value.errors[0].message
-      }
-      dispatch({ type: 'addToStepData', step: 'step4', data: { complete: true }})
-      return { ok, value }
-    } catch (error) {
-      dispatch({type: 'addError', error: "Error fetching evaluation data: " + error})
-      return { ok: false }
-    }
-  }
-
   const cancelModelCreate = async () => {
     try{
       if (!job || !cancelJob) { throw "Refresh and try again." }
@@ -167,6 +125,55 @@ export const ModelProvider = ({ children }: any) => {
       dispatch({ type: 'setBQModel', data: { jobStatus: JOB_STATUSES.canceled }})
     } catch(error) {
       dispatch({type: 'addError', error: "Failed to cancel model creation: " + error})
+      return { ok: false }
+    }
+  }
+
+  // Create & Fetch Evaluate function data in BigQuery
+  const getModelEvalFuncData = async (
+    evalFuncName: string
+  ) => {
+    try {
+      const { name: bqModelName, inputDataUID: uid, selectedFeatures } = state.bqModel
+
+      // check if evaluate table already exists
+      const selectSql = getEvaluateDataSql({ evalFuncName, gcpProject, bqmlModelDatasetName, bqModelName })
+      if (!selectSql) { throw 'Failed to generate select sql' }
+
+      let tableResults
+      const { ok, body } = await queryJob?.(selectSql)
+      tableResults = body
+
+      if (!ok) {
+        // if the evaluate table doesnt exist yet, create it and select from it again
+        const createSql = EVALUATE_CREATE_SQL_METHODS[evalFuncName]({
+          gcpProject,
+          bqmlModelDatasetName,
+          bqModelName,
+          uid,
+          selectedFeatures
+        })
+        if (!createSql) { throw 'Failed to generate create sql' }
+
+        const { ok: createOk } = await queryJob?.(createSql)
+        if (!createOk) { throw 'Failed to create evaluate table' }
+
+        // fetch table results now that table is created
+        const { ok: selectOk, body: selectBody } = await queryJob?.(selectSql)
+        if (!selectOk) { throw 'Failed to fetch evaluate table data' }
+        tableResults = selectBody
+      }
+
+      dispatch({ type: 'addToStepData', step: 'step4', data: {
+        evaluateData: {
+          ...state.wizard.steps.step4.evaluateData,
+          [evalFuncName]: tableResults
+        },
+        complete: true
+      }})
+      return { ok: true, body: tableResults }
+    } catch (error) {
+      dispatch({type: 'addError', error: "Error fetching evaluation data: " + error})
       return { ok: false }
     }
   }

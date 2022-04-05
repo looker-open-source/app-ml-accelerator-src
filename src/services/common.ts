@@ -85,3 +85,15 @@ export const isFloat = (float: string) => {
   const re = /\d+(\.\d+)?$/g;
   return re.test(float)
 }
+
+export const formatBQResults = (data: any) => (
+  data.rows.map((row: any) => {
+    const rowObj: any = {}
+    const arr = row.f
+    arr.forEach((col: any, i: number) => {
+      const columnName = data.schema.fields[i].name
+      rowObj[columnName] = col.v
+    })
+    return rowObj
+  })
+)

@@ -18,8 +18,12 @@
 
 .model-grid--body {
   grid-column: 2/6;
-  padding: 32px;
+  padding: 0;
+}
+
+.model-grid-bg {
   background-color: #f7f7f7;
+  padding: 32px;
 }
 
 .model-sidebar {
@@ -93,21 +97,75 @@
   }
 }
 
+.roc-line-chart {
+  height: 300px;
+  margin-bottom: 32px;
+}
+
 .model-data-item {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-start;
 
+  & &--placeholder {
+    margin-bottom: 6px;
+    margin-right: 6px;
+    padding: 12px 20px;
+    width: 420px;
+  }
 
   & &--name {
-    text-align: right;
-    padding: 5px 10px;
-    width: 300px;
+    margin-bottom: 6px;
+    margin-right: 6px;
+    padding: 12px 20px;
+    width: 420px;
+    background-color: #f7f7f7;
   }
 
   & &--value {
-    padding: 5px 10px;
-    width: 300px;
+    margin-bottom: 6px;
+    padding: 12px 20px;
+    width: 420px;
+    background-color: #f7f7f7;
+  }
+
+  & &--header {
+    margin-right: 6px;
+    margin-bottom: 6px;
+    padding: 12px 20px;
+    width: 420px;
+    background-color: #ccd8e4;
+  }
+}
+
+.model-cm-container {
+  position: relative;
+  overflow: scroll;
+  height: 500px;
+
+  thead tr {
+    position: sticky;
+    top: 0;
+  }
+
+  tbody tr .model-cm-item--header {
+    position: sticky;
+    left: 0;
+  }
+
+}
+
+.model-cm-item {
+  & &--header {
+    text-align: center;
+    padding: 12px;
+    background-color: #ccd8e4;
+  }
+
+  & &--value {
+    text-align: center;
+    padding: 12px;
+    background-color: #f7f7f7;
   }
 }
 

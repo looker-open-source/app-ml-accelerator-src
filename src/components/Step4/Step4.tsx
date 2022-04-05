@@ -7,7 +7,7 @@ import { ModelContext } from '../../contexts/ModelProvider'
 import { JOB_STATUSES, WIZARD_STEPS } from '../../constants'
 import { MODEL_TYPES } from '../../services/modelTypes'
 import { Prompt } from 'react-router-dom'
-import { ModelSidebar } from './ModelSiderbar'
+import { ModelSidebar } from './ModelSidebar'
 import { ModelDataBody } from './ModelDataBody'
 import { IncompleteJob } from './IncompleteJob'
 import './Step4.scss'
@@ -19,11 +19,10 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { stopPolling, getModelEvalFuncData } = useContext(ModelContext)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<string>('')
-  const [evalData, setEvalData] = useState<any>()
   const [jobComplete, setJobComplete] = useState<any>()
   const [jobCanceled, setJobCanceled] = useState<any>()
   const { state } = useStore()
-  const { step1, step3 } = state.wizard.steps
+  const { step1, step3, step4 } = state.wizard.steps
   const { jobStatus, job } = state.bqModel
   const bqModel = state.bqModel
 
@@ -31,7 +30,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     if (!bqModel.objective) { return }
     const MODEL_TYPE = MODEL_TYPES[bqModel.objective]
     if (MODEL_TYPE) {
-      const { modelTabs } = MODEL_TYPE
+      const modelTabs = MODEL_TYPE.modelTabs(bqModel.binaryClassifier)
       if (!activeTab || modelTabs.indexOf(activeTab) < 0) {
         setActiveTab(modelTabs[0])
       }
@@ -50,20 +49,12 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const fetchModelData = async () => {
     if (
       !jobComplete ||
-      !bqModel.name ||
-      !bqModel.objective ||
-      !activeTab
+      !activeTab ||
+      step4.evaluateData[activeTab]?.rows?.length > 0
     ) { return }
 
     setIsLoading(true)
-    const { ok, value } = await getModelEvalFuncData?.(
-      bqModel.objective,
-      activeTab,
-      bqModel.name
-    )
-    if (ok) {
-      setEvalData(value.data)
-    }
+    await getModelEvalFuncData?.(activeTab)
     setIsLoading(false)
   }
 
@@ -112,12 +103,12 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
               <ModelSidebar
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                bqModelObjective={bqModel.objective || ''}
+                bqModel={bqModel}
               />
             </div>
             <div className="model-grid--body">
-              { !isLoading && evalData &&
-                <ModelDataBody evalData={evalData[0]} />
+              { !isLoading && activeTab &&
+                <ModelDataBody activeTab={activeTab} />
               }
             </div>
           </div>

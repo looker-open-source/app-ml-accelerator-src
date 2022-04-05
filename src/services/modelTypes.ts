@@ -27,14 +27,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     requiredFieldTypes: ['numeric'],
     targetDataType: 'numeric',
     exploreName: 'boosted_tree',
-    modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
-    modelFields: {
-      [MODEL_EVAL_FUNCS.evaluate]:
-        ['mean_absolute_error', 'mean_squared_error', 'mean_squared_log_error',
-        'median_absolute_error', 'r2_score', 'explained_variance'].map(
-          (field: string) => `boosted_tree_evaluate.${field}`
-        )
-    }
+    modelTabs: () => [MODEL_EVAL_FUNCS.evaluate]
   },
   BOOSTED_TREE_CLASSIFIER: {
     label: 'Classification',
@@ -42,12 +35,11 @@ export const MODEL_TYPES: {[key: string]: any} = {
     detail: 'BOOSTED_TREE_CLASSIFIER',
     description: 'I want to classify something',
     exploreName: 'boosted_tree',
-    modelTabs: [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve],
-    modelFields: {
-      [MODEL_EVAL_FUNCS.evaluate]: ['precision', 'recall', 'accuracy', 'f1_score', 'log_loss', 'roc_auc'].map(
-        (field: string) => `boosted_tree_evaluate.${field}`
-      )
-    }
+    modelTabs: (isBinary: boolean) => (
+      isBinary ?
+        [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix, MODEL_EVAL_FUNCS.rocCurve] :
+        [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix]
+    )
   },
   ARIMA_PLUS: {
     label: 'Time series forecasting',
@@ -58,21 +50,14 @@ export const MODEL_TYPES: {[key: string]: any} = {
     exploreName: 'arima',
     targetDataType: 'numeric',
     optionalParameters: true,
-    modelTabs: [MODEL_EVAL_FUNCS.arimaEvaluate],
-    modelFields: {
-      [MODEL_EVAL_FUNCS.arimaEvaluate]:
-        ['non_seasonal_p', 'non_seasonal_d', 'non_seasonal_q', 'has_drift', 'log_likelihood', 'aic', 'variance',
-        'seasonal_periods', 'has_holiday_effect', 'has_spikes_and_dips', 'has_step_changes', 'error_message'].map(
-          (field: string) => `arima_evaluate.${field}`
-        )
-    }
+    modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
   },
   KMEANS: {
     label: 'Clustering',
     value: 'KMEANS',
     detail: 'KMEANS',
     description: 'Try Clustering',
-    modelTabs: [MODEL_EVAL_FUNCS.evaluate]
+    modelTabs: () => [MODEL_EVAL_FUNCS.evaluate]
   },
 }
 
@@ -85,93 +70,11 @@ export const isBoostedTree = (objective: string): boolean => (
   objective === MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value
 )
 
-type IFormSQLProps = {
-  uid: string,
-  gcpProject: string,
-  bqmlModelDatasetName: string,
-  bqModelName: string,
-  target: string,
-  features: string[],
-  arimaTimeColumn?: string,
-  advancedSettings?: any
-}
 
-interface IFormBoostedTreeTypeSQLProps extends IFormSQLProps {
-  boostedType: string
-}
 
-const formBoostedTreeSQL = ({
-  uid,
-  gcpProject,
-  bqmlModelDatasetName,
-  bqModelName,
-  target,
-  features,
-  boostedType,
-  advancedSettings
-}: IFormBoostedTreeTypeSQLProps): string => {
-  const settingsSql = advancedSettingsSql(advancedSettings)
-  return `
-    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
-          OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
-          , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
-          ${settingsSql})
-    AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`;
-  `
-}
-
-const formBoostedTreeClassifierSQL = (props: IFormSQLProps): string => {
-  return formBoostedTreeSQL({...props, boostedType: 'classifier'})
-}
-
-const formBoostedTreeRegressorSQL = (props: IFormSQLProps): string => {
-  return formBoostedTreeSQL({...props, boostedType: 'regressor'})
-}
-
-const formArimaSQL = ({
-  uid,
-  gcpProject,
-  bqmlModelDatasetName,
-  bqModelName,
-  target,
-  advancedSettings = {},
-  arimaTimeColumn
-}: IFormSQLProps) => {
-  if (!arimaTimeColumn) { return '' }
-  return `
-    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
-    OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
-      , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
-      , time_series_data_col = '${target.replace(".", "_")}'
-      , HORIZON = ${ advancedSettings.horizon || '1000' }
-      ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
-      , AUTO_ARIMA = TRUE)
-    AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`) ;
-  `
-}
-
-export const MODEL_TYPE_CREATE_METHOD: { [key: string]: (props: IFormSQLProps) => string } = {
-  BOOSTED_TREE_REGRESSOR: formBoostedTreeRegressorSQL,
-  BOOSTED_TREE_CLASSIFIER: formBoostedTreeClassifierSQL,
-  ARIMA_PLUS: formArimaSQL
-}
-
-type BoostedTreePredictProps = {
-  lookerSql: string,
-  bqmlModelDatasetName: string,
-  bqModelName: string
-}
-
-export const createBoostedTreePredictSql = ({
-  lookerSql,
-  bqmlModelDatasetName,
-  bqModelName
-}: BoostedTreePredictProps) => {
-  return `
-    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
-    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${removeLimit(lookerSql)})))
-  `
-}
+/********************/
+/* INPUT_DATA SQL */
+/********************/
 
 type FormBQInputDataSQLProps = {
   sql: string | undefined,
@@ -224,6 +127,284 @@ type GetBoostedTreePredictProps = {
   bqModelName: string,
   sorts: string[],
   limit?: string
+}
+
+
+
+/********************/
+/* MODEL CREATE SQL */
+/********************/
+type IFormModelCreateSQLProps = {
+  uid: string,
+  gcpProject: string,
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  target: string,
+  features: string[],
+  arimaTimeColumn?: string,
+  advancedSettings?: any
+}
+
+interface IFormBoostedTreeModelCreateSQLProps extends IFormModelCreateSQLProps {
+  boostedType: string
+}
+
+const formBoostedTreeSQL = ({
+  uid,
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  target,
+  features,
+  boostedType,
+  advancedSettings
+}: IFormBoostedTreeModelCreateSQLProps): string => {
+  const settingsSql = advancedSettingsSql(advancedSettings)
+  return `
+    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
+          OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
+          , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
+          ${settingsSql})
+    AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`;
+  `
+}
+
+const formBoostedTreeClassifierSQL = (props: IFormModelCreateSQLProps): string => {
+  return formBoostedTreeSQL({...props, boostedType: 'classifier'})
+}
+
+const formBoostedTreeRegressorSQL = (props: IFormModelCreateSQLProps): string => {
+  return formBoostedTreeSQL({...props, boostedType: 'regressor'})
+}
+
+const formArimaSQL = ({
+  uid,
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  target,
+  advancedSettings = {},
+  arimaTimeColumn
+}: IFormModelCreateSQLProps) => {
+  if (!arimaTimeColumn) { return '' }
+  return `
+    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
+    OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
+      , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
+      , time_series_data_col = '${target.replace(".", "_")}'
+      , HORIZON = ${ advancedSettings.horizon || '1000' }
+      ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
+      , AUTO_ARIMA = TRUE)
+    AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`) ;
+  `
+}
+
+export const MODEL_TYPE_CREATE_METHOD: { [key: string]: (props: IFormModelCreateSQLProps) => string } = {
+  BOOSTED_TREE_REGRESSOR: formBoostedTreeRegressorSQL,
+  BOOSTED_TREE_CLASSIFIER: formBoostedTreeClassifierSQL,
+  ARIMA_PLUS: formArimaSQL
+}
+
+
+/********************/
+/* EVALUATE SQL */
+/********************/
+
+type FormEvaluateSqlProps = {
+  gcpProject?: string,
+  bqmlModelDatasetName?: string,
+  bqModelName: string,
+  target?: string,
+  uid?: string
+  selectedFeatures: string[]
+}
+
+export const formEvaluateSql = ({
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  uid,
+  selectedFeatures
+}: FormEvaluateSqlProps) => {
+  if (
+    !gcpProject ||
+    !bqmlModelDatasetName ||
+    !bqModelName ||
+    !uid
+  ) {
+    return false
+  }
+  return `CREATE OR REPLACE TABLE
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_evaluate AS (
+    SELECT *
+    FROM ML.EVALUATE(
+      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
+      (SELECT ${selectedFeatures.join(', ')}
+      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid})
+    ))
+  `
+}
+
+type FormConfusionMatrixSqlProps = {
+  gcpProject?: string,
+  bqmlModelDatasetName?: string,
+  bqModelName: string,
+  uid?: string
+  selectedFeatures: string[]
+}
+
+export const formConfusionMatrixSql = ({
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  uid,
+  selectedFeatures
+}: FormConfusionMatrixSqlProps) => {
+  if (
+    !gcpProject ||
+    !bqmlModelDatasetName ||
+    !bqModelName ||
+    !uid
+  ) {
+    return false
+  }
+  return `CREATE OR REPLACE TABLE
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_confusion_matrix AS (
+    SELECT *
+    FROM ML.CONFUSION_MATRIX (
+      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
+      (SELECT ${selectedFeatures.join(', ')}
+      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid})
+    ))
+  `
+}
+
+type FormROCCurveSqlProps = {
+  gcpProject?: string,
+  bqmlModelDatasetName?: string,
+  bqModelName: string,
+  uid?: string
+  selectedFeatures: string[]
+}
+
+export const formROCCurveSql = ({
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  uid,
+  selectedFeatures
+}: FormROCCurveSqlProps) => {
+  if (
+    !gcpProject ||
+    !bqmlModelDatasetName ||
+    !bqModelName ||
+    !uid
+  ) {
+    return false
+  }
+  return `CREATE OR REPLACE TABLE
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_roc_curve AS (
+    SELECT *
+    FROM ML.ROC_CURVE(
+      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
+      (SELECT ${selectedFeatures.join(', ')}
+      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid})
+    ))
+  `
+}
+
+type FormArimaEvaluateSqlProps = {
+  gcpProject?: string,
+  bqmlModelDatasetName?: string,
+  bqModelName: string,
+  uid?: string
+}
+
+export const formArimaEvaluateSql = ({
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  uid
+}: FormArimaEvaluateSqlProps) => {
+  if (
+    !gcpProject ||
+    !bqmlModelDatasetName ||
+    !bqModelName ||
+    !uid
+  ) {
+    return false
+  }
+  return `CREATE OR REPLACE TABLE
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_evaluate AS (
+    SELECT *
+    FROM ML.ARIMA_EVALUATE(
+      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
+      STRUCT(FALSE AS show_all_candidate_models)
+    ))
+  `
+}
+
+export const EVALUATE_CREATE_SQL_METHODS: { [key: string]: (props: any) => string | false } = {
+  [MODEL_EVAL_FUNCS.evaluate]: formEvaluateSql,
+  [MODEL_EVAL_FUNCS.confusionMatrix]: formConfusionMatrixSql,
+  [MODEL_EVAL_FUNCS.rocCurve]: formROCCurveSql,
+  [MODEL_EVAL_FUNCS.arimaEvaluate]: formArimaEvaluateSql
+}
+
+type GetEvaluateDataSqlProps = {
+  evalFuncName: string,
+  gcpProject?: string,
+  bqmlModelDatasetName?: string,
+  bqModelName?: string,
+}
+
+export const getEvaluateDataSql = ({
+  evalFuncName,
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+}: GetEvaluateDataSqlProps) => {
+  if (
+    !gcpProject ||
+    !bqmlModelDatasetName ||
+    !bqModelName
+  ) {
+    return false
+  }
+
+  let tableSuffix = '_evaluate'
+  switch (evalFuncName) {
+    case MODEL_EVAL_FUNCS.confusionMatrix:
+      tableSuffix = '_confusion_matrix'
+      break
+    case MODEL_EVAL_FUNCS.rocCurve:
+      tableSuffix = '_roc_curve'
+      break
+  }
+
+  return `SELECT * FROM ${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${tableSuffix}`
+}
+
+
+/********************/
+/* PREDICT SQL */
+/********************/
+
+type BoostedTreePredictProps = {
+  lookerSql: string,
+  bqmlModelDatasetName: string,
+  bqModelName: string
+}
+
+export const createBoostedTreePredictSql = ({
+  lookerSql,
+  bqmlModelDatasetName,
+  bqModelName
+}: BoostedTreePredictProps) => {
+  return `
+    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
+    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${removeLimit(lookerSql)})))
+  `
 }
 
 export const getBoostedTreePredictSql = ({

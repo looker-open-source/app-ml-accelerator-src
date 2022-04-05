@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useState } from 'react'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
-import { formBQInputDataSQL, isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
+import { formBQInputDataSQL, isArima, MODEL_TYPES, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
 import { JOB_STATUSES } from '../constants'
 import { wizardInitialState } from '../reducers/wizard'
-import { BQModelState, Step4State, WizardState } from '../types'
+import { BQModelState, Step3State, Step4State, WizardState } from '../types'
 import { bqModelInitialState } from '../reducers/bqModel'
 import { v4 as uuidv4 } from 'uuid';
+import Step3 from '../components/Step3'
+import { noDot } from '../services/string'
+import { isBinaryClassifier } from '../services/summary'
 
 type ISummaryContext = {
   getSummaryData?: (
@@ -174,6 +177,7 @@ export const SummaryProvider = ({ children }: any) => {
       },
       inputDataUID: step3.inputData.uid,
       objective: step1.objective,
+      binaryClassifier: isBinaryClassifier(step1.objective || '', step3),
       name: step3.bqModelName,
       target: step3.targetField,
       arimaTimeColumn: step3.arimaTimeColumn,

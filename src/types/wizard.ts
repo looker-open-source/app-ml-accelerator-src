@@ -43,6 +43,7 @@ export type Step3State = {
 }
 
 export type Step4State = {
+  evaluateData: any,
   complete?: boolean
 }
 
