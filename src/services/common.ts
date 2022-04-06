@@ -71,6 +71,7 @@ export const numericOnly = (e: any) => {
   const re = /[0-9]+/g;
   if (!re.test(e.key)) {
     e.preventDefault();
+    return false
   }
 }
 

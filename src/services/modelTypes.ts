@@ -1,3 +1,4 @@
+import { DEFAULT_ARIMA_HORIZON } from "../constants"
 import { advancedSettingsSql } from "./advancedSettings"
 import { noDot } from "./string"
 import { removeLimit } from "./summary"
@@ -183,7 +184,7 @@ const formArimaSQL = ({
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
-      , HORIZON = ${ advancedSettings.horizon || '1000' }
+      , HORIZON = ${ advancedSettings.horizon || DEFAULT_ARIMA_HORIZON }
       ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
       , AUTO_ARIMA = TRUE)
     AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`) ;

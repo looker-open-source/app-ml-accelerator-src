@@ -1,18 +1,15 @@
 import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
-import { getLooksFolderName } from '../services/user'
 import { createArimaPredictSql, createBoostedTreePredictSql, getPredictSql, MODEL_TYPES } from '../services/modelTypes'
 import { bqResultsToLookerFormat, buildApplyFilters, getPredictedColumnName } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
 import { WizardContext } from './WizardProvider'
 import { BQMLContext } from './BQMLProvider'
 import { BQModelState, WizardState } from '../types'
-import { compact } from 'lodash'
 
 type IApplyContext = {
-  isLoading?: boolean,
-  getArimaPredictions?: () => Promise<any>,
+  generateArimaPredictions?: () => Promise<any>,
   getPredictions?: () => Promise<any>,
   generatePredictions?: (lookerSql: string, getOnly?: boolean) => Promise<any>
 }
@@ -27,9 +24,7 @@ export const ApplyProvider = ({ children }: any) => {
   const { coreSDK } = useContext(ExtensionContext2)
   const { persistModelState } = useContext(WizardContext)
   const { queryJob } = useContext(BQMLContext)
-  const [ isLoading, setIsLoading ] = useState<boolean>(false)
   const { bqmlModelDatasetName } = state.userAttributes
-  const { personalFolderId, looksFolderId, id: userId } = state.user
   const { bqModel } = state
   const { step5 } = state.wizard.steps
 
@@ -91,7 +86,6 @@ export const ApplyProvider = ({ children }: any) => {
     try {
       if (!bqmlModelDatasetName) { throw "No dataset provided" }
       let sql
-      debugger
       switch (bqModel.objective) {
         case MODEL_TYPES.ARIMA_PLUS.value:
           sql = createArimaPredictSql({
@@ -196,14 +190,13 @@ export const ApplyProvider = ({ children }: any) => {
     }
   }
 
-  const getArimaPredictions = async () => {
+  const generateArimaPredictions = async () => {
     const {
       objective: bqModelObjective,
       name: bqModelName,
       inputDataUID: uid,
       target: bqModelTarget,
-      arimaTimeColumn: bqModelArimaTimeColumn,
-      advancedSettings: bqModelAdvancedSettings
+      arimaTimeColumn: bqModelArimaTimeColumn
     } = bqModel
 
     if (
@@ -223,8 +216,9 @@ export const ApplyProvider = ({ children }: any) => {
         bqModelName,
         bqModelTarget,
         bqModelArimaTimeColumn,
-        bqModelAdvancedSettings
+        predictSettings: step5.predictSettings
       })
+
       const { ok, value: queryResult } = await coreSDK.create_query({
         model: BQML_LOOKER_MODEL,
         view: modelType.exploreName,
@@ -239,12 +233,14 @@ export const ApplyProvider = ({ children }: any) => {
       })
       if (!runOk) { throw "Query creation failed" }
 
+      // Format results so that column names are reverted to their original names
       const formattedResults = value.data.map((datum: any) => ({
         [getPredictedColumnName(bqModelTarget)]: datum['arima_forecast.total_forecast'],
         [bqModelTarget]: datum['arima_forecast.time_series_data_col'],
         [bqModelArimaTimeColumn]: datum['arima_forecast.date_date']
       }))
 
+      // filter out unused fields
       const isTargetOrTimeColumn = (field: any) => field === bqModelTarget || field === bqModelArimaTimeColumn
       const filteredDimensions = step5.selectedFields.dimensions.filter(isTargetOrTimeColumn)
       const filteredMeasures = step5.selectedFields.measures.filter(isTargetOrTimeColumn)
@@ -256,6 +252,7 @@ export const ApplyProvider = ({ children }: any) => {
         predictions: [getPredictedColumnName(bqModelTarget)]
       }
 
+      // Update Wizard UI with fetched Data
       const ranQuery = {
         data: formattedResults,
         rowCount: formattedResults.length,
@@ -273,12 +270,27 @@ export const ApplyProvider = ({ children }: any) => {
         type: 'addToStepData',
         step: 'step5',
         data: {
-          ...step5,
           showPredictions: true,
           selectedFields,
           ranQuery
         }
       })
+
+      // Save changes
+      const tempWizardState = {
+        ...state.wizard,
+        unlockedStep: 5
+      }
+      const tempBQModel = {
+        ...bqModel,
+        predictSettings: step5.predictSettings
+      }
+      const { ok: savedOk } = await persistModelState?.(tempWizardState, tempBQModel)
+      if (!savedOk) {
+        throw "Error occurred while saving model state"
+      }
+      dispatch ({ type: 'setBQModel', data: tempBQModel })
+      dispatch ({ type: 'setUnlockedStep', step: 5 })
 
       return queryResult
     } catch (error) {
@@ -292,8 +304,7 @@ export const ApplyProvider = ({ children }: any) => {
   return (
     <ApplyContext.Provider
       value={{
-        isLoading,
-        getArimaPredictions,
+        generateArimaPredictions,
         getPredictions,
         generatePredictions
       }}

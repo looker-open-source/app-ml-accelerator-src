@@ -57,6 +57,10 @@ body,
     margin: 0;
   }
 
+  .tiny-text {
+    font-size: 10px;
+  }
+
   .rotate-down {
     transform: rotate(90deg);
     transition: transform 0.25s ease-out;

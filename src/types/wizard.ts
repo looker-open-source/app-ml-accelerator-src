@@ -57,7 +57,8 @@ export type Step5State = {
   selectedFields: SelectedFields,
   sorts: string[],
   tableHeaders: ResultsTableHeaderItem[] | undefined,
-  ranQuery: RanQuery | undefined
+  ranQuery: RanQuery | undefined,
+  predictSettings: any
 }
 
 export type GenericStepState = Step1State | Step2State | Step3State | Step4State | Step5State

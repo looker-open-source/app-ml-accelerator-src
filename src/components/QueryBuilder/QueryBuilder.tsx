@@ -10,6 +10,8 @@ import { hasOrphanedSorts } from '../../services/resultsTable'
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
+import { isArima } from "../../services/modelTypes"
+import ArimaParamsPicker from "./ArimaParamsPicker"
 
 
 type QueryBuilderProps = {
@@ -28,7 +30,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
   predictionsButton
 }) => {
   const { saveQueryToState, createAndRunQuery } = useContext(WizardContext)
-  const { stepData, stepName, hideDirectoryPane } = useContext(QueryBuilderContext)
+  const { stepData, stepName } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
   const { step5 } = state.wizard.steps
   const firstUpdate = useRef(true)
@@ -71,8 +73,14 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
     }
   }
 
-  const directoryPaneContents = stepData.exploreName ?
-    (<FieldsSelect/>) : (<ExploreSelect />)
+  const directoryPaneContents = () => {
+    if (!stepData.exploreName) { return (<ExploreSelect />) }
+
+    if (stepName === 'step5' && isArima(state.bqModel.objective || '')) {
+      return <ArimaParamsPicker setIsLoading={setIsLoading}/>
+    }
+    return (<FieldsSelect/>)
+  }
 
   const queryPaneContents = stepData.exploreName && stepData.exploreData ?
     (<QueryPane/>) : (<NoExplorePlaceHolder />)
@@ -98,11 +106,9 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
         </div>
       </div>
       <div className="default-layout">
-        { !hideDirectoryPane &&
-          <div className="pane directory-pane">
-            {directoryPaneContents}
-          </div>
-        }
+        <div className="pane directory-pane">
+          {directoryPaneContents()}
+        </div>
         <div className="pane query-pane">
           {queryPaneContents}
         </div>

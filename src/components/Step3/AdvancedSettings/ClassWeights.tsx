@@ -102,7 +102,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
                 value={form.class_weights[column] || ''}
                 onChange={(e: any) => handleTextChange(e, column)}
                 onKeyPress={floatOnly}
-                description={<span>Float only</span>}
+                description={<span className="tiny-text">Decimal only</span>}
                 label="Weight"
               />
             </div>

@@ -4,6 +4,7 @@ import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
 import { useStore } from '../../contexts/StoreProvider'
 import QueryBuilder from '../QueryBuilder'
 import { Button } from '@looker/components'
+import { WizardContext } from '../../contexts/WizardProvider'
 
 type ArimaPredictProps = {
   isLoading: boolean,
@@ -12,31 +13,36 @@ type ArimaPredictProps = {
 
 export const ArimaPredict: React.FC<ArimaPredictProps> = ({ isLoading, setIsLoading }) => {
   const { state } = useStore()
-  const { getArimaPredictions } = useContext(ApplyContext)
+  const { step5 } = state.wizard.steps
+  const { generateArimaPredictions } = useContext(ApplyContext)
+  const { fetchExplore } = useContext(WizardContext)
 
   useEffect(() => {
     getPredictions()
   }, [])
 
+  const getExplore = async () => {
+    if (!step5.modelName || !step5.exploreName) { return }
+    await fetchExplore?.(step5.modelName, step5.exploreName, 'step5')
+  }
+
   const getPredictions = async () => {
     setIsLoading(true)
-    await getArimaPredictions?.()
+    await getExplore()
+    await generateArimaPredictions?.()
     setIsLoading(false)
   }
 
   return (
     <>
-      <QueryBuilderProvider stepName="step5" lockFields={true} hideDirectoryPane={true}>
+      <QueryBuilderProvider stepName="step5" lockFields={true}>
         <QueryBuilder
           setIsLoading={setIsLoading}
-          // runCallback={removePredictions}
-          // getPredictions={() => genPredictions(true)}
           showPredictionsButton={true}
           predictionsButton={
             <Button
               className="action-button generate-predictions-button"
               onClick={() => getPredictions()}
-              // disabled={disablePredictButton()}
               >
                 Generate Predictions
             </Button>

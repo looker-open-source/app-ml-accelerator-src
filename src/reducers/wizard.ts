@@ -95,7 +95,8 @@ const wizardInitialState: WizardState = {
       // this allows us to compare the query that was ran with the query that is about to be ran
       ranQuery: undefined,
       sorts: [],
-      tableHeaders: []
+      tableHeaders: [],
+      predictSettings: {}
     }
   }
 }

@@ -20,6 +20,7 @@ export type BQModelState = {
   jobStatus?: string,
   job?: any,
   hasPredictions: boolean,
+  predictSettings: any,
   applyQuery: {
     exploreName?: string,
     modelName?: string,

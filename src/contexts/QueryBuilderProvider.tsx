@@ -15,7 +15,6 @@ type IQueryBuilderContext = {
   stepData: any,
   stepName: 'step2' | 'step5',
   lockFields: boolean,
-  hideDirectoryPane: boolean,
   fetchSortedModelsAndExplores?: () => Promise<any>,
   getStaticDataCreatedTime?: () => Promise<any>
 }
@@ -24,17 +23,15 @@ export const QueryBuilderContext = createContext<IQueryBuilderContext>({
   stepData: wizardInitialState.steps.step2,
   stepName: 'step2',
   lockFields: false,
-  hideDirectoryPane: false
 })
 
 type QueryBuilderProps = {
   children: any
   stepName: 'step2' | 'step5',
   lockFields?: boolean,
-  hideDirectoryPane?: boolean
 }
 
-export const QueryBuilderProvider = ({ children, stepName, lockFields, hideDirectoryPane }: QueryBuilderProps) => {
+export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBuilderProps) => {
   const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
   const { queryJob } = useContext(BQMLContext)
@@ -98,7 +95,6 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields, hideDirec
         stepData,
         stepName,
         lockFields: !!lockFields,
-        hideDirectoryPane: !!hideDirectoryPane,
         fetchSortedModelsAndExplores,
         getStaticDataCreatedTime
       }}
