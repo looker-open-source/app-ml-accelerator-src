@@ -1,0 +1,30 @@
+.threshold-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 22px;
+  position: relative;
+
+  .threshold-label {
+    margin-right: 12px;
+  }
+
+  .threshold-field {
+    width: 130px;
+  }
+
+  .threshold-error {
+    position: absolute;
+    bottom: -14px;
+    text-align: right;
+  }
+
+  .threshold-visible {
+    &.hide {
+      display: none;
+    }
+    &.show {
+      display: block;
+    }
+  }
+}

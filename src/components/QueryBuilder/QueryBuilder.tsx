@@ -12,6 +12,7 @@ import { WizardContext } from "../../contexts/WizardProvider"
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 import { isArima } from "../../services/modelTypes"
 import ArimaParamsPicker from "./ArimaParamsPicker"
+import BinaryClassifierThreshold from "./BinaryClassifierThreshold"
 
 
 type QueryBuilderProps = {
@@ -94,6 +95,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
         <div className="query-header-actions">
           { stepData.exploreData && (<>
               { stepName === 'step2' && <StaticDataTimeStamp /> }
+              { stepName === 'step5' && showPredictionsButton && <BinaryClassifierThreshold /> }
               { showPredictionsButton ? predictionsButton :
                 <Button
                   onClick={() => runQuery(true)}

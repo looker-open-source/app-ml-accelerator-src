@@ -385,21 +385,26 @@ export const getEvaluateDataSql = ({
 type BoostedTreePredictProps = {
   lookerSql: string,
   bqmlModelDatasetName: string,
-  bqModelName: string
+  bqModelName: string,
+  threshold?: string
 }
 
 export const createBoostedTreePredictSql = ({
   lookerSql,
   bqmlModelDatasetName,
-  bqModelName
+  bqModelName,
+  threshold
 }: BoostedTreePredictProps) => {
   return `
     CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
-    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${removeLimit(lookerSql)})))
+    ( SELECT * FROM ML.PREDICT(
+      MODEL ${bqmlModelDatasetName}.${bqModelName},
+      (${removeLimit(lookerSql)})
+      ${ threshold && `, STRUCT(${threshold} as threshold)` }))
   `
 }
 
-type ArimmaPredictProps = {
+type ArimaPredictProps = {
   bqmlModelDatasetName: string,
   bqModelName: string,
   horizon?: number,
@@ -411,7 +416,7 @@ export const createArimaPredictSql = ({
   bqModelName,
   horizon = 30,
   confidenceLevel = 0.95
-}: ArimmaPredictProps) => {
+}: ArimaPredictProps) => {
   return `
     CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
     ( SELECT * FROM ML.FORECAST(MODEL ${bqmlModelDatasetName}.${bqModelName}

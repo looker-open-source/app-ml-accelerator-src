@@ -99,7 +99,8 @@ export const ApplyProvider = ({ children }: any) => {
           sql = createBoostedTreePredictSql({
             bqmlModelDatasetName,
             lookerSql,
-            bqModelName: bqModel.name
+            bqModelName: bqModel.name,
+            threshold: bqModel.binaryClassifier ? step5.predictSettings.threshold : undefined
           })
       }
 

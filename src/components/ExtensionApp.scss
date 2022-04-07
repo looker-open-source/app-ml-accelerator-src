@@ -61,6 +61,11 @@ body,
     font-size: 10px;
   }
 
+  .field-error {
+    font-size: 11px;
+    color: rgb(204, 31, 54);
+  }
+
   .rotate-down {
     transform: rotate(90deg);
     transition: transform 0.25s ease-out;
