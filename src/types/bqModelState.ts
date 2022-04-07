@@ -19,8 +19,8 @@ export type BQModelState = {
   binaryClassifier: boolean,
   jobStatus?: string,
   job?: any,
-  look?: any,
   hasPredictions: boolean,
+  predictSettings: any,
   applyQuery: {
     exploreName?: string,
     modelName?: string,

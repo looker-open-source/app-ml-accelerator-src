@@ -32,8 +32,8 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
       binaryClassifier: bqModelState.binaryClassifier,
       jobStatus: bqModelState.jobStatus,
       job: bqModelState.job,
-      look: bqModelState.look,
       hasPredictions: bqModelState.hasPredictions,
+      predictSettings: bqModelState.predictSettings,
       applyQuery: {
         exploreName: bqModelState.applyQuery.exploreName,
         modelName: bqModelState.applyQuery.modelName,
@@ -112,12 +112,12 @@ const buildWizardStep4 = (bqModelState: BQModelState, wizardStep4: Step4State): 
 const buildWizardStep5 = (bqModelState: BQModelState, wizardStep5: Step5State): Step5State => {
   const { applyQuery, inputDataQuery } = bqModelState
   const query = applyQuery.exploreName ? applyQuery : inputDataQuery
-  const mappedModelState = { ...query }
-  return {
-    ...wizardStep5,
-    ...mappedModelState,
+  const mappedModelState = {
+    ...query,
+    predictSettings: bqModelState.predictSettings,
     showPredictions: bqModelState.hasPredictions
   }
+  return { ...wizardStep5, ...mappedModelState }
 }
 
 type SavedModelState = {

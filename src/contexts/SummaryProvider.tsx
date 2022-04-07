@@ -163,16 +163,18 @@ export const SummaryProvider = ({ children }: any) => {
   // build out the BQ Model state
   const buildBaseBQModel = (wizardState: WizardState, bqModel: BQModelState, jobState: any, features: string[], advancedSettings: any) => {
     const { step1, step3 } = wizardState.steps
+    const inputDataQuery = {
+      exploreName: step3.inputData?.exploreName,
+      modelName: step3.inputData?.modelName,
+      exploreLabel: step3.inputData?.exploreLabel,
+      limit: step3.inputData?.limit,
+      selectedFields: step3.inputData?.selectedFields,
+      sorts: step3.inputData?.sorts,
+    }
+
     return {
       ...bqModel,
-      inputDataQuery: {
-        exploreName: step3.inputData?.exploreName,
-        modelName: step3.inputData?.modelName,
-        exploreLabel: step3.inputData?.exploreLabel,
-        limit: step3.inputData?.limit,
-        selectedFields: step3.inputData?.selectedFields,
-        sorts: step3.inputData?.sorts,
-      },
+      inputDataQuery,
       inputDataUID: step3.inputData.uid,
       objective: step1.objective,
       binaryClassifier: isBinaryClassifier(step1.objective || '', step3),
@@ -180,9 +182,12 @@ export const SummaryProvider = ({ children }: any) => {
       target: step3.targetField,
       arimaTimeColumn: step3.arimaTimeColumn,
       hasPredictions: false,
+      predictSettings: {
+        horizon: advancedSettings.horizon
+      },
       selectedFeatures: features,
       advancedSettings: advancedSettings,
-      applyQuery: { ...bqModelInitialState.applyQuery },
+      applyQuery: { ...bqModelInitialState.applyQuery, ...inputDataQuery },
       ...jobState
     }
   }
@@ -248,7 +253,10 @@ export const SummaryProvider = ({ children }: any) => {
       dispatch({
         type: 'addToStepData',
         step: 'step4',
-        data: { complete: false }
+        data: {
+          evaluateData: {},
+          complete: false
+        }
       })
       dispatch({ type: 'setUnlockedStep', step: 4 })
       // everytime we create/update a model, we rehydrate step5 with the same params as the inputDataQuery
@@ -258,7 +266,8 @@ export const SummaryProvider = ({ children }: any) => {
         data: {
           ...wizardInitialState.steps.step5,
           ...bqModel.inputDataQuery,
-          showPredictions: false
+          showPredictions: false,
+          predictSettings: tempBQModel.predictSettings || {}
         }
       })
       return { ok, body }

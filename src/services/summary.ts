@@ -74,14 +74,15 @@ export const needsModelUpdate = ({
   uiAdvancedSettings,
   uiObjective,
   uiFeatures,
-  uiTarget
+  uiTarget,
+  uiArimaTimeColumn
 }: NeedsModelUpdateProps) => {
   return (bqModel.jobStatus === JOB_STATUSES.failed || bqModel.jobStatus ===JOB_STATUSES.canceled) ||
     bqModel.objective !== uiObjective ||
     !isEqual(bqModel.advancedSettings, uiAdvancedSettings) ||
     bqModel.inputDataUID !== uiInputDataUID ||
     !isEqual(bqModel.selectedFeatures, uiFeatures) ||
-    hasTargetOrTimeColumnChange(bqModel, uiTarget)
+    hasTargetOrTimeColumnChange(bqModel, uiTarget, uiArimaTimeColumn)
 }
 
 export const hasTargetOrTimeColumnChange = (inputData: InputData | BQModelState, uiTarget?: string, uiArimaTimeColumn?: string) => (

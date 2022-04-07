@@ -10,6 +10,9 @@ import { hasOrphanedSorts } from '../../services/resultsTable'
 import { Button } from "@looker/components"
 import { WizardContext } from "../../contexts/WizardProvider"
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
+import { isArima } from "../../services/modelTypes"
+import ArimaParamsPicker from "./ArimaParamsPicker"
+import BinaryClassifierThreshold from "./BinaryClassifierThreshold"
 
 
 type QueryBuilderProps = {
@@ -71,8 +74,14 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
     }
   }
 
-  const directoryPaneContents = stepData.exploreName ?
-    (<FieldsSelect/>) : (<ExploreSelect />)
+  const directoryPaneContents = () => {
+    if (!stepData.exploreName) { return (<ExploreSelect />) }
+
+    if (stepName === 'step5' && isArima(state.bqModel.objective || '')) {
+      return <ArimaParamsPicker setIsLoading={setIsLoading}/>
+    }
+    return (<FieldsSelect/>)
+  }
 
   const queryPaneContents = stepData.exploreName && stepData.exploreData ?
     (<QueryPane/>) : (<NoExplorePlaceHolder />)
@@ -86,6 +95,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
         <div className="query-header-actions">
           { stepData.exploreData && (<>
               { stepName === 'step2' && <StaticDataTimeStamp /> }
+              { stepName === 'step5' && showPredictionsButton && <BinaryClassifierThreshold /> }
               { showPredictionsButton ? predictionsButton :
                 <Button
                   onClick={() => runQuery(true)}
@@ -99,7 +109,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
       </div>
       <div className="default-layout">
         <div className="pane directory-pane">
-          {directoryPaneContents}
+          {directoryPaneContents()}
         </div>
         <div className="pane query-pane">
           {queryPaneContents}

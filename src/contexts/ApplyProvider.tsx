@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
-import { getLooksFolderName } from '../services/user'
-import { createBoostedTreePredictSql, getBoostedTreePredictSql, MODEL_TYPES } from '../services/modelTypes'
+import { createArimaPredictSql, createBoostedTreePredictSql, getPredictSql, MODEL_TYPES } from '../services/modelTypes'
 import { bqResultsToLookerFormat, buildApplyFilters, getPredictedColumnName } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
 import { WizardContext } from './WizardProvider'
@@ -10,10 +9,9 @@ import { BQMLContext } from './BQMLProvider'
 import { BQModelState, WizardState } from '../types'
 
 type IApplyContext = {
-  isLoading?: boolean,
-  initArima?: () => Promise<any>,
-  getBoostedTreePredictions?: () => Promise<any>,
-  generateBoostedTreePredictions?: (lookerSql: string, getOnly?: boolean) => Promise<any>
+  generateArimaPredictions?: () => Promise<any>,
+  getPredictions?: () => Promise<any>,
+  generatePredictions?: (lookerSql: string, getOnly?: boolean) => Promise<any>
 }
 
 export const ApplyContext = createContext<IApplyContext>({})
@@ -26,21 +24,19 @@ export const ApplyProvider = ({ children }: any) => {
   const { coreSDK } = useContext(ExtensionContext2)
   const { persistModelState } = useContext(WizardContext)
   const { queryJob } = useContext(BQMLContext)
-  const [ isLoading, setIsLoading ] = useState<boolean>(false)
   const { bqmlModelDatasetName } = state.userAttributes
-  const { personalFolderId, looksFolderId, id: userId } = state.user
   const { bqModel } = state
   const { step5 } = state.wizard.steps
 
-  const generateBoostedTreePredictions = async (lookerSql: string, getOnly?: boolean) => {
+  const generatePredictions = async (lookerSql: string, getOnly?: boolean) => {
     try {
       if (!getOnly) {
-        const { ok } = await createBoostedTreePredictions(lookerSql)
+        const { ok } = await createPredictions(lookerSql)
         if (!ok) {
           return { ok: false }
         }
       }
-      const { ok: getOk, body: data } = await getBoostedTreePredictions?.()
+      const { ok: getOk, body: data } = await getPredictions?.()
       if (!getOk || !data.schema) {
         return { ok: false }
       }
@@ -86,14 +82,28 @@ export const ApplyProvider = ({ children }: any) => {
     }
   }
 
-  const createBoostedTreePredictions = async (lookerSql: string) => {
+  const createPredictions = async (lookerSql: string) => {
     try {
       if (!bqmlModelDatasetName) { throw "No dataset provided" }
-      const sql = createBoostedTreePredictSql({
-        bqmlModelDatasetName,
-        lookerSql,
-        bqModelName: bqModel.name
-      })
+      let sql
+      switch (bqModel.objective) {
+        case MODEL_TYPES.ARIMA_PLUS.value:
+          sql = createArimaPredictSql({
+            bqmlModelDatasetName,
+            bqModelName: bqModel.name
+          })
+          break;
+        case MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value:
+        case MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value:
+        default:
+          sql = createBoostedTreePredictSql({
+            bqmlModelDatasetName,
+            lookerSql,
+            bqModelName: bqModel.name,
+            threshold: bqModel.binaryClassifier ? step5.predictSettings.threshold : undefined
+          })
+      }
+
       const { ok, body } = await queryJob?.(sql)
       if (!ok) {
         throw "Unable to create table."
@@ -108,12 +118,12 @@ export const ApplyProvider = ({ children }: any) => {
     }
   }
 
-  const getBoostedTreePredictions = async () => {
+  const getPredictions = async () => {
     try {
       if (!bqmlModelDatasetName || !bqModel.target || !bqModel.inputDataQuery.exploreName) {
         throw "This model does not have a dataset, target, or an explore, please try reloading."
       }
-      const sql = getBoostedTreePredictSql({
+      const sql = getPredictSql({
         bqmlModelDatasetName,
         bqModelName: bqModel.name,
         sorts: step5.sorts || [],
@@ -181,96 +191,107 @@ export const ApplyProvider = ({ children }: any) => {
     }
   }
 
-  const initArima = async () => {
-    setIsLoading(true)
-    let folderId = looksFolderId
-    if (!folderId) {
-      folderId = await createLooksFolder()
-    }
-    if ((!bqModel.look || !bqModel.look.id) && folderId) {
-      await createLook(folderId)
-    }
-    setIsLoading(false)
-  }
-
-  // Create a folder for our BQML Looks
-  const createLooksFolder = async () => {
-    if (!userId || !personalFolderId) {
-      dispatch({
-        type: 'addError',
-        error: 'Failed to retrieve user or personal folder, please try refreshing.'
-      })
-      return
-    }
-    // Create a folder for bqml looks to be saved in
-    const newFolderName = getLooksFolderName(userId)
-    try {
-      const { ok, value: looksFolder } = await coreSDK.create_folder({
-        name: newFolderName,
-        parent_id: `${personalFolderId}`,
-      })
-      dispatch({
-        type: 'setUser',
-        user: {
-          looksFolderId: looksFolder.id
-        }
-      })
-      return looksFolder.id
-    } catch (err) {
-      dispatch({
-        type: 'addError',
-        error: 'Failed to create the looks bqml folder - ' + err
-      })
-      console.log(err)
-    }
-  }
-
-  const getLook = async () => {
-    try {
-      const { ok, value } = await coreSDK.look(`${bqModel.look.id}`)
-    } catch (err) {
-      dispatch({
-        type: 'addError',
-        error: 'Failed to load your predictions - ' + err
-      })
-    }
-  }
-
-  const createQuery = async () => {
+  const generateArimaPredictions = async () => {
     const {
       objective: bqModelObjective,
       name: bqModelName,
+      inputDataUID: uid,
       target: bqModelTarget,
-      arimaTimeColumn: bqModelArimaTimeColumn,
-      advancedSettings: bqModelAdvancedSettings
+      arimaTimeColumn: bqModelArimaTimeColumn
     } = bqModel
 
     if (
       !bqModelObjective ||
       !bqModelName ||
-      !bqModelTarget
+      !bqModelTarget ||
+      !bqModelArimaTimeColumn ||
+      !uid
     ) { return }
 
     try {
       const modelType = MODEL_TYPES[bqModelObjective]
       const filters = buildApplyFilters({
         modelType,
+        uid,
         bqModelObjective,
         bqModelName,
         bqModelTarget,
         bqModelArimaTimeColumn,
-        bqModelAdvancedSettings
+        predictSettings: step5.predictSettings
       })
+
       const { ok, value: queryResult } = await coreSDK.create_query({
         model: BQML_LOOKER_MODEL,
         view: modelType.exploreName,
         fields: ['arima_forecast.date_date', 'arima_forecast.total_forecast', 'arima_forecast.time_series_data_col'],
         filters
       })
+      if (!ok) { throw "Query creation failed" }
 
-      if (!ok) {
-        throw "Query creation failed"
+      const { ok: runOk, value } = await coreSDK.run_query({
+        query_id: queryResult.id,
+        result_format: "json_detail",
+      })
+      if (!runOk) { throw "Query creation failed" }
+
+      // Format results so that column names are reverted to their original names
+      const formattedResults = value.data.map((datum: any) => ({
+        [getPredictedColumnName(bqModelTarget)]: datum['arima_forecast.total_forecast'],
+        [bqModelTarget]: datum['arima_forecast.time_series_data_col'],
+        [bqModelArimaTimeColumn]: datum['arima_forecast.date_date']
+      }))
+
+      // filter out unused fields
+      const isTargetOrTimeColumn = (field: any) => field === bqModelTarget || field === bqModelArimaTimeColumn
+      const filteredDimensions = step5.selectedFields.dimensions.filter(isTargetOrTimeColumn)
+      const filteredMeasures = step5.selectedFields.measures.filter(isTargetOrTimeColumn)
+      const selectedFields = {
+        ...step5.selectedFields,
+        dimensions: filteredDimensions,
+        measures: filteredMeasures,
+        // add the predictedColumn so table headers will be regenerated
+        predictions: [getPredictedColumnName(bqModelTarget)]
       }
+
+      // Update Wizard UI with fetched Data
+      const ranQuery = {
+        data: formattedResults,
+        rowCount: formattedResults.length,
+        sql: '',
+        exploreUrl: '',
+        exploreName: step5.exploreName,
+        modelName: step5.modelName,
+        exploreLabel: step5.exploreLabel,
+        limit: step5.limit,
+        selectedFields,
+        sorts: step5.sorts,
+      }
+
+      dispatch({
+        type: 'addToStepData',
+        step: 'step5',
+        data: {
+          showPredictions: true,
+          selectedFields,
+          ranQuery
+        }
+      })
+
+      // Save changes
+      const tempWizardState = {
+        ...state.wizard,
+        unlockedStep: 5
+      }
+      const tempBQModel = {
+        ...bqModel,
+        predictSettings: step5.predictSettings
+      }
+      const { ok: savedOk } = await persistModelState?.(tempWizardState, tempBQModel)
+      if (!savedOk) {
+        throw "Error occurred while saving model state"
+      }
+      dispatch ({ type: 'setBQModel', data: tempBQModel })
+      dispatch ({ type: 'setUnlockedStep', step: 5 })
 
       return queryResult
     } catch (error) {
@@ -281,80 +302,12 @@ export const ApplyProvider = ({ children }: any) => {
     }
   }
 
-  const createLook = async (folderId: number) => {
-    try {
-      const { name: bqModelName } = bqModel
-      const queryResult = await createQuery()
-      const queryId = queryResult.id
-
-      const look = await coreSDK.create_look({
-        folder_id: folderId,
-        query_id: queryId,
-        title: bqModelName
-      })
-      if (!look.ok) {
-        const error = look.error.errors[0]
-        throw `${error.field} - ${error.message}`
-      }
-
-      const lookObj = {
-        id: look.value.id,
-        embedUrl: look.value.embed_url
-      }
-      await saveArimaState(lookObj)
-    } catch (error) {
-      dispatch({
-        type: 'addError',
-        error: 'Failed to create look - ' + error
-      })
-    }
-  }
-
-  const updateLook = async () => {
-    try {
-      const { name: bqModelName } = bqModel
-      const queryResult = await createQuery()
-      const queryId = queryResult.id
-
-      const look = await coreSDK.update_look(bqModel.look.id, {
-        query_id: queryId,
-        title: bqModelName
-      })
-      if (!look.ok) {
-        throw "error"
-      }
-
-      const lookObj = {
-        id: look.value.id,
-        embedUrl: look.value.embed_url
-      }
-      // save look id to BQ model state table
-      await saveArimaState(lookObj)
-    } catch (error) {
-      dispatch({
-        type: 'addError',
-        error: 'Failed to update look - ' + error
-      })
-    }
-  }
-
-  const saveArimaState = async (lookObj: any) => {
-    const { wizard, bqModel } = state
-    const tempBQModel = { ...bqModel, look: lookObj }
-    await persistModelState?.({ ...wizard }, tempBQModel)
-    dispatch({
-      type: 'setBQModel',
-      data: { look: lookObj }
-    })
-  }
-
   return (
     <ApplyContext.Provider
       value={{
-        isLoading,
-        initArima,
-        getBoostedTreePredictions,
-        generateBoostedTreePredictions
+        generateArimaPredictions,
+        getPredictions,
+        generatePredictions
       }}
     >
       {children}

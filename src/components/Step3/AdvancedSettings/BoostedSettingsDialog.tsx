@@ -83,7 +83,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.num_parallel_tree}
                   onChange={(e: any) => handleTextChange(e, 'num_parallel_tree')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -114,7 +114,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.min_tree_child_weight}
                   onChange={(e: any) => handleTextChange(e, 'min_tree_child_weight')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -125,7 +125,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.colsample_bytree}
                   onChange={(e: any) => handleTextChange(e, 'colsample_bytree')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -136,7 +136,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.colsample_bylevel}
                   onChange={(e: any) => handleTextChange(e, 'colsample_bylevel')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -147,7 +147,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.colsample_bynode}
                   onChange={(e: any) => handleTextChange(e, 'colsample_bynode')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -158,7 +158,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.min_split_loss}
                   onChange={(e: any) => handleTextChange(e, 'min_split_loss')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -169,7 +169,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.max_tree_depth}
                   onChange={(e: any) => handleTextChange(e, 'max_tree_depth')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -180,7 +180,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.subsample}
                   onChange={(e: any) => handleTextChange(e, 'subsample')}
                   onKeyPress={floatOnly}
-                  description={<span>Float only</span>}
+                  description={<span className="tiny-text">Decimal only</span>}
                 />
               </div>
               { objective === MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value &&
@@ -213,7 +213,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.l1_reg}
                   onChange={(e: any) => handleTextChange(e, 'l1_reg')}
                   onKeyPress={floatOnly}
-                  description={<span>Float only</span>}
+                  description={<span className="tiny-text">Decimal only</span>}
                 />
               </div>
               <div className="form-row">
@@ -224,7 +224,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.l2_reg}
                   onChange={(e: any) => handleTextChange(e, 'l2_reg')}
                   onKeyPress={floatOnly}
-                  description={<span>Float only</span>}
+                  description={<span className="tiny-text">Decimal only</span>}
                 />
               </div>
               <div className="form-row">
@@ -246,7 +246,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.learn_rate}
                   onChange={(e: any) => handleTextChange(e, 'learn_rate')}
                   onKeyPress={floatOnly}
-                  description={<span>Float only</span>}
+                  description={<span className="tiny-text">Decimal only</span>}
                 />
               </div>
               <div className="form-row">
@@ -257,7 +257,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.max_iterations}
                   onChange={(e: any) => handleTextChange(e, 'max_iterations')}
                   onKeyPress={numericOnly}
-                  description={<span>Numeric only</span>}
+                  description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
               <div className="form-row">
@@ -268,7 +268,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   value={form.min_rel_progress}
                   onChange={(e: any) => handleTextChange(e, 'min_rel_progress')}
                   onKeyPress={floatOnly}
-                  description={<span>Float only</span>}
+                  description={<span className="tiny-text">Decimal only</span>}
                 />
               </div>
               <div className="form-row">
@@ -291,7 +291,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                     value={form.data_split_eval_fraction}
                     onChange={(e: any) => handleTextChange(e, 'data_split_eval_fraction')}
                     onKeyPress={floatOnly}
-                    description={<span>Float only</span>}
+                    description={<span className="tiny-text">Decimal only</span>}
                   />
                 </div>)
               }

@@ -4,11 +4,12 @@ import { formatParameterFilter, noDot } from "./string"
 
 type buildApplyFiltersProps = {
   modelType: any,
+  uid: string,
   bqModelObjective: string,
   bqModelName: string,
   bqModelTarget: string,
   bqModelArimaTimeColumn?: string,
-  bqModelAdvancedSettings?: any
+  predictSettings?: any,
 }
 
 export const buildApplyFilters = ({
@@ -17,10 +18,12 @@ export const buildApplyFilters = ({
   bqModelName,
   bqModelTarget,
   bqModelArimaTimeColumn,
-  bqModelAdvancedSettings
+  predictSettings,
+  uid
 }: buildApplyFiltersProps) => {
   let filters = {
-    [`${modelType.exploreName}.model_name`]: formatParameterFilter(bqModelName)
+    [`${modelType.exploreName}.model_name`]: formatParameterFilter(bqModelName),
+    [`${modelType.exploreName}.input_table_name`]: formatParameterFilter(`${bqModelName}_input_data_${uid}`)
   }
   if (isArima(bqModelObjective) && bqModelArimaTimeColumn) {
     filters = {
@@ -29,8 +32,12 @@ export const buildApplyFilters = ({
       [`${modelType.exploreName}.time_series_timestamp_col`]: formatParameterFilter(bqModelArimaTimeColumn)
     }
 
-    if (bqModelAdvancedSettings.horizon) {
-      filters[`${modelType.exploreName}.set_horizon`] = bqModelAdvancedSettings.horizon
+    if (predictSettings.horizon) {
+      filters[`${modelType.exploreName}.set_horizon`] = predictSettings.horizon
+    }
+
+    if (predictSettings.confidenceLevel) {
+      filters[`${modelType.exploreName}.set_confidence_level`] = predictSettings.confidenceLevel
     }
   }
 

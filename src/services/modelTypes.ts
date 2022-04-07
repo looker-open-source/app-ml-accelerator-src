@@ -1,3 +1,4 @@
+import { DEFAULT_ARIMA_HORIZON } from "../constants"
 import { advancedSettingsSql } from "./advancedSettings"
 import { noDot } from "./string"
 import { removeLimit } from "./summary"
@@ -122,15 +123,6 @@ export const getBQInputDataMetaDataSql = ({
   `SELECT * FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}_input_data_${uid}'`
 )
 
-type GetBoostedTreePredictProps = {
-  bqmlModelDatasetName: string,
-  bqModelName: string,
-  sorts: string[],
-  limit?: string
-}
-
-
-
 /********************/
 /* MODEL CREATE SQL */
 /********************/
@@ -192,7 +184,7 @@ const formArimaSQL = ({
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
-      , HORIZON = ${ advancedSettings.horizon || '1000' }
+      , HORIZON = ${ advancedSettings.horizon || DEFAULT_ARIMA_HORIZON }
       ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
       , AUTO_ARIMA = TRUE)
     AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`) ;
@@ -393,26 +385,61 @@ export const getEvaluateDataSql = ({
 type BoostedTreePredictProps = {
   lookerSql: string,
   bqmlModelDatasetName: string,
-  bqModelName: string
+  bqModelName: string,
+  threshold?: string
 }
 
 export const createBoostedTreePredictSql = ({
   lookerSql,
   bqmlModelDatasetName,
-  bqModelName
+  bqModelName,
+  threshold
 }: BoostedTreePredictProps) => {
   return `
     CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
-    ( SELECT * FROM ML.PREDICT(MODEL ${bqmlModelDatasetName}.${bqModelName}, (${removeLimit(lookerSql)})))
+    ( SELECT * FROM ML.PREDICT(
+      MODEL ${bqmlModelDatasetName}.${bqModelName},
+      (${removeLimit(lookerSql)})
+      ${ threshold ?
+        `, STRUCT(${threshold} as threshold)` : ''
+      }))
   `
 }
 
-export const getBoostedTreePredictSql = ({
+type ArimaPredictProps = {
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  horizon?: number,
+  confidenceLevel?: number
+}
+
+export const createArimaPredictSql = ({
+  bqmlModelDatasetName,
+  bqModelName,
+  horizon = 30,
+  confidenceLevel = 0.95
+}: ArimaPredictProps) => {
+  return `
+    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
+    ( SELECT * FROM ML.FORECAST(MODEL ${bqmlModelDatasetName}.${bqModelName}
+      , STRUCT(${horizon} AS horizon
+      , ${confidenceLevel} AS confidence_level)))
+  `
+}
+
+type GetPredictProps = {
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  sorts: string[],
+  limit?: string
+}
+
+export const getPredictSql = ({
   bqmlModelDatasetName,
   bqModelName,
   sorts,
   limit
-}: GetBoostedTreePredictProps) => {
+}: GetPredictProps) => {
   const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => noDot(s)).join(', ')} ` : ''
   return `
     SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString} LIMIT ${limit || 500}

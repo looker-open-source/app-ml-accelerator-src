@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { ApplyContext } from '../../contexts/ApplyProvider'
 import { QueryBuilderProvider } from '../../contexts/QueryBuilderProvider'
 import { useStore } from '../../contexts/StoreProvider'
@@ -13,22 +13,22 @@ type BoostedTreePredictProps = {
 
 export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoading, setIsLoading }) => {
   const { state, dispatch } = useStore()
-  const { generateBoostedTreePredictions, getBoostedTreePredictions } = useContext(ApplyContext)
+  const { generatePredictions, getPredictions } = useContext(ApplyContext)
   const { step5 } = state.wizard.steps
 
   useEffect(() => {
     if (step5.showPredictions) {
       setIsLoading(true)
-      getBoostedTreePredictions?.().finally(() =>
+      getPredictions?.().finally(() =>
         setIsLoading(false)
       )
     }
   }, [])
 
-  const generatePredictions = async (getOnly?: boolean) => {
+  const genPredictions = async (getOnly?: boolean) => {
     if (!step5.ranQuery) { return }
     setIsLoading(true)
-    await generateBoostedTreePredictions?.(step5.ranQuery.sql, getOnly)
+    await generatePredictions?.(step5.ranQuery.sql, getOnly)
     setIsLoading(false)
   }
 
@@ -66,12 +66,12 @@ export const BoostedTreePredict: React.FC<BoostedTreePredictProps> = ({ isLoadin
         <QueryBuilder
           setIsLoading={setIsLoading}
           runCallback={removePredictions}
-          getPredictions={() => generatePredictions(true)}
+          getPredictions={() => genPredictions(true)}
           showPredictionsButton={showPredictionsButton()}
           predictionsButton={
             <Button
               className="action-button generate-predictions-button"
-              onClick={() => generatePredictions()}
+              onClick={() => genPredictions()}
               disabled={disablePredictButton()}>
                 Generate Predictions
             </Button>

@@ -71,6 +71,7 @@ export const numericOnly = (e: any) => {
   const re = /[0-9]+/g;
   if (!re.test(e.key)) {
     e.preventDefault();
+    return false
   }
 }
 
@@ -92,6 +93,10 @@ export const formatBQResults = (data: any) => (
     const arr = row.f
     arr.forEach((col: any, i: number) => {
       const columnName = data.schema.fields[i].name
+      if (Array.isArray(col.v)) {
+        rowObj[columnName] = col.v.map((obj: any) =>  obj.v).join(', ')
+        return
+      }
       rowObj[columnName] = col.v
     })
     return rowObj

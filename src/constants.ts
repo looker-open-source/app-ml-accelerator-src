@@ -43,6 +43,10 @@ export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
   fullEmailList: 'model_info.full_email_list'
 }
 
+export const DEFAULT_PREDICT_THRESHOLD = 0.5
+export const DEFAULT_ARIMA_CONFIDENCE_LEVEL = 0.95
+export const DEFAULT_ARIMA_HORIZON = 1000
+
 export const DESC_STRING = "desc"
 export const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/bigquery'
 
