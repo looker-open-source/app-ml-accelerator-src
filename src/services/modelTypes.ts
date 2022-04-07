@@ -400,7 +400,9 @@ export const createBoostedTreePredictSql = ({
     ( SELECT * FROM ML.PREDICT(
       MODEL ${bqmlModelDatasetName}.${bqModelName},
       (${removeLimit(lookerSql)})
-      ${ threshold && `, STRUCT(${threshold} as threshold)` }))
+      ${ threshold ?
+        `, STRUCT(${threshold} as threshold)` : ''
+      }))
   `
 }
 

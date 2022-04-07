@@ -15,7 +15,7 @@ import { Add } from "@styled-icons/material"
 
 export const BinaryClassifierThreshold: React.FC = () => {
   const { state, dispatch } = useStore()
-  if (!state.bqModel.binaryClassifier) { <></> }
+  if (!state.bqModel.binaryClassifier) { return <></> }
 
   const [ thresholdError, setThresholdError ] = useState<string>('')
   const [ showThreshold, setShowThreshold ] = useState<boolean>(false)

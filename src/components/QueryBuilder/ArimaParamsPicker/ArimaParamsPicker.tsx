@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { useStore } from '../../../contexts/StoreProvider'
 import {
   Label,
@@ -6,7 +6,7 @@ import {
 } from '@looker/components'
 import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
 import { floatOnly, numericOnly } from "../../../services/common"
-import { DEFAULT_ARIMA_HORIZON } from "../../../constants"
+import { DEFAULT_ARIMA_CONFIDENCE_LEVEL, DEFAULT_ARIMA_HORIZON } from "../../../constants"
 import "./ArimaParamsPicker.scss"
 
 
@@ -18,6 +18,13 @@ export const ArimaParamsPicker: React.FC<{ setIsLoading: (isLoading: boolean) =>
   const { predictSettings } = stepData
   const { advancedSettings } = state.wizard.steps.step3
   const maxHorizon = advancedSettings.horizon ? advancedSettings.horizon : DEFAULT_ARIMA_HORIZON
+
+  useEffect(() => {
+    updateSetting({
+      horizon: predictSettings.horizon || '30',
+      confidenceLevel: predictSettings.confidenceLevel || `${DEFAULT_ARIMA_CONFIDENCE_LEVEL}`
+    })
+  }, [])
 
   // pass in { horizon: 30 }
   const updateSetting = (setting: any) => {

@@ -44,6 +44,7 @@ export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
 }
 
 export const DEFAULT_PREDICT_THRESHOLD = 0.5
+export const DEFAULT_ARIMA_CONFIDENCE_LEVEL = 0.95
 export const DEFAULT_ARIMA_HORIZON = 1000
 
 export const DESC_STRING = "desc"
