@@ -18,6 +18,14 @@ import { SaveSummaryProps } from '../types/summary'
 import { SaveInputDataProps } from '../types/inputData'
 import { cloneDeep } from 'lodash'
 
+type PersistModelStateProps = {
+  wizardState: WizardState,
+  bqModel: BQModelState,
+  isModelCreate?: boolean,
+  isModelUpdate?: boolean,
+  retry?: boolean
+}
+
 type IWizardContext = {
   loadingModel?: boolean,
   fetchExplore?: (modelName: string, exploreName: string, stepName: string) => Promise<any>,
@@ -31,7 +39,7 @@ type IWizardContext = {
   fetchSummary?: (bqModelName: string, targetField: string, uid: string) => Promise<any>,
   saveSummary?: (props: SaveSummaryProps) => void,
   saveInputData?: (props: SaveInputDataProps) => void,
-  persistModelState?: (wizardState: WizardState, bqModel: BQModelState, retry?: boolean) => Promise<any>
+  persistModelState?: (props: PersistModelStateProps) => Promise<any>
 }
 
 export const WizardContext = createContext<IWizardContext>({})
@@ -300,9 +308,17 @@ export const WizardProvider = ({ children }: any) => {
     })
   }
 
+
+
   // Save bqModel state associated with the bqModelName
   // into a BQ table so we can reload past models
-  const persistModelState = async (wizardState: WizardState, bqModel: BQModelState, retry: boolean = false) => {
+  const persistModelState = async ({
+    wizardState,
+    bqModel,
+    isModelCreate = false,
+    isModelUpdate = false,
+    retry = false
+  }: PersistModelStateProps) => {
     try {
       {
         const { ok, body } = await createModelStateTable?.()
@@ -310,7 +326,7 @@ export const WizardProvider = ({ children }: any) => {
           throw "Failed to create table"
         }
       }
-      const { ok, body } = await insertOrUpdateModelState?.(wizardState, bqModel)
+      const { ok, body } = await insertOrUpdateModelState?.({ wizardState, bqModel, isModelCreate, isModelUpdate })
       if (!ok) {
         throw "Failed to save your model"
       }
@@ -321,7 +337,7 @@ export const WizardProvider = ({ children }: any) => {
         return { ok: false }
       }
       // retry once
-      persistModelState(wizardState, bqModel, true)
+      persistModelState({ wizardState, bqModel, isModelCreate, isModelUpdate, retry: true })
     }
   }
 

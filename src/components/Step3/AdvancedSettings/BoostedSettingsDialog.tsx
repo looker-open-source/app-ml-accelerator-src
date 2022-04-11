@@ -86,16 +86,18 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   description={<span className="tiny-text">Numeric only</span>}
                 />
               </div>
-              <div className="form-row">
-                <Label>
-                  Dart Normalize Type
-                </Label>
-                <Select
-                  options={arrayToSelectOptions(DART_NORMALIZE_TYPE)}
-                  value={form.dart_normalize_type}
-                  onChange={(value: string) => handleSelectChange(value, 'dart_normalize_type')}
-                />
-              </div>
+              { form.booster_type === 'DART' &&
+                <div className="form-row">
+                  <Label>
+                    Dart Normalize Type
+                  </Label>
+                  <Select
+                    options={arrayToSelectOptions(DART_NORMALIZE_TYPE)}
+                    value={form.dart_normalize_type}
+                    onChange={(value: string) => handleSelectChange(value, 'dart_normalize_type')}
+                  />
+                </div>
+              }
               <div className="form-row">
                 <Label>
                   Tree Method

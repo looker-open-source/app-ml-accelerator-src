@@ -10,11 +10,6 @@ export const TitleBar : React.FC = () => {
           BigQuery ML<span>app</span>
         </Link>
       </div>
-      <div className="button_container">
-        <Link to={'/admin'} className="toolbar-button-link">
-          <ButtonOutline className="ToolBar-button">Model Admin</ButtonOutline>
-        </Link>
-      </div>
     </div>
   )
 }

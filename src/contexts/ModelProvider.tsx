@@ -116,7 +116,7 @@ export const ModelProvider = ({ children }: any) => {
       const { wizard, bqModel } = state
       // create a copy of the bqModel state with the job added
       const tempBQModel = { ...bqModel, jobStatus: JOB_STATUSES.canceled }
-      await persistModelState?.({ ...wizard }, tempBQModel)
+      await persistModelState?.({ wizardState: { ...wizard }, bqModel: tempBQModel })
       dispatch({
         type: 'addToStepData',
         step: 'step4',

@@ -65,7 +65,7 @@ export const ApplyProvider = ({ children }: any) => {
         unlockedStep: 5
       }
 
-      const { ok: savedOk } = await persistModelState?.(tempWizardState, tempBQModel)
+      const { ok: savedOk } = await persistModelState?.({ wizardState: tempWizardState, bqModel: tempBQModel })
       if (!savedOk) {
         throw "Error occurred while saving model state"
       }
@@ -286,7 +286,7 @@ export const ApplyProvider = ({ children }: any) => {
         ...bqModel,
         predictSettings: step5.predictSettings
       }
-      const { ok: savedOk } = await persistModelState?.(tempWizardState, tempBQModel)
+      const { ok: savedOk } = await persistModelState?.({ wizardState: tempWizardState, bqModel: tempBQModel })
       if (!savedOk) {
         throw "Error occurred while saving model state"
       }

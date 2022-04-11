@@ -53,13 +53,13 @@ export const MODEL_TYPES: {[key: string]: any} = {
     optionalParameters: true,
     modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
   },
-  KMEANS: {
-    label: 'Clustering',
-    value: 'KMEANS',
-    detail: 'KMEANS',
-    description: 'Try Clustering',
-    modelTabs: () => [MODEL_EVAL_FUNCS.evaluate]
-  },
+  // KMEANS: {
+  //   label: 'Clustering',
+  //   value: 'KMEANS',
+  //   detail: 'KMEANS',
+  //   description: 'Try Clustering',
+  //   modelTabs: () => [MODEL_EVAL_FUNCS.evaluate]
+  // },
 }
 
 export const isArima = (objective: string): boolean => (

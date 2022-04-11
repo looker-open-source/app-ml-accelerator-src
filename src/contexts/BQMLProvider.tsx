@@ -7,6 +7,13 @@ import { generateModelState } from '../services/modelState'
 import { BQML_LOOKER_MODEL, JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
 import { BQModelState, WizardState } from '../types'
 
+type insertOrUpdateModelStateProps = {
+  wizardState: WizardState,
+  bqModel: BQModelState,
+  isModelCreate?: boolean,
+  isModelUpdate?: boolean
+}
+
 type IBQMLContext = {
   expired?: boolean,
   setExpired?: (value: boolean) => void,
@@ -22,10 +29,10 @@ type IBQMLContext = {
     cancel: () => void
   },
   createModelStateTable?: () => Promise<any>,
-  insertOrUpdateModelState?: (wizardState: WizardState, bqModel: BQModelState) => Promise<any>,
+  insertOrUpdateModelState?: (props: insertOrUpdateModelStateProps) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
   getAllMySavedModels?: (hideError?: boolean) => Promise<any>,
-  getAllAccessibleSavedModels?: (hideError?: boolean) => Promise<any>,
+  getSavedModelsSharedWithMe?: (hideError?: boolean) => Promise<any>,
   getSavedModelState?: (modelName: string) => Promise<any>
   getSavedModelByName?: (modelName: string) => Promise<any>
 }
@@ -150,28 +157,49 @@ export const BQMLProvider = ({ children }: any) => {
                   (model_name         STRING,
                    state_json         STRING,
                    created_by_email   STRING,
-                   shared_with_emails   STRING)
+                   shared_with_emails   STRING,
+                   model_created_at   INTEGER,
+                   model_updated_at   INTEGER)
     `
     return queryJob(sql)
   }
 
-  const insertOrUpdateModelState = (wizardState: WizardState, bqModel: BQModelState) => {
+  const insertOrUpdateModelState = ({
+    wizardState,
+    bqModel,
+    isModelCreate = false,
+    isModelUpdate = false
+  }: insertOrUpdateModelStateProps) => {
     const  { name: bqModelName } = bqModel
     const { email: userEmail } = state.user
     const stateJson = JSON.stringify(generateModelState(wizardState, bqModel))
+
+    let timeSql: string = ''
+    let timestampCreate: string = ''
+    let timestampUpdate: string = ''
+    const now = new Date().getTime()
+    if (isModelCreate) {
+      timeSql += `, ${now} as model_created_at, ${now} as model_updated_at`
+      timestampCreate = ', model_created_at, model_updated_at'
+    }
+    if (!isModelCreate && isModelUpdate) {
+      timeSql +=`, ${now} as model_updated_at`
+      timestampUpdate = ', model_updated_at=S.model_updated_at'
+    }
 
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
           USING (SELECT '${bqModelName}' AS model_name
                   , '${stateJson}' as state_json
                   , '${userEmail}' as created_by_email
+                  ${timeSql}
                 ) AS S
           ON T.model_name = S.model_name
           WHEN MATCHED THEN
-            UPDATE SET state_json=S.state_json
+            UPDATE SET state_json=S.state_json ${timestampUpdate}
           WHEN NOT MATCHED THEN
-            INSERT (model_name, state_json, created_by_email)
-            VALUES(model_name, state_json, created_by_email)
+            INSERT (model_name, state_json, created_by_email${timestampCreate})
+            VALUES(model_name, state_json, created_by_email${timestampCreate})
     `
     return queryJob(sql)
   }
@@ -243,13 +271,13 @@ export const BQMLProvider = ({ children }: any) => {
     }
   }
 
-  // Get all models user has access to
-  const getAllAccessibleSavedModels = async (hideError?: boolean) => {
+  // Get all models shared with the user
+  const getSavedModelsSharedWithMe = async (hideError?: boolean) => {
     try {
       const { email: userEmail } = state.user
       if (!userEmail) { return { ok: false } }
       return await getSavedModels({
-        [MODEL_STATE_TABLE_COLUMNS.fullEmailList]: `%"${userEmail}"%`
+        [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: `%"${userEmail}"%`
       }, Object.values(MODEL_STATE_TABLE_COLUMNS))
     } catch (error) {
       if (!hideError) {
@@ -304,7 +332,7 @@ export const BQMLProvider = ({ children }: any) => {
         insertOrUpdateModelState,
         updateModelStateSharedWithEmails,
         getAllMySavedModels,
-        getAllAccessibleSavedModels,
+        getSavedModelsSharedWithMe,
         getSavedModelState,
         getSavedModelByName
       }}

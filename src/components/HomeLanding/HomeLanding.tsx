@@ -1,55 +1,62 @@
-import { Select } from "@looker/components"
+import { Button } from "@looker/components"
+import { Add } from "@styled-icons/material"
 import React, { useContext, useEffect, useState } from "react"
-import { Link, useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import { WIZARD_STEPS } from "../../constants"
-import { BQMLContext } from "../../contexts/BQMLProvider"
+import { AdminContext } from "../../contexts/AdminProvider"
 import { useStore } from "../../contexts/StoreProvider"
-import { buildModelListOptions, filterModelListOptions } from "../../services/modelList"
+import { BrowseModels } from "../BrowseModels/BrowseModels"
 import './HomeLanding.scss'
 
 export const HomeLanding : React.FC = () => {
   const history = useHistory()
   const { state, dispatch } = useStore()
-  const [ savedModels, setSavedModels ] = useState<any[]>([])
-  const [ filteredModels, setFilteredModels ] = useState<any[]>([])
-  const [ loadingModels, setLoadingModels ] = useState<boolean>(false)
-  const [ filterSearchTerm, setFilterSearchTerm ] = useState("")
-  const { getAllAccessibleSavedModels } = useContext(BQMLContext)
-  const { firstName, email } = state.user
+  const [ myModels, setMyModels ] = useState<any[]>([])
+  const [ myModelPages, setMyModelPages ] = useState<number>(1)
+  const [ sharedModels, setSharedModels ] = useState<any[]>([])
+  const [ sharedModelPages, setSharedModelPages ] = useState<number>(1)
+  const [ loadingSharedModels, setLoadingSharedModels ] = useState<boolean>(false)
+  const [ loadingMyModels, setLoadingMyModels ] = useState<boolean>(false)
+  const { getSharedModels, getMyModels } = useContext(AdminContext)
+  const { firstName } = state.user
 
   useEffect(() => {
-    populateSavedModels()
+    fetchMyModels()
+    fetchSharedModels()
   }, [])
 
-  const populateSavedModels = async () => {
-    setLoadingModels(true)
-    const { ok, value } = await getAllAccessibleSavedModels?.(true)
+  const fetchSharedModels = async () => {
+    setLoadingSharedModels(true)
+    const { ok, data, pages } = await getSharedModels?.()
     if (!ok) {
-      setLoadingModels(false)
+      setLoadingSharedModels(false)
       return
     }
-
-    const modelListOptions = buildModelListOptions(value.data, email || "")
-
-    setSavedModels([...modelListOptions])
-    setFilteredModels([...modelListOptions])
-    setLoadingModels(false)
+    console.log({ sharedModelData: data})
+    setSharedModels([...data])
+    setSharedModelPages(pages)
+    setLoadingSharedModels(false)
   }
 
-  useEffect(() => {
-    if (!filterSearchTerm) {
-      setFilteredModels([...savedModels])
+  const fetchMyModels = async () => {
+    setLoadingMyModels(true)
+    const { ok, data, pages } = await getMyModels?.()
+    if (!ok) {
+      setLoadingMyModels(false)
+      return
     }
-    const newFilteredModels = filterModelListOptions([...savedModels], filterSearchTerm)
-    setFilteredModels(newFilteredModels)
-  }, [filterSearchTerm])
+    setMyModels([...data])
+    setMyModelPages(pages)
+    setLoadingMyModels(false)
+  }
 
   const handleModelSelect = async (modelName: string) => {
     history.push(`/ml/${modelName}/${WIZARD_STEPS['step4']}`)
   }
 
-  const clearState = () => {
+  const goToWizard = () => {
     dispatch({ type: 'clearState' })
+    history.push('/ml')
   }
 
   return (
@@ -70,7 +77,7 @@ export const HomeLanding : React.FC = () => {
             Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit.
           </p>
           <div className="home-landing-model-select">
-            <Link to="/ml" onClick={clearState}>Create New Model</Link>
+            <Button size="large" onClick={goToWizard} className="action-color" iconBefore={<Add />}>Create a new model</Button>
           </div>
         </div>
         <div className="grid-item-large-right">
@@ -79,16 +86,15 @@ export const HomeLanding : React.FC = () => {
             Aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat, sed ullamcorper erat commodo. Vestibulum sit amet ipsum vitae mauris mattis vulputate lacinia nec neque. Aenean quis consectetur nisi, ac interdum elit. Aliquam sit amet luctus elit, id tempus purus.
           </p>
           <div className="home-landing-model-select">
-            <label>Select a Model</label>
-            <Select
-              options={filteredModels}
-              placeholder="View/Edit a Model"
-              onChange={handleModelSelect}
-              isLoading={loadingModels}
-              value={filterSearchTerm}
-              onFilter={setFilterSearchTerm}
-              isFilterable
-            />
+            <h5>My Models</h5>
+            <BrowseModels models={myModels} loadingModels={loadingMyModels} totalPages={myModelPages}/>
+            { sharedModels && sharedModels.length > 0 ?
+              <>
+                <h5>Models Shared With Me</h5>
+                <BrowseModels models={sharedModels} loadingModels={loadingSharedModels} totalPages={sharedModelPages} isShared={true}/>
+              </>
+              : <></>
+            }
           </div>
         </div>
       </div>

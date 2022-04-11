@@ -242,9 +242,10 @@ export const SummaryProvider = ({ children }: any) => {
         ...wizard,
         unlockedStep: 4
       }
+      const isModelCreate = !bqModel.name
       const tempBQModel = buildBaseBQModel(wizard, bqModel, jobState, features, advancedSettings)
 
-      await persistModelState?.(tempWizard, tempBQModel)
+      await persistModelState?.({ wizardState: tempWizard, bqModel: tempBQModel, isModelCreate, isModelUpdate: true })
 
       dispatch({
         type: 'setBQModel',
