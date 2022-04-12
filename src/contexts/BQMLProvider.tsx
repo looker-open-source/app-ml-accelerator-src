@@ -28,6 +28,7 @@ type IBQMLContext = {
     promise: Promise<any>,
     cancel: () => void
   },
+  getModel?: (props: any) => Promise<any>,
   createModelStateTable?: () => Promise<any>,
   insertOrUpdateModelState?: (props: insertOrUpdateModelStateProps) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
@@ -149,6 +150,19 @@ export const BQMLProvider = ({ children }: any) => {
       maxAttempts
     })
     return { promise, cancel }
+  }
+
+  /**
+   * Fetch a model
+   */
+   const getModel = async ({ modelName }: { modelName: string }) => {
+    if (!modelName) {
+      throw "Failed fetch model because modelName was not provided"
+    }
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`
+    )
+    return result
   }
 
   const createModelStateTable = () => {
@@ -329,6 +343,7 @@ export const BQMLProvider = ({ children }: any) => {
         cancelJob,
         getJob,
         pollJobStatus,
+        getModel,
         createModelStateTable,
         insertOrUpdateModelState,
         updateModelStateSharedWithEmails,

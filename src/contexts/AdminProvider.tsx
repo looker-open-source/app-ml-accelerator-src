@@ -4,6 +4,7 @@ import { BQMLContext } from './BQMLProvider'
 import { formatSavedModelData, MODELS_PER_PAGE } from '../services/modelList'
 
 type IAdminContext = {
+  getModelMetadata?: (modelName: string) => Promise<any>
   updateSharedEmails?: (bqModelName: string, sharedWithEmails: any[]) => Promise<any>,
   getSharedModels?: () => Promise<any>,
   getMyModels?: () => Promise<any>
@@ -13,7 +14,23 @@ export const AdminContext = createContext<IAdminContext>({})
 
 export const AdminProvider = ({ children }: any) => {
   const { dispatch } = useStore()
-  const { updateModelStateSharedWithEmails, getSavedModelsSharedWithMe, getAllMySavedModels } = useContext(BQMLContext)
+  const { updateModelStateSharedWithEmails, getSavedModelsSharedWithMe, getAllMySavedModels, getModel } = useContext(BQMLContext)
+
+  const getModelMetadata = async (modelName: string) => {
+    try {
+      const { ok, body } = await getModel?.({ modelName })
+      if (!ok) {
+        throw "Request was unsuccessful"
+      }
+      return { ok, body }
+    } catch (error) {
+      dispatch({
+        type: 'addError',
+        error: `Failed to get Model metadata: ${modelName} - ${error}`
+      })
+      return { ok: false }
+    }
+  }
 
   const updateSharedEmails = async (bqModelName: string, sharedWithEmails: any[]) => {
     try {
@@ -64,6 +81,7 @@ export const AdminProvider = ({ children }: any) => {
   return (
     <AdminContext.Provider
       value={{
+        getModelMetadata,
         updateSharedEmails,
         getSharedModels,
         getMyModels

@@ -10,11 +10,11 @@ type BrowseModelsViewProps = {
   sortedModels: any[],
   navigate: (path: string) => void,
   setSortedModels: (models: any[]) => void,
-  onShareModel: (model: any) => void,
+  openDialog: (model: any, dialog: 'share' | 'metadata') => void,
   isShared?: boolean
 }
 
-export const BrowseModelsList: React.FC<BrowseModelsViewProps> = ({ pagedModels, sortedModels, navigate, setSortedModels, onShareModel, isShared }) => {
+export const BrowseModelsList: React.FC<BrowseModelsViewProps> = ({ pagedModels, sortedModels, navigate, setSortedModels, openDialog, isShared }) => {
   const [ columns, setColumns ] = useState<DataTableColumns>([
     {
       canSort: true,
@@ -63,7 +63,7 @@ export const BrowseModelsList: React.FC<BrowseModelsViewProps> = ({ pagedModels,
   }
 
   const items = pagedModels.map((model, i) => (
-    <BrowseModelListItem model={model} handleModelSelect={handleModelSelect} key={i} onShareModel={onShareModel} isShared={isShared} />
+    <BrowseModelListItem model={model} handleModelSelect={handleModelSelect} key={i} openDialog={openDialog} isShared={isShared} />
   ))
 
   return (

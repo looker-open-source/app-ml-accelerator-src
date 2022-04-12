@@ -9,15 +9,15 @@ const { modelName, createdByEmail, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
 type BrowseModelListItemProps = {
   model: any,
   handleModelSelect: (name: string) => void,
-  onShareModel: (model: any) => void,
+  openDialog: (model: any, dialog: 'share' | 'metadata') => void,
   isShared?: boolean
 }
 
-export const BrowseModelListItem: React.FC<BrowseModelListItemProps> = ({ model, handleModelSelect, onShareModel, isShared }) => {
+export const BrowseModelListItem: React.FC<BrowseModelListItemProps> = ({ model, handleModelSelect, openDialog, isShared }) => {
   const actions = (
     <>
-      { isShared ? <></> : <DataTableAction onClick={() => onShareModel(model)}>Share</DataTableAction> }
-      <DataTableAction>Info</DataTableAction>
+      { isShared ? <></> : <DataTableAction onClick={() => openDialog(model, 'share')}>Share</DataTableAction> }
+      <DataTableAction onClick={() => openDialog(model, 'metadata')}>Info</DataTableAction>
       <DataTableAction onClick={() => handleModelSelect(model)}>Edit</DataTableAction>
       { isShared ? <></> : <DataTableAction>Delete</DataTableAction> }
     </>

@@ -44,7 +44,6 @@ export const HomeLanding : React.FC = () => {
       setLoadingMyModels(false)
       return
     }
-    console.log({ modelData: data})
     setMyModels([...data])
     setMyModelPages(pages)
     setLoadingMyModels(false)

@@ -10,6 +10,7 @@ import { BrowseModelsGrid } from "./BrowseModelsGrid"
 import { BrowseModelsList } from "./BrowseModelsList"
 import './BrowseModels.scss'
 import { ShareModelDialog } from "./ShareModelDialog"
+import { ModelMetadataDialog } from "./ModelMetadataDialog"
 
 
 type BrowseModelsProps = {
@@ -31,6 +32,7 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
   const [ pagedModels, setPagedModels ] = useState<any[]>([])
   const [ currentPage, setCurrentPage ] = useState(1)
   const [ isShareOpen, setIsShareOpen ] = useState(false)
+  const [ isMetadataOpen, setIsMetadataOpen ] = useState(false)
   const [ modelToEdit, setModelToEdit ] = useState<any | undefined>()
 
   useEffect(() => {
@@ -46,11 +48,13 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
 
   const closeDialog = () => {
     setIsShareOpen(false)
+    setIsMetadataOpen(false)
   }
 
-  const onShareModel = (model: any) => {
+  const openDialog = (model: any, dialog: 'share' | 'metadata') => {
     setModelToEdit(model)
-    setIsShareOpen(true)
+    if (dialog === 'share') { setIsShareOpen(true) }
+    if (dialog === 'metadata') { setIsMetadataOpen(true) }
   }
 
   if (models.length <= 0) {
@@ -79,12 +83,12 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
             sortedModels={sortedModels}
             setSortedModels={setSortedModels}
             navigate={navigate}
-            onShareModel={onShareModel}
+            openDialog={openDialog}
             isShared={isShared} />) :
           (<BrowseModelsGrid
             models={pagedModels}
             navigate={navigate}
-            onShareModel={onShareModel}
+            openDialog={openDialog}
             isShared={isShared} />)
       }
       <div className="browse-models-pagination-container">
@@ -100,6 +104,13 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
         width={"600px"}
       >
         <ShareModelDialog model={modelToEdit} closeDialog={closeDialog} />
+      </Dialog>
+      <Dialog
+        isOpen={isMetadataOpen}
+        onClose={closeDialog}
+        width={"800px"}
+      >
+        <ModelMetadataDialog model={modelToEdit} closeDialog={closeDialog} />
       </Dialog>
     </div>
   )

@@ -118,3 +118,25 @@
   display: inline-block;
   vertical-align: middle;
 }
+
+.metadata-item {
+  margin-bottom: 8px;
+  padding: 0 0 8px;
+  border-bottom: 1px solid #c1c1c1;
+
+  &:last-child {
+    border: none;
+  }
+
+  label {
+    display: inline-block;
+    width: 140px;
+    margin-right: 12px;
+  }
+
+  .metadata-item--value {
+    display: inline-block;
+    color: #6a6a6a;
+    font-size: 12px;
+  }
+}
