@@ -32,7 +32,6 @@ export const HomeLanding : React.FC = () => {
       setLoadingSharedModels(false)
       return
     }
-    console.log({ sharedModelData: data})
     setSharedModels([...data])
     setSharedModelPages(pages)
     setLoadingSharedModels(false)
@@ -45,6 +44,7 @@ export const HomeLanding : React.FC = () => {
       setLoadingMyModels(false)
       return
     }
+    console.log({ modelData: data})
     setMyModels([...data])
     setMyModelPages(pages)
     setLoadingMyModels(false)
@@ -88,13 +88,8 @@ export const HomeLanding : React.FC = () => {
           <div className="home-landing-model-select">
             <h5>My Models</h5>
             <BrowseModels models={myModels} loadingModels={loadingMyModels} totalPages={myModelPages}/>
-            { sharedModels && sharedModels.length > 0 ?
-              <>
-                <h5>Models Shared With Me</h5>
-                <BrowseModels models={sharedModels} loadingModels={loadingSharedModels} totalPages={sharedModelPages} isShared={true}/>
-              </>
-              : <></>
-            }
+            <h5>Models Shared With Me</h5>
+            <BrowseModels models={sharedModels} loadingModels={loadingSharedModels} totalPages={sharedModelPages} isShared={true}/>
           </div>
         </div>
       </div>

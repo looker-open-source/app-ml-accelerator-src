@@ -12,7 +12,7 @@ export const formatSavedModelData = (models: any[]) => (
       [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: model[MODEL_STATE_TABLE_COLUMNS.createdByEmail]?.value,
       [MODEL_STATE_TABLE_COLUMNS.stateJson]: state,
       objective: state.bqModel.objective,
-      [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: parseModelInfoJson(model[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]?.value),
+      [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: safelyParseJson(model[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]?.value),
       [MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]?.value),
       [MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]?.value),
     }
@@ -24,11 +24,16 @@ const toDate = (dateStr: string) => (
 )
 
 const parseModelInfoJson = (json: string) => {
+  const parsed = safelyParseJson(json)
+  if (!parsed || !parsed.hasOwnProperty('bqModel')) { return undefined }
+  return parsed
+}
+
+const safelyParseJson = (json: string) => {
   let parsed
   try {
     parsed = JSON.parse(json)
   } catch (e) {}
-  if (!parsed || !parsed.hasOwnProperty('bqModel')) { return undefined }
   return parsed
 }
 

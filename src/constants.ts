@@ -45,6 +45,11 @@ export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
   modelUpdatedAt: 'model_info.model_updated_at'
 }
 
+export const SHARE_PERMISSION_LEVEL: {[key: string]: number} = {
+  read: 0,
+  edit: 1
+}
+
 export const DEFAULT_PREDICT_THRESHOLD = 0.5
 export const DEFAULT_ARIMA_CONFIDENCE_LEVEL = 0.95
 export const DEFAULT_ARIMA_HORIZON = 1000

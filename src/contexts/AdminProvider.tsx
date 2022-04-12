@@ -4,7 +4,7 @@ import { BQMLContext } from './BQMLProvider'
 import { formatSavedModelData, MODELS_PER_PAGE } from '../services/modelList'
 
 type IAdminContext = {
-  updateSharedEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>,
+  updateSharedEmails?: (bqModelName: string, sharedWithEmails: any[]) => Promise<any>,
   getSharedModels?: () => Promise<any>,
   getMyModels?: () => Promise<any>
 }
@@ -15,7 +15,7 @@ export const AdminProvider = ({ children }: any) => {
   const { dispatch } = useStore()
   const { updateModelStateSharedWithEmails, getSavedModelsSharedWithMe, getAllMySavedModels } = useContext(BQMLContext)
 
-  const updateSharedEmails = async (bqModelName: string, sharedWithEmails: string[]) => {
+  const updateSharedEmails = async (bqModelName: string, sharedWithEmails: any[]) => {
     try {
       const { ok, body } = await updateModelStateSharedWithEmails?.(bqModelName, sharedWithEmails)
       if (!ok) {
@@ -27,6 +27,7 @@ export const AdminProvider = ({ children }: any) => {
         type: 'addError',
         error: `Failed to update shared list for Model: ${bqModelName} - ${error}`
       })
+      return { ok: false }
     }
   }
 

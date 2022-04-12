@@ -232,6 +232,7 @@ export const BQMLProvider = ({ children }: any) => {
     const { ok, value } = await coreSDK.run_query({
       query_id: query.id,
       result_format: "json_detail",
+      cache: false
     })
     if (!ok) {
       throw "Please try refreshing the page."

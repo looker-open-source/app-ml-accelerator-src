@@ -9,31 +9,40 @@ type BrowseModelsViewProps = {
   pagedModels: any[],
   sortedModels: any[],
   navigate: (path: string) => void,
-  setSortedModels: (models: any[]) => void
+  setSortedModels: (models: any[]) => void,
+  onShareModel: (model: any) => void,
+  isShared?: boolean
 }
 
-export const BrowseModelsList: React.FC<BrowseModelsViewProps> = ({ pagedModels, sortedModels, navigate, setSortedModels }) => {
+export const BrowseModelsList: React.FC<BrowseModelsViewProps> = ({ pagedModels, sortedModels, navigate, setSortedModels, onShareModel, isShared }) => {
   const [ columns, setColumns ] = useState<DataTableColumns>([
     {
       canSort: true,
       id: modelName,
       title: 'Name',
       type: 'string',
-      size: 40,
+      size: 35,
     },
     {
       canSort: true,
       id: createdByEmail,
       title: 'Created By',
       type: 'string',
-      size: 30
+      size: 20
+    },
+    {
+      canSort: true,
+      id: 'objective',
+      title: 'Type',
+      type: 'string',
+      size: 25,
     },
     {
       canSort: true,
       id: modelUpdatedAt,
       title: 'Last Updated',
       type: 'date',
-      size: 30
+      size: 20
     }
   ])
 
@@ -48,12 +57,13 @@ export const BrowseModelsList: React.FC<BrowseModelsViewProps> = ({ pagedModels,
     setColumns(sortedColumns)
   }
 
-  const handleModelSelect = (name: string) => {
+  const handleModelSelect = (model: any) => {
+    const name = model[modelName]
     navigate(`/ml/${name}/${WIZARD_STEPS['step5']}`)
   }
 
   const items = pagedModels.map((model, i) => (
-    <BrowseModelListItem model={model} handleModelSelect={handleModelSelect} key={i} />
+    <BrowseModelListItem model={model} handleModelSelect={handleModelSelect} key={i} onShareModel={onShareModel} isShared={isShared} />
   ))
 
   return (
