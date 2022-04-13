@@ -117,11 +117,14 @@
 .inline-spinner {
   display: inline-block;
   vertical-align: middle;
+  margin-left: 8px;
 }
 
 .metadata-item {
-  margin-bottom: 8px;
-  padding: 0 0 8px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  padding: 4px 0 8px;
   border-bottom: 1px solid #c1c1c1;
 
   &:last-child {
@@ -138,5 +141,44 @@
     display: inline-block;
     color: #6a6a6a;
     font-size: 12px;
+    width: 400px;
+
+    label {
+      display: none;
+    }
+  }
+}
+
+.metadata-label-container:last-child {
+  margin-bottom: 8px;
+}
+
+.metadata-item--add-label {
+
+  .metadata-item--add-label-key, .metadata-item--add-label-val {
+    display: inline-block;
+    width: 150px;
+    margin: 0 4px;
+  }
+
+  .metadata-item--add-label-key {
+    margin: 0 4px 0 0;
+  }
+}
+
+
+.metadata-label {
+  display: inline-block;
+  background-color: #f1f1f1;
+  padding: 4px 12px;
+  margin-bottom: 4px;
+  margin-right: 8px;
+
+  .metadata-label--key {
+    font-weight: 700;
+  }
+
+  .metadata-label--value {
+    margin-left: 8px;
   }
 }

@@ -13,7 +13,7 @@ export const removeSharedPermissions = (sharedList: any[]) => (
 export const formatMetaData = (metadata: any) => ({
   modelId: metadata.modelReference ? `${metadata.modelReference.projectId}:${metadata.modelReference.datasetId}.${metadata.modelReference.modelId}` : '',
   description: metadata.description,
-  labels: metadata.labels || [],
+  labels: metadata.labels || {},
   creationTime: new Date(Number(metadata.creationTime)),
   expiration: metadata.modelExpiration ? new Date(Number(metadata.modelExpiration)) : 'Never',
   modifiedTime: new Date(Number(metadata.lastModifiedTime)),

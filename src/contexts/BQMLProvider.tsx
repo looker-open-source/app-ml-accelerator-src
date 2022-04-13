@@ -6,6 +6,7 @@ import { poll } from '../services/common'
 import { generateModelState } from '../services/modelState'
 import { BQML_LOOKER_MODEL, JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
 import { BQModelState, WizardState } from '../types'
+import { BigQueryModel } from '../types/BigQueryModel'
 
 type insertOrUpdateModelStateProps = {
   wizardState: WizardState,
@@ -28,7 +29,9 @@ type IBQMLContext = {
     promise: Promise<any>,
     cancel: () => void
   },
-  getModel?: (props: any) => Promise<any>,
+  getModel?: (props: { modelName: string }) => Promise<any>,
+  updateModel?: (props: { model: BigQueryModel, modelName: string }) => Promise<any>,
+  deleteModel?: (props: { modelName: string }) => Promise<any>,
   createModelStateTable?: () => Promise<any>,
   insertOrUpdateModelState?: (props: insertOrUpdateModelStateProps) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
@@ -58,11 +61,11 @@ export const BQMLProvider = ({ children }: any) => {
    *
    * This is a private method.
    */
-  const invokeBQApi = async (pathname: string, requestBody?: any) => {
+  const invokeBQApi = async (pathname: string, requestBody?: any, forcedMethod?: 'PATCH' | 'DELETE') => {
     try {
       const init: any = requestBody
         ? {
-            method: 'POST',
+            method: forcedMethod || 'POST',
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
@@ -70,7 +73,7 @@ export const BQMLProvider = ({ children }: any) => {
             body: JSON.stringify(requestBody),
           }
         : {
-            method: 'GET',
+            method: forcedMethod || 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -161,6 +164,36 @@ export const BQMLProvider = ({ children }: any) => {
     }
     const result = await invokeBQApi(
       `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`
+    )
+    return result
+  }
+
+  /**
+   * Patch a model
+   */
+    const updateModel = async ({ model, modelName }: { model: BigQueryModel, modelName: string }) => {
+    if (!model || !modelName) {
+      throw "Failed to save model because model was not provided"
+    }
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`,
+      model,
+      'PATCH'
+    )
+    return result
+  }
+
+   /**
+   * Delete a model
+   */
+  const deleteModel = async ({ modelName }: { modelName: string }) => {
+    if (!modelName) {
+      throw "Failed to delete model because modelName was not provided"
+    }
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`,
+      undefined,
+      'DELETE'
     )
     return result
   }
@@ -344,6 +377,8 @@ export const BQMLProvider = ({ children }: any) => {
         getJob,
         pollJobStatus,
         getModel,
+        updateModel,
+        deleteModel,
         createModelStateTable,
         insertOrUpdateModelState,
         updateModelStateSharedWithEmails,

@@ -2,9 +2,11 @@ import React, { createContext, useContext } from 'react'
 import { useStore } from './StoreProvider'
 import { BQMLContext } from './BQMLProvider'
 import { formatSavedModelData, MODELS_PER_PAGE } from '../services/modelList'
+import { BigQueryModel } from '../types/BigQueryModel'
 
 type IAdminContext = {
   getModelMetadata?: (modelName: string) => Promise<any>
+  saveModelMetadata?: (model: BigQueryModel, modelName: string) => Promise<any>
   updateSharedEmails?: (bqModelName: string, sharedWithEmails: any[]) => Promise<any>,
   getSharedModels?: () => Promise<any>,
   getMyModels?: () => Promise<any>
@@ -14,7 +16,7 @@ export const AdminContext = createContext<IAdminContext>({})
 
 export const AdminProvider = ({ children }: any) => {
   const { dispatch } = useStore()
-  const { updateModelStateSharedWithEmails, getSavedModelsSharedWithMe, getAllMySavedModels, getModel } = useContext(BQMLContext)
+  const { updateModelStateSharedWithEmails, getSavedModelsSharedWithMe, getAllMySavedModels, getModel, updateModel } = useContext(BQMLContext)
 
   const getModelMetadata = async (modelName: string) => {
     try {
@@ -27,6 +29,22 @@ export const AdminProvider = ({ children }: any) => {
       dispatch({
         type: 'addError',
         error: `Failed to get Model metadata: ${modelName} - ${error}`
+      })
+      return { ok: false }
+    }
+  }
+
+  const saveModelMetadata = async (model: BigQueryModel, modelName: string) => {
+    try {
+      const { ok, body } = await updateModel?.({ model, modelName })
+      if (!ok) {
+        throw "Request was unsuccessful"
+      }
+      return { ok, body }
+    } catch (error) {
+      dispatch({
+        type: 'addError',
+        error: `Failed to save Model metadata: ${error}`
       })
       return { ok: false }
     }
@@ -82,6 +100,7 @@ export const AdminProvider = ({ children }: any) => {
     <AdminContext.Provider
       value={{
         getModelMetadata,
+        saveModelMetadata,
         updateSharedEmails,
         getSharedModels,
         getMyModels
