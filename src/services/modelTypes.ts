@@ -42,17 +42,17 @@ export const MODEL_TYPES: {[key: string]: any} = {
         [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix]
     )
   },
-  ARIMA_PLUS: {
-    label: 'Time series forecasting',
-    value: 'ARIMA_PLUS',
-    detail: 'ARIMA_PLUS',
-    description: 'I want to forecast a number (e.g. future sales)',
-    requiredFieldTypes: ['date_date', 'numeric'],
-    exploreName: 'arima',
-    targetDataType: 'numeric',
-    optionalParameters: true,
-    modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
-  },
+  // ARIMA_PLUS: {
+  //   label: 'Time series forecasting',
+  //   value: 'ARIMA_PLUS',
+  //   detail: 'ARIMA_PLUS',
+  //   description: 'I want to forecast a number (e.g. future sales)',
+  //   requiredFieldTypes: ['date_date', 'numeric'],
+  //   exploreName: 'arima',
+  //   targetDataType: 'numeric',
+  //   optionalParameters: true,
+  //   modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
+  // },
   // KMEANS: {
   //   label: 'Clustering',
   //   value: 'KMEANS',

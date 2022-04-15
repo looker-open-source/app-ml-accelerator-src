@@ -132,9 +132,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     })
   )
 
-  const modelNeedsUpdate = () => {
-    console.log({ bqFeatures: bqModel.selectedFeatures, uiFeatures: step3.selectedFeatures})
-    return needsModelUpdate({
+  const modelNeedsUpdate = () => (
+    needsModelUpdate({
       bqModel,
       uiInputDataUID: step3.inputData.uid,
       uiAdvancedSettings: step3.advancedSettings,
@@ -143,7 +142,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       uiTarget: step3.targetField,
       uiArimaTimeColumn: step3.arimaTimeColumn
     })
-  }
+  )
 
   const buildHandleCompleteClick = () => {
     if (modelNameParam && !modelNeedsUpdate()) {

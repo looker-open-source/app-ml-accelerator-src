@@ -253,8 +253,7 @@ export const BQMLProvider = ({ children }: any) => {
                    created_by_email       STRING,
                    shared_with_emails     STRING,
                    model_created_at       INTEGER,
-                   model_updated_at       INTEGER,
-                   input_data_uid_history STRING)
+                   model_updated_at       INTEGER)
     `
     return queryJobAndWait(sql)
   }
