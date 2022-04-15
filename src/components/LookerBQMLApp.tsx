@@ -7,7 +7,6 @@ import ErrorBar from './ErrorBar'
 import TitleBar from './TitleBar'
 import MLWizard from './MLWizard'
 import HomeLanding from './HomeLanding'
-import Admin from './Admin'
 import './ExtensionApp.scss'
 import { AdminProvider } from '../contexts/AdminProvider'
 import { useStore } from '../contexts/StoreProvider'
@@ -41,11 +40,8 @@ export const _LookerBQMLApp: React.FC = () => {
         { !loggingIn && token && (
           <Switch>
             <Route exact path="/">
-              <HomeLanding />
-            </Route>
-            <Route exact path="/admin">
               <AdminProvider>
-                <Admin />
+                <HomeLanding />
               </AdminProvider>
             </Route>
             <Route path={["/ml/create", "/ml/:modelNameParam?"]}>
@@ -56,6 +52,7 @@ export const _LookerBQMLApp: React.FC = () => {
           </Switch>
         )}
       </div>
+      <div id="dialog-portal" />
     </div>
   )
 }

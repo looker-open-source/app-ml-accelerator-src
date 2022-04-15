@@ -22,7 +22,7 @@ export const ModelContext = createContext<IModelContext>({})
 export const ModelProvider = ({ children }: any) => {
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
-  const { pollJobStatus, cancelJob, getJob, queryJob } = useContext(BQMLContext)
+  const { pollJobStatus, cancelJob, getJob, queryJobAndWait } = useContext(BQMLContext)
   const { persistModelState } = useContext(WizardContext)
   const { jobStatus, job } = state.bqModel
   const [ polling, setPolling ] = useState(false)
@@ -116,7 +116,7 @@ export const ModelProvider = ({ children }: any) => {
       const { wizard, bqModel } = state
       // create a copy of the bqModel state with the job added
       const tempBQModel = { ...bqModel, jobStatus: JOB_STATUSES.canceled }
-      await persistModelState?.({ ...wizard }, tempBQModel)
+      await persistModelState?.({ wizardState: { ...wizard }, bqModel: tempBQModel })
       dispatch({
         type: 'addToStepData',
         step: 'step4',
@@ -140,7 +140,7 @@ export const ModelProvider = ({ children }: any) => {
       const selectSql = getEvaluateDataSql({ evalFuncName, gcpProject, bqmlModelDatasetName, bqModelName })
       if (!selectSql) { throw 'Failed to generate select sql' }
 
-      const { ok, body } = await queryJob?.(selectSql)
+      const { ok, body } = await queryJobAndWait?.(selectSql)
       let queryResults = body
 
       if (!ok) {
@@ -154,11 +154,11 @@ export const ModelProvider = ({ children }: any) => {
         })
         if (!createSql) { throw 'Failed to generate create sql' }
 
-        const { ok: createOk } = await queryJob?.(createSql)
+        const { ok: createOk } = await queryJobAndWait?.(createSql)
         if (!createOk) { throw 'Failed to create evaluate table' }
 
         // fetch table results now that table is created
-        const { ok: selectOk, body: selectBody } = await queryJob?.(selectSql)
+        const { ok: selectOk, body: selectBody } = await queryJobAndWait?.(selectSql)
         if (!selectOk) { throw 'Failed to fetch evaluate table data' }
         queryResults = selectBody
       }

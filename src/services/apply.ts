@@ -1,5 +1,5 @@
 import { ExploreData } from "../types"
-import { isArima } from "./modelTypes"
+import { isArima, TABLE_SUFFIXES } from "./modelTypes"
 import { formatParameterFilter, noDot } from "./string"
 
 type buildApplyFiltersProps = {
@@ -23,7 +23,7 @@ export const buildApplyFilters = ({
 }: buildApplyFiltersProps) => {
   let filters = {
     [`${modelType.exploreName}.model_name`]: formatParameterFilter(bqModelName),
-    [`${modelType.exploreName}.input_table_name`]: formatParameterFilter(`${bqModelName}_input_data_${uid}`)
+    [`${modelType.exploreName}.input_table_name`]: formatParameterFilter(`${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}`)
   }
   if (isArima(bqModelObjective) && bqModelArimaTimeColumn) {
     filters = {

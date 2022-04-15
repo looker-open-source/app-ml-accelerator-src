@@ -42,24 +42,24 @@ export const MODEL_TYPES: {[key: string]: any} = {
         [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix]
     )
   },
-  ARIMA_PLUS: {
-    label: 'Time series forecasting',
-    value: 'ARIMA_PLUS',
-    detail: 'ARIMA_PLUS',
-    description: 'I want to forecast a number (e.g. future sales)',
-    requiredFieldTypes: ['date_date', 'numeric'],
-    exploreName: 'arima',
-    targetDataType: 'numeric',
-    optionalParameters: true,
-    modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
-  },
-  KMEANS: {
-    label: 'Clustering',
-    value: 'KMEANS',
-    detail: 'KMEANS',
-    description: 'Try Clustering',
-    modelTabs: () => [MODEL_EVAL_FUNCS.evaluate]
-  },
+  // ARIMA_PLUS: {
+  //   label: 'Time series forecasting',
+  //   value: 'ARIMA_PLUS',
+  //   detail: 'ARIMA_PLUS',
+  //   description: 'I want to forecast a number (e.g. future sales)',
+  //   requiredFieldTypes: ['date_date', 'numeric'],
+  //   exploreName: 'arima',
+  //   targetDataType: 'numeric',
+  //   optionalParameters: true,
+  //   modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
+  // },
+  // KMEANS: {
+  //   label: 'Clustering',
+  //   value: 'KMEANS',
+  //   detail: 'KMEANS',
+  //   description: 'Try Clustering',
+  //   modelTabs: () => [MODEL_EVAL_FUNCS.evaluate]
+  // },
 }
 
 export const isArima = (objective: string): boolean => (
@@ -71,7 +71,13 @@ export const isBoostedTree = (objective: string): boolean => (
   objective === MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value
 )
 
-
+export const TABLE_SUFFIXES:  {[key: string]: string} = {
+  evaluate: '_evaluate',
+  confusionMatrix: '_confusion_matrix',
+  rocCurve: '_roc_curve',
+  inputData: '_input_data',
+  predictions: '_predictions'
+}
 
 /********************/
 /* INPUT_DATA SQL */
@@ -98,7 +104,7 @@ export const formBQInputDataSQL = ({
   ) {
     return false
   }
-  return `CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_input_data_${uid} AS (${removeLimit(sql)})`
+  return `CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} AS (${removeLimit(sql)})`
 }
 
 type GetBQInputDataSqlProps = {
@@ -112,7 +118,7 @@ export const getBQInputDataSql = ({
   bqModelName,
   uid
 }: GetBQInputDataSqlProps) => (
-  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}`
+  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}`
 )
 
 export const getBQInputDataMetaDataSql = ({
@@ -120,7 +126,19 @@ export const getBQInputDataMetaDataSql = ({
   bqModelName,
   uid
 }: GetBQInputDataSqlProps) => (
-  `SELECT * FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}_input_data_${uid}'`
+  `SELECT * FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}'`
+)
+
+type GetAllBQInputDataSqlProps = {
+  bqmlModelDatasetName: string,
+  bqModelName: string
+}
+
+export const getAllInputDataTablesSql = ({
+  bqmlModelDatasetName,
+  bqModelName
+}: GetAllBQInputDataSqlProps) => (
+  `SELECT table_name FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name like '${bqModelName}${TABLE_SUFFIXES.inputData}_%'`
 )
 
 /********************/
@@ -157,7 +175,7 @@ const formBoostedTreeSQL = ({
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
           , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
           ${settingsSql})
-    AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`;
+    AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}\`;
   `
 }
 
@@ -187,7 +205,7 @@ const formArimaSQL = ({
       , HORIZON = ${ advancedSettings.horizon || DEFAULT_ARIMA_HORIZON }
       ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
       , AUTO_ARIMA = TRUE)
-    AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid}\`) ;
+    AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}\`) ;
   `
 }
 
@@ -227,12 +245,12 @@ export const formEvaluateSql = ({
     return false
   }
   return `CREATE OR REPLACE TABLE
-    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_evaluate AS (
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.evaluate} AS (
     SELECT *
     FROM ML.EVALUATE(
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (SELECT ${selectedFeatures.join(', ')}
-      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid})
+      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
     ))
   `
 }
@@ -261,12 +279,12 @@ export const formConfusionMatrixSql = ({
     return false
   }
   return `CREATE OR REPLACE TABLE
-    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_confusion_matrix AS (
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.confusionMatrix} AS (
     SELECT *
     FROM ML.CONFUSION_MATRIX (
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (SELECT ${selectedFeatures.join(', ')}
-      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid})
+      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
     ))
   `
 }
@@ -295,12 +313,12 @@ export const formROCCurveSql = ({
     return false
   }
   return `CREATE OR REPLACE TABLE
-    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_roc_curve AS (
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.rocCurve} AS (
     SELECT *
     FROM ML.ROC_CURVE(
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (SELECT ${selectedFeatures.join(', ')}
-      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_input_data_${uid})
+      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
     ))
   `
 }
@@ -327,7 +345,7 @@ export const formArimaEvaluateSql = ({
     return false
   }
   return `CREATE OR REPLACE TABLE
-    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}_evaluate AS (
+    \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.evaluate} AS (
     SELECT *
     FROM ML.ARIMA_EVALUATE(
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
@@ -364,13 +382,13 @@ export const getEvaluateDataSql = ({
     return false
   }
 
-  let tableSuffix = '_evaluate'
+  let tableSuffix = TABLE_SUFFIXES.evaluate
   switch (evalFuncName) {
     case MODEL_EVAL_FUNCS.confusionMatrix:
-      tableSuffix = '_confusion_matrix'
+      tableSuffix = TABLE_SUFFIXES.confusionMatrix
       break
     case MODEL_EVAL_FUNCS.rocCurve:
-      tableSuffix = '_roc_curve'
+      tableSuffix = TABLE_SUFFIXES.rocCurve
       break
   }
 
@@ -396,7 +414,7 @@ export const createBoostedTreePredictSql = ({
   threshold
 }: BoostedTreePredictProps) => {
   return `
-    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
+    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
     ( SELECT * FROM ML.PREDICT(
       MODEL ${bqmlModelDatasetName}.${bqModelName},
       (${removeLimit(lookerSql)})
@@ -420,7 +438,7 @@ export const createArimaPredictSql = ({
   confidenceLevel = 0.95
 }: ArimaPredictProps) => {
   return `
-    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}_predictions AS
+    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
     ( SELECT * FROM ML.FORECAST(MODEL ${bqmlModelDatasetName}.${bqModelName}
       , STRUCT(${horizon} AS horizon
       , ${confidenceLevel} AS confidence_level)))
@@ -442,6 +460,6 @@ export const getPredictSql = ({
 }: GetPredictProps) => {
   const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => noDot(s)).join(', ')} ` : ''
   return `
-    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}_predictions ${sortString} LIMIT ${limit || 500}
+    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} ${sortString} LIMIT ${limit || 500}
   `
 }

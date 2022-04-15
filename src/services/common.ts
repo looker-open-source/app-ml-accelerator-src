@@ -60,6 +60,13 @@ export const arrayToSelectOptions = (options: string[]) => {
   }))
 }
 
+export const metadataLabelOnly = (e: any) => {
+  const re = /[0-9a-z-_]+/g;
+  if (!re.test(e.key)) {
+    e.preventDefault();
+  }
+}
+
 export const alphaNumericOnly = (e: any) => {
   const re = /[0-9a-zA-Z_]+/g;
   if (!re.test(e.key)) {

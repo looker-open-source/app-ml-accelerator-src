@@ -7,7 +7,7 @@ import Spinner from '../Spinner'
 
 type StepCompleteParams = {
   isStepComplete?: boolean
-  isLoading?: boolean,
+  isDisabled?: boolean,
   stepNumber: number,
   buttonText?: string,
   handleCompleteClick?: () => Promise<any>
@@ -15,7 +15,7 @@ type StepCompleteParams = {
 
 export const StepComplete: React.FC<StepCompleteParams> = ({
   isStepComplete,
-  isLoading,
+  isDisabled,
   stepNumber,
   buttonText,
   handleCompleteClick
@@ -55,7 +55,7 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
       <Button
         className={`wizard-next-step-btn ${btnClass}`}
         onClick={handleClick}
-        disabled={isLoading}
+        disabled={isDisabled}
       >
         { buttonText || "Continue" }
       </Button>

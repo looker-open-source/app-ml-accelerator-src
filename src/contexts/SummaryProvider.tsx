@@ -39,7 +39,7 @@ export const SummaryProvider = ({ children }: any) => {
   const { fetchSummary, saveSummary, saveInputData, persistModelState } = useContext(WizardContext)
   const {
     queryJob,
-    pollJobStatus,
+    queryJobAndWait,
     getJob
   } = useContext(BQMLContext)
   const { gcpProject, bqmlModelDatasetName } = state.userAttributes
@@ -70,21 +70,7 @@ export const SummaryProvider = ({ children }: any) => {
       if (!sql) {
         throw "Failed to create BigQuery View SQL statement"
       }
-      const { ok, body } = await createJob(sql)
-      if (!ok) { return { ok, body }}
-      if (!body.jobComplete) {
-        // Give it another 10s to get the job status in case BQ is taking a while to create the view
-        if (!pollJobStatus) {
-          throw "Failed to  finish creating bigQuery view"
-        }
-        const { promise } = pollJobStatus(
-          body.jobReference.jobId,
-          3300,
-          3
-        )
-        const result = await promise
-        return result;
-      }
+      const { ok, body } = await queryJobAndWait?.(sql, 3300, 3)
       return { ok, body }
     } catch (error) {
       return { ok: false }
@@ -185,8 +171,8 @@ export const SummaryProvider = ({ children }: any) => {
       predictSettings: {
         horizon: advancedSettings.horizon
       },
-      selectedFeatures: features,
-      advancedSettings: advancedSettings,
+      selectedFeatures: [...features],
+      advancedSettings: {...advancedSettings},
       applyQuery: { ...bqModelInitialState.applyQuery, ...inputDataQuery },
       ...jobState
     }
@@ -242,9 +228,10 @@ export const SummaryProvider = ({ children }: any) => {
         ...wizard,
         unlockedStep: 4
       }
+      const isModelCreate = !bqModel.name
       const tempBQModel = buildBaseBQModel(wizard, bqModel, jobState, features, advancedSettings)
 
-      await persistModelState?.(tempWizard, tempBQModel)
+      await persistModelState?.({ wizardState: tempWizard, bqModel: tempBQModel, isModelCreate, isModelUpdate: true })
 
       dispatch({
         type: 'setBQModel',

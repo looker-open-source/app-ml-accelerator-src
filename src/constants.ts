@@ -40,7 +40,14 @@ export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
   createdByEmail: 'model_info.created_by_email',
   stateJson: 'model_info.state_json',
   sharedWithEmails: 'model_info.shared_with_emails',
-  fullEmailList: 'model_info.full_email_list'
+  fullEmailList: 'model_info.full_email_list',
+  modelCreatedAt: 'model_info.model_created_at',
+  modelUpdatedAt: 'model_info.model_updated_at'
+}
+
+export const SHARE_PERMISSION_LEVEL: {[key: string]: number} = {
+  read: 0,
+  edit: 1
 }
 
 export const DEFAULT_PREDICT_THRESHOLD = 0.5

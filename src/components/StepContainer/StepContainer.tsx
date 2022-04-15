@@ -4,6 +4,7 @@ import StepComplete from '../StepComplete'
 
 type StepContainerParams = {
   isLoading?: boolean
+  isDisabled?: boolean
   stepComplete?: boolean
   lastStep?: boolean
   customClass?: string
@@ -16,6 +17,7 @@ type StepContainerParams = {
 
 export const StepContainer: React.FC<StepContainerParams> = ({
   isLoading,
+  isDisabled,
   stepComplete,
   lastStep,
   customClass,
@@ -36,7 +38,7 @@ export const StepContainer: React.FC<StepContainerParams> = ({
           {stepInfo}
           <StepComplete
             isStepComplete={stepComplete}
-            isLoading={isLoading}
+            isDisabled={isLoading || isDisabled}
             stepNumber={stepNumber}
             buttonText={buttonText}
             handleCompleteClick={handleCompleteClick}

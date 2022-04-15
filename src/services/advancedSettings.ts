@@ -15,6 +15,9 @@ export const advancedSettingsSql = (advancedSettings: any) => {
     } else if (key === 'data_split_col' &&
       !showDataSplitCol(advancedSettings.data_split_method)) {
         continue
+    } else if (key === 'dart_normalize_type' &&
+      !showDartNormalizeType(advancedSettings.booster_type)) {
+        continue
     } else if (advancedSettings[key] !== undefined) {
       const value = quotedSettings.includes(key) ?
         `'${advancedSettings[key]}'` :
@@ -213,7 +216,7 @@ export const getBoostedSettingsDefaults = (objective: string) => {
 export const showClassWeights = (auto_class_weights: boolean) => (!auto_class_weights)
 export const showDataSplitEvalFraction = (data_split_method: string) => (data_split_method === 'RANDOM' || data_split_method === 'SEQ')
 export const showDataSplitCol = (data_split_method: string) => (data_split_method === 'CUSTOM' || data_split_method === 'SEQ')
-
+export const showDartNormalizeType = (booster_type: string) => booster_type === 'DART'
 
 // ARIMA ADVANCED SETTINGS
 export const HOLIDAY_REGION_OPTIONS = [

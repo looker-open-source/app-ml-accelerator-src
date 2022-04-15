@@ -18,6 +18,14 @@ import { SaveSummaryProps } from '../types/summary'
 import { SaveInputDataProps } from '../types/inputData'
 import { cloneDeep } from 'lodash'
 
+type PersistModelStateProps = {
+  wizardState: WizardState,
+  bqModel: BQModelState,
+  isModelCreate?: boolean,
+  isModelUpdate?: boolean,
+  retry?: boolean
+}
+
 type IWizardContext = {
   loadingModel?: boolean,
   fetchExplore?: (modelName: string, exploreName: string, stepName: string) => Promise<any>,
@@ -31,7 +39,7 @@ type IWizardContext = {
   fetchSummary?: (bqModelName: string, targetField: string, uid: string) => Promise<any>,
   saveSummary?: (props: SaveSummaryProps) => void,
   saveInputData?: (props: SaveInputDataProps) => void,
-  persistModelState?: (wizardState: WizardState, bqModel: BQModelState, retry?: boolean) => Promise<any>
+  persistModelState?: (props: PersistModelStateProps) => Promise<any>
 }
 
 export const WizardContext = createContext<IWizardContext>({})
@@ -41,7 +49,7 @@ export const WizardProvider = ({ children }: any) => {
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
-  const { queryJob, getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
+  const { queryJobAndWait, getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
   const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
   const { bqmlModelDatasetName } = state.userAttributes
 
@@ -81,12 +89,12 @@ export const WizardProvider = ({ children }: any) => {
       const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName, 'step2')
       if (exploreData) {
         const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID)
+        if (!ok) {
+          throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
+        }
         const results = {
           data: bqResultsToLookerFormat(body, step2.exploreName, exploreData),
           sql: ''
-        }
-        if (!ok) {
-          throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
         }
         const headers = getHeaderColumns(
           step2.selectedFields,
@@ -300,9 +308,17 @@ export const WizardProvider = ({ children }: any) => {
     })
   }
 
+
+
   // Save bqModel state associated with the bqModelName
   // into a BQ table so we can reload past models
-  const persistModelState = async (wizardState: WizardState, bqModel: BQModelState, retry: boolean = false) => {
+  const persistModelState = async ({
+    wizardState,
+    bqModel,
+    isModelCreate = false,
+    isModelUpdate = false,
+    retry = false
+  }: PersistModelStateProps) => {
     try {
       {
         const { ok, body } = await createModelStateTable?.()
@@ -310,7 +326,7 @@ export const WizardProvider = ({ children }: any) => {
           throw "Failed to create table"
         }
       }
-      const { ok, body } = await insertOrUpdateModelState?.(wizardState, bqModel)
+      const { ok, body } = await insertOrUpdateModelState?.({ wizardState, bqModel, isModelCreate, isModelUpdate })
       if (!ok) {
         throw "Failed to save your model"
       }
@@ -321,7 +337,7 @@ export const WizardProvider = ({ children }: any) => {
         return { ok: false }
       }
       // retry once
-      persistModelState(wizardState, bqModel, true)
+      persistModelState({ wizardState, bqModel, isModelCreate, isModelUpdate, retry: true })
     }
   }
 
@@ -333,7 +349,7 @@ export const WizardProvider = ({ children }: any) => {
         bqModelName,
         uid
       })
-      const { ok, body } = await queryJob?.(sql)
+      const { ok, body } = await queryJobAndWait?.(sql)
       if (!ok) {
         throw `Unable to fetch from ${bqModelName}_input_data table (uid: ${uid}).`
       }
