@@ -17,7 +17,7 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
 
   switch (activeTab) {
     case MODEL_EVAL_FUNCS.confusionMatrix:
-      return <ConfusionMatrixTable data={formattedData} />
+      return <ConfusionMatrixTable data={formattedData} target={state.bqModel.target}/>
     case MODEL_EVAL_FUNCS.rocCurve:
       return <ROCCurveTable data={formattedData} />
     case MODEL_EVAL_FUNCS.evaluate:
@@ -47,11 +47,19 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
   )
 }
 
-const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
+const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {
   const dataItems = []
   const sortedData = sortBy(data, 'expected_label')
+  const valueCount = sortedData.length
   const firstRow = sortedData[0]
   const matrixColor = (pct: number) => `rgba(230,0,0, ${pct / 100})`
+
+  const cellSizeClass = (() => {
+    if (valueCount <= 2) return 'xlarge'
+    if (valueCount <= 4) return 'large'
+    if (valueCount <= 5) return 'medium'
+    return 'small'
+  })()
 
   const headers = [(
     <td className="model-cm-item--placeholder"></td>
@@ -60,7 +68,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
   for (const key in firstRow) {
     if (key === 'expected_label') { continue }
     headers.push(
-      <td className="model-cm-item--header">{titilize(splitFieldName(key))}</td>
+      <td className={`model-cm-item--header ${cellSizeClass}`}>{titilize(splitFieldName(key))}</td>
     )
   }
 
@@ -75,12 +83,12 @@ const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
     for (const key in sortedData[rowKey]) {
       const value = sortedData[rowKey][key]
       if (key === 'expected_label') {
-        cells.push(<td className="model-cm-item--header">{titilize(splitFieldName(value))}</td>)
+        cells.push(<td className={`model-cm-item--header ${cellSizeClass}`}>{titilize(splitFieldName(value))}</td>)
       } else {
         cells.push(
           <td
             style={{ backgroundColor: matrixColor(Number(value))}}
-            className="model-cm-item--value">
+            className={`model-cm-item--value ${cellSizeClass}`}>
               {value}
           </td>
         )
@@ -97,6 +105,9 @@ const ConfusionMatrixTable: React.FC<{ data: any[] }> = ({ data }) => {
   return (
     <div className="model-grid-bg">
       <div className="model-cm-container">
+        <div className="confusion-grid-target">
+          Selected Target: <span>{ target }</span>
+        </div>
         <table>
           <thead>
             { tableHeader }
