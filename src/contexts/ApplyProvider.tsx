@@ -23,7 +23,7 @@ export const ApplyProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { coreSDK } = useContext(ExtensionContext2)
   const { persistModelState } = useContext(WizardContext)
-  const { queryJob } = useContext(BQMLContext)
+  const { queryJob, queryJobAndWait } = useContext(BQMLContext)
   const { bqmlModelDatasetName } = state.userAttributes
   const { bqModel } = state
   const { step5 } = state.wizard.steps
@@ -104,7 +104,7 @@ export const ApplyProvider = ({ children }: any) => {
           })
       }
 
-      const { ok, body } = await queryJob?.(sql)
+      const { ok, body } = await queryJobAndWait?.(sql)
       if (!ok) {
         throw "Unable to create table."
       }
@@ -130,7 +130,7 @@ export const ApplyProvider = ({ children }: any) => {
         limit: step5.limit
       })
 
-      const { ok, body } = await queryJob?.(sql)
+      const { ok, body } = await queryJobAndWait?.(sql)
       if (!ok) {
         throw "Unable to find table."
       }

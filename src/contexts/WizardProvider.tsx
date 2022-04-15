@@ -49,7 +49,7 @@ export const WizardProvider = ({ children }: any) => {
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
-  const { queryJob, getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
+  const { queryJobAndWait, getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
   const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
   const { bqmlModelDatasetName } = state.userAttributes
 
@@ -89,12 +89,12 @@ export const WizardProvider = ({ children }: any) => {
       const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName, 'step2')
       if (exploreData) {
         const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID)
+        if (!ok) {
+          throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
+        }
         const results = {
           data: bqResultsToLookerFormat(body, step2.exploreName, exploreData),
           sql: ''
-        }
-        if (!ok) {
-          throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
         }
         const headers = getHeaderColumns(
           step2.selectedFields,
@@ -349,7 +349,7 @@ export const WizardProvider = ({ children }: any) => {
         bqModelName,
         uid
       })
-      const { ok, body } = await queryJob?.(sql)
+      const { ok, body } = await queryJobAndWait?.(sql)
       if (!ok) {
         throw `Unable to fetch from ${bqModelName}_input_data table (uid: ${uid}).`
       }

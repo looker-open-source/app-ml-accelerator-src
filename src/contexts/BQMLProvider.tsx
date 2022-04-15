@@ -6,7 +6,7 @@ import { poll } from '../services/common'
 import { generateModelState } from '../services/modelState'
 import { BQML_LOOKER_MODEL, JOB_STATUSES, MODEL_STATE_TABLE_COLUMNS } from '../constants'
 import { BQModelState, WizardState } from '../types'
-import { BigQueryModel } from '../types/BigQueryModel'
+import { BigQueryModelMetadata } from '../types/BigQueryModel'
 
 type insertOrUpdateModelStateProps = {
   wizardState: WizardState,
@@ -35,7 +35,7 @@ type IBQMLContext = {
     cancel: () => void
   },
   getModel?: (props: { modelName: string }) => Promise<any>,
-  updateModel?: (props: { model: BigQueryModel, modelName: string }) => Promise<any>,
+  updateModel?: (props: { model: BigQueryModelMetadata, modelName: string }) => Promise<any>,
   deleteModel?: (props: { modelName: string }) => Promise<any>,
   deleteTable?: (props: { tableName: string }) => Promise<any>,
   createModelStateTable?: () => Promise<any>,
@@ -124,13 +124,7 @@ export const BQMLProvider = ({ children }: any) => {
    */
    const queryJobAndWait = async (sql: string, interval?: number, maxAttempts?: number) => {
      try {
-      const { ok, body } = await invokeBQApi(
-        `projects/${gcpProject}/queries`,
-        {
-          query: sql.replace(/\n/g, ' '),
-          useLegacySql: false
-        }
-      )
+      const { ok, body } = await queryJob(sql)
       if (!ok) { return { ok, body }}
       if (!body.jobComplete) {
         // poll job until we get a result
@@ -209,7 +203,7 @@ export const BQMLProvider = ({ children }: any) => {
   /**
    * Patch a model
    */
-    const updateModel = async ({ model, modelName }: { model: BigQueryModel, modelName: string }) => {
+    const updateModel = async ({ model, modelName }: { model: BigQueryModelMetadata, modelName: string }) => {
     if (!model || !modelName) {
       throw "Failed to save model because model was not provided"
     }
@@ -262,7 +256,7 @@ export const BQMLProvider = ({ children }: any) => {
                    model_updated_at       INTEGER,
                    input_data_uid_history STRING)
     `
-    return queryJob(sql)
+    return queryJobAndWait(sql)
   }
 
   const insertOrUpdateModelState = ({
@@ -302,7 +296,7 @@ export const BQMLProvider = ({ children }: any) => {
             INSERT (model_name, state_json, created_by_email${timestampCreate})
             VALUES(model_name, state_json, created_by_email${timestampCreate})
     `
-    return queryJob(sql)
+    return queryJobAndWait(sql)
   }
 
   const updateModelStateSharedWithEmails = (bqModelName: string, sharedWithEmails: string[]) => {

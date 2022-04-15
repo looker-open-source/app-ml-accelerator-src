@@ -16,6 +16,7 @@ import { OptionalParameters } from './OptionalParameters'
 import AdvancedSettings from './AdvancedSettings'
 import { ModelValidation } from './ModelValidation'
 import { noDot } from '../../services/string'
+import { JOB_STATUSES } from '../../constants'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -30,6 +31,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { step1, step2, step3 } = wizard.steps
   const { objective } = step1
   const { exploreData, exploreName, modelName, ranQuery } = step2
+  const { jobStatus } = bqModel
 
   if (!exploreName || !modelName) {
     dispatch({type: 'addError', error: 'Something went wrong, please return to the previous step'})
@@ -130,8 +132,9 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     })
   )
 
-  const modelNeedsUpdate = () => (
-    needsModelUpdate({
+  const modelNeedsUpdate = () => {
+    console.log({ bqFeatures: bqModel.selectedFeatures, uiFeatures: step3.selectedFeatures})
+    return needsModelUpdate({
       bqModel,
       uiInputDataUID: step3.inputData.uid,
       uiAdvancedSettings: step3.advancedSettings,
@@ -140,7 +143,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       uiTarget: step3.targetField,
       uiArimaTimeColumn: step3.arimaTimeColumn
     })
-  )
+  }
 
   const buildHandleCompleteClick = () => {
     if (modelNameParam && !modelNeedsUpdate()) {
@@ -169,9 +172,16 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return MODEL_TYPES[objective].optionalParameters ? <OptionalParameters objective={objective}/> : <></>
   }
 
+  const disableModelCreate = () => {
+    if (stepCompleteButtonText() === "Continue") { return false }
+    if (!jobStatus) { return false }
+    return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
+  }
+
   return (
     <StepContainer
       isLoading={isLoading}
+      isDisabled={disableModelCreate()}
       stepComplete={!isInvalid && stepComplete}
       stepNumber={3}
       buttonText={stepCompleteButtonText()}

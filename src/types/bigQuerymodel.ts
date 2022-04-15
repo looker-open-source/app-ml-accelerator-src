@@ -1,4 +1,4 @@
-export type BigQueryModel = {
+export type BigQueryModelMetadata = {
   etag?: string,
   modelReference?: {
     projectId: string

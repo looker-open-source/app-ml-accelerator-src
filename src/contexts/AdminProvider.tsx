@@ -2,13 +2,13 @@ import React, { createContext, useContext } from 'react'
 import { useStore } from './StoreProvider'
 import { BQMLContext } from './BQMLProvider'
 import { formatSavedModelData, MODELS_PER_PAGE } from '../services/modelList'
-import { BigQueryModel } from '../types/BigQueryModel'
+import { BigQueryModelMetadata } from '../types/BigQueryModel'
 import { TABLE_SUFFIXES, getAllInputDataTablesSql } from '../services/modelTypes'
 import { formatBQResults } from '../services/common'
 
 type IAdminContext = {
   getModelMetadata?: (modelName: string) => Promise<any>
-  saveModelMetadata?: (model: BigQueryModel, modelName: string) => Promise<any>
+  saveModelMetadata?: (model: BigQueryModelMetadata, modelName: string) => Promise<any>
   updateSharedEmails?: (bqModelName: string, sharedWithEmails: any[]) => Promise<any>,
   getSharedModels?: () => Promise<any>,
   getMyModels?: () => Promise<any>,
@@ -48,7 +48,7 @@ export const AdminProvider = ({ children }: any) => {
     }
   }
 
-  const saveModelMetadata = async (model: BigQueryModel, modelName: string) => {
+  const saveModelMetadata = async (model: BigQueryModelMetadata, modelName: string) => {
     try {
       const { ok, body } = await updateModel?.({ model, modelName })
       if (!ok) {
