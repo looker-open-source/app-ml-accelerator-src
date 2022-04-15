@@ -19,6 +19,11 @@ type IBQMLContext = {
   expired?: boolean,
   setExpired?: (value: boolean) => void,
   queryJob?: (sql: string) => Promise<any>,
+  queryJobAndWait?: (
+    jobId: string,
+    interval?: number,
+    maxAttempts?: number
+  ) => Promise<any>
   cancelJob?: (props: { jobId: string, location: string }) => Promise<any>
   getJob?: (props: any) => Promise<any>,
   pollJobStatus?: (
@@ -32,13 +37,16 @@ type IBQMLContext = {
   getModel?: (props: { modelName: string }) => Promise<any>,
   updateModel?: (props: { model: BigQueryModel, modelName: string }) => Promise<any>,
   deleteModel?: (props: { modelName: string }) => Promise<any>,
+  deleteTable?: (props: { tableName: string }) => Promise<any>,
   createModelStateTable?: () => Promise<any>,
   insertOrUpdateModelState?: (props: insertOrUpdateModelStateProps) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
+  deleteModelFromModelState?: (bqModelName: string) => Promise<any>
   getAllMySavedModels?: (hideError?: boolean) => Promise<any>,
   getSavedModelsSharedWithMe?: (hideError?: boolean) => Promise<any>,
-  getSavedModelState?: (modelName: string) => Promise<any>
-  getSavedModelByName?: (modelName: string) => Promise<any>
+  getSavedModelState?: (modelName: string) => Promise<any>,
+  getSavedModelByName?: (modelName: string) => Promise<any>,
+  getAllInputDataTables?: (modelName: string) => Promise<any>
 }
 
 export const BQMLContext = createContext<IBQMLContext>({})
@@ -83,7 +91,7 @@ export const BQMLProvider = ({ children }: any) => {
         `https://bigquery.googleapis.com/bigquery/v2/${pathname}`,
         init
       )
-      if (status === 401 || status === 404) {
+      if (status === 401) { //|| status === 404
         if (canExpire) {
           setCanExpire(false)
           setExpired(true)
@@ -92,7 +100,7 @@ export const BQMLProvider = ({ children }: any) => {
       }
       return { ok, body, status }
     } catch (error) {
-      dispatch({ type: 'addError', error: "Failed to connect to BigQuery. Please refresh and try again." })
+      // dispatch({ type: 'addError', error: "Failed to connect to BigQuery. Please refresh and try again." })
       return { ok: false }
     }
   }
@@ -109,6 +117,36 @@ export const BQMLProvider = ({ children }: any) => {
       }
     )
     return result
+  }
+
+  /**
+   * Create job and if it doesnt complete, poll it until it does
+   */
+   const queryJobAndWait = async (sql: string, interval?: number, maxAttempts?: number) => {
+     try {
+      const { ok, body } = await invokeBQApi(
+        `projects/${gcpProject}/queries`,
+        {
+          query: sql.replace(/\n/g, ' '),
+          useLegacySql: false
+        }
+      )
+      if (!ok) { return { ok, body }}
+      if (!body.jobComplete) {
+        // poll job until we get a result
+        const { promise } = pollJobStatus(
+          body.jobReference.jobId,
+          interval || 2000,
+          maxAttempts
+        )
+        const result = await promise
+        return result;
+      }
+
+      return { ok, body }
+    } catch (error) {
+      return { ok: false, error }
+    }
   }
 
   /**
@@ -198,15 +236,31 @@ export const BQMLProvider = ({ children }: any) => {
     return result
   }
 
+  /**
+  * Delete a model
+  */
+  const deleteTable = async ({ tableName }: { tableName: string }) => {
+    if (!tableName) {
+      throw "Failed to delete table because tableName was not provided"
+    }
+    const result = await invokeBQApi(
+      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/tables/${tableName}`,
+      undefined,
+      'DELETE'
+    )
+    return result
+  }
+
   const createModelStateTable = () => {
     const sql = `
       CREATE TABLE IF NOT EXISTS ${bqmlModelDatasetName}.bqml_model_info
-                  (model_name         STRING,
-                   state_json         STRING,
-                   created_by_email   STRING,
-                   shared_with_emails   STRING,
-                   model_created_at   INTEGER,
-                   model_updated_at   INTEGER)
+                  (model_name             STRING,
+                   state_json             STRING,
+                   created_by_email       STRING,
+                   shared_with_emails     STRING,
+                   model_created_at       INTEGER,
+                   model_updated_at       INTEGER,
+                   input_data_uid_history STRING)
     `
     return queryJob(sql)
   }
@@ -263,6 +317,15 @@ export const BQMLProvider = ({ children }: any) => {
           WHEN MATCHED THEN
             UPDATE SET shared_with_emails=S.shared_with_emails
     `
+    return queryJob(sql)
+  }
+
+  const deleteModelFromModelState = (bqModelName: string) => {
+    const sql = `
+      DELETE ${gcpProject}.${bqmlModelDatasetName}.bqml_model_info
+      WHERE model_name = '${bqModelName}'
+    `
+
     return queryJob(sql)
   }
 
@@ -373,15 +436,18 @@ export const BQMLProvider = ({ children }: any) => {
         expired,
         setExpired,
         queryJob,
+        queryJobAndWait,
         cancelJob,
         getJob,
         pollJobStatus,
         getModel,
         updateModel,
         deleteModel,
+        deleteTable,
         createModelStateTable,
         insertOrUpdateModelState,
         updateModelStateSharedWithEmails,
+        deleteModelFromModelState,
         getAllMySavedModels,
         getSavedModelsSharedWithMe,
         getSavedModelState,

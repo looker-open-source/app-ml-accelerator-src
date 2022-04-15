@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react"
-import { Button, Dialog, Icon, Pagination, Tooltip } from "@looker/components"
+import React, { useContext, useEffect, useState } from "react"
+import { Dialog, Icon, Pagination, Tooltip, useConfirm } from "@looker/components"
 import { useHistory } from "react-router-dom"
 import { useStore } from "../../contexts/StoreProvider"
-import { Add, GridView } from "@styled-icons/material"
+import { GridView } from "@styled-icons/material"
 import Spinner from "../Spinner"
 import { getPagedModels } from "../../services/modelList"
 import { BrowseTable } from "@looker/icons"
@@ -11,7 +11,10 @@ import { BrowseModelsList } from "./BrowseModelsList"
 import './BrowseModels.scss'
 import { ShareModelDialog } from "./ShareModelDialog"
 import { ModelMetadataDialog } from "./ModelMetadataDialog"
+import { AdminContext } from "../../contexts/AdminProvider"
+import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 
+const { modelName } = MODEL_STATE_TABLE_COLUMNS
 
 type BrowseModelsProps = {
   loadingModels: boolean,
@@ -27,6 +30,7 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
 
   const history = useHistory()
   const { dispatch } = useStore()
+  const { removeModel } = useContext(AdminContext)
   const [ listView, setListView ] = useState<boolean>(false)
   const [ sortedModels, setSortedModels ] = useState<any[]>(models)
   const [ pagedModels, setPagedModels ] = useState<any[]>([])
@@ -34,6 +38,19 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
   const [ isShareOpen, setIsShareOpen ] = useState(false)
   const [ isMetadataOpen, setIsMetadataOpen ] = useState(false)
   const [ modelToEdit, setModelToEdit ] = useState<any | undefined>()
+  const [deleteDialog, openDelete] = useConfirm({
+    confirmLabel: 'Continue',
+    buttonColor: 'key',
+    title: `Delete model`,
+    message: 'Are you sure you want to delete this model and all associated tables?',
+    onConfirm: (close) => {
+      if (!modelToEdit) { close() }
+      const deleteModelName = modelToEdit[modelName]
+      removeModel?.(deleteModelName)
+      setSortedModels(sortedModels.filter((model) => model[modelName] !== deleteModelName))
+      close()
+    }
+  })
 
   useEffect(() => {
     setPagedModels(
@@ -51,10 +68,11 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
     setIsMetadataOpen(false)
   }
 
-  const openDialog = (model: any, dialog: 'share' | 'metadata') => {
+  const openDialog = (model: any, dialog: 'share' | 'metadata' | 'delete') => {
     setModelToEdit(model)
     if (dialog === 'share') { setIsShareOpen(true) }
-    if (dialog === 'metadata') { setIsMetadataOpen(true) }
+    else if (dialog === 'metadata') { setIsMetadataOpen(true) }
+    else if (dialog === 'delete') { openDelete() }
   }
 
   if (models.length <= 0) {
@@ -112,6 +130,7 @@ export const BrowseModels: React.FC<BrowseModelsProps> = ({ loadingModels, model
       >
         <ModelMetadataDialog model={modelToEdit} closeDialog={closeDialog} />
       </Dialog>
+      {deleteDialog}
     </div>
   )
 }

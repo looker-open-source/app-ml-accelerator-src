@@ -10,7 +10,7 @@ const { modelName, createdByEmail, stateJson, modelUpdatedAt } = MODEL_STATE_TAB
 type BrowseModelGridItemProps = {
   model: any,
   navigate: (path: string) => void,
-  openDialog: (model: any, dialog: 'share' | 'metadata') => void,
+  openDialog: (model: any, dialog: 'share' | 'metadata' | 'delete') => void,
   isShared?: boolean
 }
 
@@ -36,7 +36,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
               { isShared ? <></> : <MenuItem onClick={() => openDialog(model, 'share')}>Share</MenuItem> }
               <MenuItem onClick={() => openDialog(model, 'metadata')}>Info</MenuItem>
               <MenuItem onClick={handleModelSelect}>Edit</MenuItem>
-              { isShared ? <></> : <MenuItem >Delete</MenuItem> }
+              { isShared ? <></> : <MenuItem onClick={() => openDialog(model, 'delete')}>Delete</MenuItem> }
             </>
           }
         >

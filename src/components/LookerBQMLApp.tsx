@@ -52,6 +52,7 @@ export const _LookerBQMLApp: React.FC = () => {
           </Switch>
         )}
       </div>
+      <div id="dialog-portal" />
     </div>
   )
 }

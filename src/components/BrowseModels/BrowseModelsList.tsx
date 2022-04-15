@@ -10,7 +10,7 @@ type BrowseModelsViewProps = {
   sortedModels: any[],
   navigate: (path: string) => void,
   setSortedModels: (models: any[]) => void,
-  openDialog: (model: any, dialog: 'share' | 'metadata') => void,
+  openDialog: (model: any, dialog: 'share' | 'metadata' | 'delete') => void,
   isShared?: boolean
 }
 

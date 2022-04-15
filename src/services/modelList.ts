@@ -1,7 +1,7 @@
 import { compact } from "lodash"
 import { MODEL_STATE_TABLE_COLUMNS } from "../constants"
 
-export const MODELS_PER_PAGE = 6
+export const MODELS_PER_PAGE = 15
 
 export const formatSavedModelData = (models: any[]) => (
   compact(models.map((model) => {

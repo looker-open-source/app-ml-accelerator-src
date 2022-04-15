@@ -1,6 +1,6 @@
+import React, { useContext, useEffect, useState } from "react"
 import { Button } from "@looker/components"
 import { Add } from "@styled-icons/material"
-import React, { useContext, useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
 import { WIZARD_STEPS } from "../../constants"
 import { AdminContext } from "../../contexts/AdminProvider"
@@ -49,10 +49,6 @@ export const HomeLanding : React.FC = () => {
     setLoadingMyModels(false)
   }
 
-  const handleModelSelect = async (modelName: string) => {
-    history.push(`/ml/${modelName}/${WIZARD_STEPS['step4']}`)
-  }
-
   const goToWizard = () => {
     dispatch({ type: 'clearState' })
     history.push('/ml')
@@ -60,17 +56,14 @@ export const HomeLanding : React.FC = () => {
 
   return (
     <div className="home-landing-container">
-      <h1 className="no-margin-top">Welcome back {firstName ? `, ${firstName}` : '' }</h1>
       <div className="home-landing-grid">
         <div className="grid-item-large-left">
+        <h1 className="no-margin-top">Welcome back {firstName ? `, ${firstName}` : '' }</h1>
           <p>
             Role-based intro message aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat, sed ullamcorper erat commodo. Vestibulum sit amet ipsum vitae mauris mattis vulputate lacinia nec neque. Aenean quis consectetur nisi, ac interdum elit. Aliquam sit amet luctus elit, id tempus purus. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat.
           </p>
         </div>
-      </div>
-      <h1>Get Started</h1>
-      <div className="home-landing-grid">
-        <div className="grid-item-small-left">
+        <div className="grid-item-small-right">
           <h3>Create New Models</h3>
           <p>
             Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit.
@@ -79,7 +72,10 @@ export const HomeLanding : React.FC = () => {
             <Button size="large" onClick={goToWizard} className="action-color" iconBefore={<Add />}>Create a new model</Button>
           </div>
         </div>
-        <div className="grid-item-large-right">
+      </div>
+      <h1>Get Started</h1>
+      <div>
+        <div>
           <h3>Use existing models</h3>
           <p>
             Aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat, sed ullamcorper erat commodo. Vestibulum sit amet ipsum vitae mauris mattis vulputate lacinia nec neque. Aenean quis consectetur nisi, ac interdum elit. Aliquam sit amet luctus elit, id tempus purus.
