@@ -12,11 +12,11 @@ export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
 }
 
 export const MODEL_TABS: {[key:string]: string} = {
-  [MODEL_EVAL_FUNCS.trainingInfo]: 'ML.TRAINING_INFO',
-  [MODEL_EVAL_FUNCS.evaluate]: 'ML.EVALUATE',
-  [MODEL_EVAL_FUNCS.arimaEvaluate]: 'ML.ARIMA_EVALUATE',
-  [MODEL_EVAL_FUNCS.confusionMatrix]: 'ML.CONFUSION_MATRIX',
-  [MODEL_EVAL_FUNCS.rocCurve]: 'ML.ROC_CURVE'
+  [MODEL_EVAL_FUNCS.trainingInfo]: 'TRAINING INFO',
+  [MODEL_EVAL_FUNCS.evaluate]: 'EVALUATE',
+  [MODEL_EVAL_FUNCS.arimaEvaluate]: 'ARIMA EVALUATE',
+  [MODEL_EVAL_FUNCS.confusionMatrix]: 'CONFUSION MATRIX',
+  [MODEL_EVAL_FUNCS.rocCurve]: 'ROC CURVE'
 }
 
 export const MODEL_TYPES: {[key: string]: any} = {
@@ -42,17 +42,17 @@ export const MODEL_TYPES: {[key: string]: any} = {
         [MODEL_EVAL_FUNCS.evaluate, MODEL_EVAL_FUNCS.confusionMatrix]
     )
   },
-  // ARIMA_PLUS: {
-  //   label: 'Time series forecasting',
-  //   value: 'ARIMA_PLUS',
-  //   detail: 'ARIMA_PLUS',
-  //   description: 'I want to forecast a number (e.g. future sales)',
-  //   requiredFieldTypes: ['date_date', 'numeric'],
-  //   exploreName: 'arima',
-  //   targetDataType: 'numeric',
-  //   optionalParameters: true,
-  //   modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
-  // },
+  ARIMA_PLUS: {
+    label: 'Time series forecasting',
+    value: 'ARIMA_PLUS',
+    detail: 'ARIMA_PLUS',
+    description: 'I want to forecast a number (e.g. future sales)',
+    requiredFieldTypes: ['date_date', 'numeric'],
+    exploreName: 'arima',
+    targetDataType: 'numeric',
+    optionalParameters: true,
+    modelTabs: () => [MODEL_EVAL_FUNCS.arimaEvaluate]
+  },
   // KMEANS: {
   //   label: 'Clustering',
   //   value: 'KMEANS',

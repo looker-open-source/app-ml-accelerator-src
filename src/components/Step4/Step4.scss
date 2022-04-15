@@ -141,11 +141,10 @@
 .model-cm-container {
   position: relative;
   overflow: scroll;
-  max-height: 500px;
-
-  table {
-    margin: 0 auto;
-  }
+  max-height: 800px;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
 
   thead tr {
     position: sticky;
@@ -161,15 +160,21 @@
 
 .model-cm-item {
   & &--header {
-    text-align: center;
-    padding: 12px;
     background-color: #ccd8e4;
   }
 
   & &--value {
-    text-align: center;
-    padding: 12px;
     background-color: #f7f7f7;
+  }
+
+  & &--header, & &--value {
+    text-align: center;
+    padding: 8px;
+
+    &.xlarge { height: 120px; width: 120px; }
+    &.large { height: 95px; width: 95px; }
+    &.medium { height: 80px; width: 80px; }
+    &.small { height: 60px; width: 60px; }
   }
 }
 
@@ -187,5 +192,22 @@
     font-size: 16px;
     font-weight: 100;
     letter-spacing: 0.06em;
+  }
+}
+
+.confusion-grid-target {
+  padding: 12px;
+  font-weight: 700;
+  margin-bottom: 11px;
+  font-size: 12px;
+  flex: 1;
+  text-align: center;
+
+  span {
+    font-weight: 400;
+    color: #a1a1a1;
+    font-size: 16px;
+    text-transform: none;
+    margin-left: 8px;
   }
 }
