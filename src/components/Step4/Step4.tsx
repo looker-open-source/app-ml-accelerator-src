@@ -10,10 +10,10 @@ import { Prompt } from 'react-router-dom'
 import { ModelSidebar } from './ModelSidebar'
 import { ModelDataBody } from './ModelDataBody'
 import { IncompleteJob } from './IncompleteJob'
-import './Step4.scss'
+import BinaryClassifierThreshold from '../BinaryClassifierThreshold'
 import { titilize } from '../../services/string'
-import { needsModelUpdate } from '../../services/summary'
-
+import { isBinaryClassifier, needsModelUpdate } from '../../services/summary'
+import './Step4.scss'
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { stopPolling, getModelEvalFuncData } = useContext(ModelContext)
@@ -22,8 +22,9 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [jobComplete, setJobComplete] = useState<any>()
   const [jobCanceled, setJobCanceled] = useState<any>()
   const { state } = useStore()
-  const { step1, step3, step4 } = state.wizard.steps
+  const { step1, step3, step4, step5 } = state.wizard.steps
   const { jobStatus, job } = state.bqModel
+  const { threshold: uiThreshold } = step5.predictSettings
   const bqModel = state.bqModel
 
   useEffect(() => {
@@ -44,19 +45,28 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   useEffect(() => {
     fetchModelData()
-  }, [jobComplete, activeTab])
+  }, [jobComplete, activeTab, uiThreshold])
 
   const fetchModelData = async () => {
+    const tabEvalData = step4.evaluateData[activeTab]
     if (
       !jobComplete ||
       !activeTab ||
-      step4.evaluateData[activeTab]?.rows?.length > 0
+      hasEvalDataForTab(tabEvalData)
     ) { return }
 
     setIsLoading(true)
-    await getModelEvalFuncData?.(activeTab)
+    await getModelEvalFuncData?.(activeTab, thresholdChanged(tabEvalData))
     setIsLoading(false)
   }
+
+  const hasEvalDataForTab = (tabEvalData: any) => (
+    tabEvalData && tabEvalData.data.rows?.length > 0 && !thresholdChanged(tabEvalData)
+  )
+
+  const thresholdChanged = (tabEvalData: any) => (
+    tabEvalData && tabEvalData.threshold !== uiThreshold
+  )
 
   const onRouteChange = () => {
     stopPolling?.()
@@ -86,6 +96,18 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return <></>
   }
 
+  const buildThreshold = () => {
+    if (!isBinaryClassifier(step1.objective || '', step3)) {
+      return <></>
+    }
+
+    return (
+      <div className="binary-classifier-container">
+        <BinaryClassifierThreshold />
+      </div>
+    )
+  }
+
   return (
     <StepContainer
       isLoading={isLoading}
@@ -105,6 +127,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
                 setActiveTab={setActiveTab}
                 bqModel={bqModel}
               />
+              {buildThreshold()}
             </div>
             <div className="model-grid--body">
               { !isLoading && activeTab &&

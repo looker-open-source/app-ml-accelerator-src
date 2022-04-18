@@ -12,8 +12,7 @@ import { WizardContext } from "../../contexts/WizardProvider"
 import { QueryBuilderContext } from "../../contexts/QueryBuilderProvider"
 import { isArima } from "../../services/modelTypes"
 import ArimaParamsPicker from "./ArimaParamsPicker"
-import BinaryClassifierThreshold from "./BinaryClassifierThreshold"
-
+import BinaryClassifierThreshold from "../BinaryClassifierThreshold"
 
 type QueryBuilderProps = {
   setIsLoading: (isLoading: boolean) => void,

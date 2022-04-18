@@ -211,3 +211,12 @@
     margin-left: 8px;
   }
 }
+
+.binary-classifier-container {
+  padding: 12px;
+  margin-top: 8px;
+
+  .threshold-container {
+    justify-content: flex-start;
+  }
+}

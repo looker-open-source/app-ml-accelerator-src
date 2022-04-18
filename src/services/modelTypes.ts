@@ -226,7 +226,8 @@ type FormEvaluateSqlProps = {
   bqModelName: string,
   target?: string,
   uid?: string
-  selectedFeatures: string[]
+  selectedFeatures: string[],
+  threshold?: string
 }
 
 export const formEvaluateSql = ({
@@ -234,7 +235,8 @@ export const formEvaluateSql = ({
   bqmlModelDatasetName,
   bqModelName,
   uid,
-  selectedFeatures
+  selectedFeatures,
+  threshold
 }: FormEvaluateSqlProps) => {
   if (
     !gcpProject ||
@@ -251,6 +253,9 @@ export const formEvaluateSql = ({
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (SELECT ${selectedFeatures.join(', ')}
       FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
+      ${ threshold ?
+        `, STRUCT(${threshold} as threshold)` : ''
+      }
     ))
   `
 }
@@ -260,7 +265,8 @@ type FormConfusionMatrixSqlProps = {
   bqmlModelDatasetName?: string,
   bqModelName: string,
   uid?: string
-  selectedFeatures: string[]
+  selectedFeatures: string[],
+  threshold?: string
 }
 
 export const formConfusionMatrixSql = ({
@@ -268,7 +274,8 @@ export const formConfusionMatrixSql = ({
   bqmlModelDatasetName,
   bqModelName,
   uid,
-  selectedFeatures
+  selectedFeatures,
+  threshold
 }: FormConfusionMatrixSqlProps) => {
   if (
     !gcpProject ||
@@ -285,6 +292,9 @@ export const formConfusionMatrixSql = ({
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (SELECT ${selectedFeatures.join(', ')}
       FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
+      ${ threshold ?
+        `, STRUCT(${threshold} as threshold)` : ''
+      }
     ))
   `
 }

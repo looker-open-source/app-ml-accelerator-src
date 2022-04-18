@@ -9,7 +9,8 @@ import { WizardContext } from './WizardProvider'
 type IModelContext = {
   stopPolling?: () => void
   getModelEvalFuncData?: (
-    evalFuncName: string
+    evalFuncName: string,
+    forceCreate?: boolean
     ) => Promise<any>,
   cancelModelCreate?: () => Promise<any>
 }
@@ -131,26 +132,34 @@ export const ModelProvider = ({ children }: any) => {
 
   // Create & Fetch Evaluate function data in BigQuery
   const getModelEvalFuncData = async (
-    evalFuncName: string
+    evalFuncName: string,
+    forceCreate?: boolean
   ) => {
     try {
       const { name: bqModelName, inputDataUID: uid, selectedFeatures } = state.bqModel
+      const { threshold } = state.wizard.steps.step5.predictSettings
+      let queryResults
+      let create: boolean | undefined = forceCreate
 
-      // check if evaluate table already exists
       const selectSql = getEvaluateDataSql({ evalFuncName, gcpProject, bqmlModelDatasetName, bqModelName })
       if (!selectSql) { throw 'Failed to generate select sql' }
 
-      const { ok, body } = await queryJobAndWait?.(selectSql)
-      let queryResults = body
+      if (!create) {
+        // check if evaluate table already exists
+        const { ok, body } = await queryJobAndWait?.(selectSql)
+        queryResults = body
+        create = !ok
+      }
 
-      if (!ok) {
+      if (create) {
         // if the evaluate table doesnt exist yet, create it and select from it again
         const createSql = EVALUATE_CREATE_SQL_METHODS[evalFuncName]({
           gcpProject,
           bqmlModelDatasetName,
           bqModelName,
           uid,
-          selectedFeatures
+          selectedFeatures,
+          threshold
         })
         if (!createSql) { throw 'Failed to generate create sql' }
 
@@ -166,7 +175,7 @@ export const ModelProvider = ({ children }: any) => {
       dispatch({ type: 'addToStepData', step: 'step4', data: {
         evaluateData: {
           ...state.wizard.steps.step4.evaluateData,
-          [evalFuncName]: queryResults
+          [evalFuncName]: { data: queryResults, threshold }
         },
         complete: true
       }})
