@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useState } from "react"
-import { useStore } from '../../../contexts/StoreProvider'
+import React, { useState } from "react"
+import { useStore } from '../../contexts/StoreProvider'
 import {
   FieldText,
   ExtendComponentsThemeProvider,
   ButtonTransparent
 } from '@looker/components'
-import { QueryBuilderContext } from "../../../contexts/QueryBuilderProvider"
-import { floatOnly } from "../../../services/common"
-import { DEFAULT_PREDICT_THRESHOLD } from "../../../constants"
+import { floatOnly } from "../../services/common"
+import { DEFAULT_PREDICT_THRESHOLD } from "../../constants"
 import "./BinaryClassifierThreshold.scss"
 import { Add } from "@styled-icons/material"
 
@@ -16,15 +15,10 @@ import { Add } from "@styled-icons/material"
 export const BinaryClassifierThreshold: React.FC = () => {
   const { state, dispatch } = useStore()
   if (!state.bqModel.binaryClassifier) { return <></> }
-
+  const { predictSettings } = state.wizard.steps.step5
+  const [ threshold, setThreshold ] = useState<string>(predictSettings.threshold || `${DEFAULT_PREDICT_THRESHOLD}`)
   const [ thresholdError, setThresholdError ] = useState<string>('')
   const [ showThreshold, setShowThreshold ] = useState<boolean>(false)
-  const { stepData } = useContext(QueryBuilderContext)
-  const { predictSettings } = stepData
-
-  useEffect(() => {
-    updateSetting({ threshold: predictSettings.threshold || `${DEFAULT_PREDICT_THRESHOLD}` })
-  }, [])
 
   // pass in { threshold: 0.5 }
   const updateSetting = (setting: any) => {
@@ -41,13 +35,17 @@ export const BinaryClassifierThreshold: React.FC = () => {
   }
 
   const handleThreholdChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const value = Number(e.currentTarget.value)
+    const value = Number(e.target.value)
     if (value > 1) {
       setThresholdError(`Must be between 0 and 1`)
       return
     }
     setThresholdError('')
-    updateSetting({ threshold: e.target.value || undefined })
+    setThreshold(e.target.value)
+  }
+
+  const handleThresholdBlur = () => {
+    updateSetting({ threshold })
   }
 
   return (
@@ -69,8 +67,9 @@ export const BinaryClassifierThreshold: React.FC = () => {
             externalLabel={false}
             label="Threshold"
             className="threshold-field"
-            value={predictSettings.threshold || ''}
+            value={threshold || ''}
             onChange={handleThreholdChange}
+            onBlur={handleThresholdBlur}
             onKeyPress={floatOnly}
           />
         </ExtendComponentsThemeProvider>

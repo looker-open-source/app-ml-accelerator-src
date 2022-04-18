@@ -9,7 +9,7 @@ import { noDot, splitFieldName, titilize } from '../../services/string'
 
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   const { state } = useStore()
-  const evalData = state.wizard.steps.step4.evaluateData[activeTab]
+  const evalData = state.wizard.steps.step4.evaluateData[activeTab]?.data
 
   if (!evalData) { return (<></>) }
 
