@@ -94,14 +94,21 @@ export const isFloat = (float: string) => {
   return re.test(float)
 }
 
-export const formatBQResults = (data: any) => (
+export const formatBQResults = (data: any, nested?: boolean) => (
   data.rows.map((row: any) => {
     const rowObj: any = {}
     const arr = row.f
     arr.forEach((col: any, i: number) => {
       const columnName = data.schema.fields[i].name
       if (Array.isArray(col.v)) {
-        rowObj[columnName] = col.v.map((obj: any) =>  obj.v).join(', ')
+        if (nested) {
+          rowObj[columnName] = formatBQResults({
+            rows: col.v.map((row: any) => row.v),
+            schema: data.schema.fields[i]
+          })
+        } else {
+          rowObj[columnName] = col.v.map((obj: any) =>  obj.v).join(', ')
+        }
         return
       }
       rowObj[columnName] = col.v

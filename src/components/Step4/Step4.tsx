@@ -56,7 +56,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     ) { return }
 
     setIsLoading(true)
-    await getModelEvalFuncData?.(activeTab, thresholdChanged(tabEvalData))
+    await getModelEvalFuncData?.(activeTab)
     setIsLoading(false)
   }
 
@@ -97,15 +97,14 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const buildThreshold = () => {
-    if (!isBinaryClassifier(step1.objective || '', step3)) {
-      return <></>
+    if (bqModel.binaryClassifier) {
+      return (
+        <div className="binary-classifier-container">
+          <BinaryClassifierThreshold />
+        </div>
+      )
     }
-
-    return (
-      <div className="binary-classifier-container">
-        <BinaryClassifierThreshold />
-      </div>
-    )
+    return <></>
   }
 
   return (

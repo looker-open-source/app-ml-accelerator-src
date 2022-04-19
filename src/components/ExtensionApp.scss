@@ -48,15 +48,6 @@ body,
     margin: 0;
   }
 
-  p {
-    font-size: 14px;
-    letter-spacing: 0.2px;
-    color: #5F6368;
-    line-height: 18px;
-    padding: 0;
-    margin: 0;
-  }
-
   .tiny-text {
     font-size: 10px;
   }
@@ -110,6 +101,16 @@ body,
 }
 
 .bqml-app, #modal-root {
+  p {
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    color: #5F6368;
+    line-height: 18px;
+    padding: 0;
+    margin: 0;
+    font-weight: 400;
+  }
+
   .action-button {
     height: 28px;
     font-size: 12;

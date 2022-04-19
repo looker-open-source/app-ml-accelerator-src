@@ -75,7 +75,7 @@ export const truncateLabels = function (value: string | number) {
   return label.length > 11 ? label.substr(0, 10) + '...' : label
 }
 
-const getDatasetColors = (count: number) => {
+export const getDatasetColors = (count: number) => {
   return [...VIZ_COLORS, ...chroma.scale(['navy','red','yellow','white']).correctLightness().colors(count)]
 }
 

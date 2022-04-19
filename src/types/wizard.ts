@@ -4,6 +4,10 @@ import { InputData } from './inputData'
 export type WizardState = {
   unlockedStep: number,
   steps: WizardSteps
+  explain: {
+    model?: any,
+    class?: any
+  }
 }
 
 export type WizardSteps = {

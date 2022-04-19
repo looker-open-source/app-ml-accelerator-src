@@ -1,6 +1,6 @@
 import React from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import { MODEL_TYPES } from '../../services/modelTypes'
+import { MODEL_TYPES, MODEL_TYPES_AVAILABLE } from '../../services/modelTypes'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
@@ -27,7 +27,8 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
       <div className="modeltypes">
         {
-          Object.values(MODEL_TYPES).map((modelType) => {
+          Object.values(MODEL_TYPES_AVAILABLE).map((typeName) => {
+            const modelType = MODEL_TYPES[typeName]
             return (
               <ModelTypeCard
                 selected={modelType.value === objective}

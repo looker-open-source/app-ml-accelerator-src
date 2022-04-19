@@ -1,4 +1,5 @@
 import React from 'react'
+import GlobalExplain from '../GlobalExplain'
 import LoadingOverlay from '../LoadingOverlay'
 import StepComplete from '../StepComplete'
 
@@ -33,18 +34,20 @@ export const StepContainer: React.FC<StepContainerParams> = ({
     <section className={`step-container ${loadingClass} ${customClass || ''}`}>
       <LoadingOverlay isLoading={!!isLoading} />
       { children }
-      { !lastStep &&
+
         <div className="wizard-footer-bar">
+          <GlobalExplain />
           {stepInfo}
-          <StepComplete
-            isStepComplete={stepComplete}
-            isDisabled={isLoading || isDisabled}
-            stepNumber={stepNumber}
-            buttonText={buttonText}
-            handleCompleteClick={handleCompleteClick}
-          />
+          { !lastStep &&
+            <StepComplete
+              isStepComplete={stepComplete}
+              isDisabled={isLoading || isDisabled}
+              stepNumber={stepNumber}
+              buttonText={buttonText}
+              handleCompleteClick={handleCompleteClick}
+            />
+          }
         </div>
-      }
     </section>
   )
 }

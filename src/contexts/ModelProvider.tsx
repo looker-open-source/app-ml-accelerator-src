@@ -9,8 +9,7 @@ import { WizardContext } from './WizardProvider'
 type IModelContext = {
   stopPolling?: () => void
   getModelEvalFuncData?: (
-    evalFuncName: string,
-    forceCreate?: boolean
+    evalFuncName: string
     ) => Promise<any>,
   cancelModelCreate?: () => Promise<any>
 }
@@ -132,45 +131,33 @@ export const ModelProvider = ({ children }: any) => {
 
   // Create & Fetch Evaluate function data in BigQuery
   const getModelEvalFuncData = async (
-    evalFuncName: string,
-    forceCreate?: boolean
+    evalFuncName: string
   ) => {
     try {
       const { name: bqModelName, inputDataUID: uid, selectedFeatures } = state.bqModel
       const { threshold } = state.wizard.steps.step5.predictSettings
       let queryResults
-      let create: boolean | undefined = forceCreate
 
+      const createSql = EVALUATE_CREATE_SQL_METHODS[evalFuncName]({
+        gcpProject,
+        bqmlModelDatasetName,
+        bqModelName,
+        uid,
+        selectedFeatures,
+        threshold
+      })
+      if (!createSql) { throw 'Failed to generate create sql' }
+
+      const { ok: createOk } = await queryJobAndWait?.(createSql)
+      if (!createOk) { throw 'Failed to create evaluate table' }
+
+      // fetch table results now that table is created
       const selectSql = getEvaluateDataSql({ evalFuncName, gcpProject, bqmlModelDatasetName, bqModelName })
       if (!selectSql) { throw 'Failed to generate select sql' }
 
-      if (!create) {
-        // check if evaluate table already exists
-        const { ok, body } = await queryJobAndWait?.(selectSql)
-        queryResults = body
-        create = !ok
-      }
-
-      if (create) {
-        // if the evaluate table doesnt exist yet, create it and select from it again
-        const createSql = EVALUATE_CREATE_SQL_METHODS[evalFuncName]({
-          gcpProject,
-          bqmlModelDatasetName,
-          bqModelName,
-          uid,
-          selectedFeatures,
-          threshold
-        })
-        if (!createSql) { throw 'Failed to generate create sql' }
-
-        const { ok: createOk } = await queryJobAndWait?.(createSql)
-        if (!createOk) { throw 'Failed to create evaluate table' }
-
-        // fetch table results now that table is created
-        const { ok: selectOk, body: selectBody } = await queryJobAndWait?.(selectSql)
-        if (!selectOk) { throw 'Failed to fetch evaluate table data' }
-        queryResults = selectBody
-      }
+      const { ok: selectOk, body: selectBody } = await queryJobAndWait?.(selectSql)
+      if (!selectOk) { throw 'Failed to fetch evaluate table data' }
+      queryResults = selectBody
 
       dispatch({ type: 'addToStepData', step: 'step4', data: {
         evaluateData: {

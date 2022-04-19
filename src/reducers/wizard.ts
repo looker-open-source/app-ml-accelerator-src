@@ -5,6 +5,7 @@ import { getStepStateClone } from '../services/wizard'
 type Action = { type: 'clearState' } |
   { type: 'populateWizard', wizardState: WizardState } |
   { type: 'setUnlockedStep', step: number } |
+  { type: 'setExplain', explainLevel: 'model' | 'class', data: any } |
   { type: 'addToStepData', step: keyof WizardSteps, data: any } |
   { type: 'setSelectedDimension', field: Field, step: 'step2' | 'step5'  } |
   { type: 'setSelectedMeasure', field: Field, step: 'step2' | 'step5' } |
@@ -98,7 +99,8 @@ const wizardInitialState: WizardState = {
       tableHeaders: [],
       predictSettings: {}
     }
-  }
+  },
+  explain: {}
 }
 
 // the ui state of the wizard
@@ -114,6 +116,15 @@ function wizardReducer(state: WizardState, action: Action): any {
     }
     case 'setUnlockedStep': {
       return {...state, unlockedStep: action.step}
+    }
+    case 'setExplain': {
+      return {
+        ...state,
+        explain: {
+          ...state.explain,
+          [action.explainLevel]: action.data
+        }
+      }
     }
     case 'addToStepData': {
       return {

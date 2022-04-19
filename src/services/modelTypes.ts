@@ -19,6 +19,8 @@ export const MODEL_TABS: {[key:string]: string} = {
   [MODEL_EVAL_FUNCS.rocCurve]: 'ROC CURVE'
 }
 
+export const MODEL_TYPES_AVAILABLE: string[] = ['BOOSTED_TREE_REGRESSOR', 'BOOSTED_TREE_CLASSIFIER']
+
 export const MODEL_TYPES: {[key: string]: any} = {
   BOOSTED_TREE_REGRESSOR: {
     label: 'Regression',
@@ -71,12 +73,18 @@ export const isBoostedTree = (objective: string): boolean => (
   objective === MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value
 )
 
+export const isClassifier = (objective: string): boolean => (
+  objective === MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value
+)
+
 export const TABLE_SUFFIXES:  {[key: string]: string} = {
   evaluate: '_evaluate',
   confusionMatrix: '_confusion_matrix',
   rocCurve: '_roc_curve',
   inputData: '_input_data',
-  predictions: '_predictions'
+  predictions: '_predictions',
+  globalExplainModel: '_global_explain_model',
+  globalExplainClass: '_global_explain_class'
 }
 
 /********************/
@@ -174,6 +182,7 @@ const formBoostedTreeSQL = ({
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
           , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
+          , ENABLE_GLOBAL_EXPLAIN = TRUE
           ${settingsSql})
     AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}\`;
   `
@@ -202,6 +211,7 @@ const formArimaSQL = ({
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
+      , ENABLE_GLOBAL_EXPLAIN = TRUE
       , HORIZON = ${ advancedSettings.horizon || DEFAULT_ARIMA_HORIZON }
       ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
       , AUTO_ARIMA = TRUE)
@@ -403,6 +413,65 @@ export const getEvaluateDataSql = ({
   }
 
   return `SELECT * FROM ${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${tableSuffix}`
+}
+
+/*********************/
+/* GLOBAL EXPLAIN */
+/*********************/
+
+
+type BoostedTreeGlobalExplainProps = {
+  gcpProject: string
+  bqmlModelDatasetName: string,
+  bqModelName: string,
+  classLevelExplain?: boolean
+}
+
+export const createClassifierGlobalExplainSql = ({
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  classLevelExplain
+}: BoostedTreeGlobalExplainProps) => {
+  const suffix = classLevelExplain ? TABLE_SUFFIXES.globalExplainClass : TABLE_SUFFIXES.globalExplainModel
+  return `
+    CREATE OR REPLACE TABLE
+      \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${suffix} AS (
+      SELECT *
+      FROM ML.GLOBAL_EXPLAIN(
+        MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
+        STRUCT(${ classLevelExplain ? 'TRUE' : 'FALSE' } AS class_level_explain)
+      )
+    )
+  `
+}
+
+export const createRegressorGlobalExplainSql = ({
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName
+}: BoostedTreeGlobalExplainProps) => {
+  return `
+    CREATE OR REPLACE TABLE
+      \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.globalExplainModel} AS (
+      SELECT *
+      FROM ML.GLOBAL_EXPLAIN(
+        MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}
+      )
+    )
+  `
+}
+
+export const selectBoostedTreeGlobalExplainSql = ({
+  gcpProject,
+  bqmlModelDatasetName,
+  bqModelName,
+  classLevelExplain
+}: BoostedTreeGlobalExplainProps) => {
+  const suffix = classLevelExplain ? TABLE_SUFFIXES.globalExplainClass : TABLE_SUFFIXES.globalExplainModel
+  return `
+    SELECT * FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${suffix}
+  `
 }
 
 
