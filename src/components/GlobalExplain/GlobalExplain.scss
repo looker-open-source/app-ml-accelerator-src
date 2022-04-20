@@ -14,28 +14,38 @@
 .explain-tabs {
   display: flex;
   justify-content: flex-start;
+  width: 42%;
 
   .explain-tab {
     cursor: pointer;
     flex: 1;
     text-align: center;
-    background-color: #f7f7f7;
-    padding: 22px;
+    padding: 12px;
+    color: #4285F4;
 
-    &:first-child {
-      margin-right: 8px;
-    }
 
     &.active {
-      color: #4285F4;
-      border-bottom: 3px solid #4285F4;
+      color: black;
+      background-color: #f7f7f7;
     }
+  }
+}
+
+.global-explain--charts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f7f7f7;
+  padding: 22px 22px 0;
+
+  h5 {
+    padding: 0;
+    margin: 10px 0;
   }
 }
 
 .global-explain--charts {
   display: flex;
-  gap: 22px;
   justify-content: center;
   flex-wrap: wrap;
 

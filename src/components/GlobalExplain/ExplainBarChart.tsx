@@ -25,7 +25,7 @@ export const ExplainBarChart: React.FC<{ data: any[],label: string }> = ({ data,
   const buildChartObj = () => {
     const chartType: keyof ChartTypeRegistry = 'bar'
     const labels = data.map((feature) => titilize(feature.feature))
-    const barValues = data.map((feature) => feature.attribution)
+    const barValues = data.map((feature) => Number(feature.attribution))
 
     return {
       type: chartType,

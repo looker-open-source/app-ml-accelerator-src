@@ -66,7 +66,7 @@ export const GlobalExplainDialog: React.FC = () => {
 
     if (isClassLevel(activeTab)) {
       return chartData.map((datum: any, i: number) => (
-        <ExplainBarChart data={datum.top_feature_attributions} label={titilize(datum[Object.keys(datum)[0]])} key={i}/>
+        <ExplainBarChart data={datum.top_feature_attributions} label={`${displayTarget()}: ${titilize(datum[Object.keys(datum)[0]])}`} key={i}/>
       ))
     }
 
@@ -75,6 +75,10 @@ export const GlobalExplainDialog: React.FC = () => {
     }
     return <ExplainBarChart data={chartData} label="Features" />
   }
+
+  const displayTarget = () => (
+    titilize(noDot(target || ''))
+  )
 
   return (
     <>
@@ -87,9 +91,11 @@ export const GlobalExplainDialog: React.FC = () => {
             <GlobalExplainDialogTabs activeTab={activeTab} setActiveTab={setActiveTab} availableTabs={EXPLAIN_TABS} />
           }
           <div className="global-explain--charts-container" >
-            <h5>Target: {titilize(noDot(target || ''))}</h5>
-            <div className="global-explain--top-features">
-            { !isClassLevel(activeTab) && <ButtonToggle value={topFeatures} onChange={setTopFeatures} options={topFeaturesOptions} /> }
+            <div className="global-explain--charts-header">
+              <h5>Target: {displayTarget()}</h5>
+              <div className="global-explain--top-features">
+              { !isClassLevel(activeTab) && <ButtonToggle value={topFeatures} onChange={setTopFeatures} options={topFeaturesOptions} /> }
+              </div>
             </div>
             <div className="global-explain--charts">
               { drawCharts() }
