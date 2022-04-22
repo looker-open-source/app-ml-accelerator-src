@@ -210,7 +210,7 @@ const formArimaSQL = ({
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
       , HORIZON = ${ advancedSettings.horizon || DEFAULT_ARIMA_HORIZON }
-      ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
+      ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = '${advancedSettings.holidayRegion}'` : ''}
       , AUTO_ARIMA = TRUE)
     AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}\`) ;
   `
