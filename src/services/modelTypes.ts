@@ -19,8 +19,6 @@ export const MODEL_TABS: {[key:string]: string} = {
   [MODEL_EVAL_FUNCS.rocCurve]: 'ROC CURVE'
 }
 
-export const MODEL_TYPES_AVAILABLE: string[] = ['BOOSTED_TREE_REGRESSOR', 'BOOSTED_TREE_CLASSIFIER']
-
 export const MODEL_TYPES: {[key: string]: any} = {
   BOOSTED_TREE_REGRESSOR: {
     label: 'Predict a Value',

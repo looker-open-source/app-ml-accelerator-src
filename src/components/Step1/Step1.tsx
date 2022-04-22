@@ -1,6 +1,6 @@
 import React from 'react'
 import { useStore } from "../../contexts/StoreProvider"
-import { MODEL_TYPES, MODEL_TYPES_AVAILABLE } from '../../services/modelTypes'
+import { MODEL_TYPES } from '../../services/modelTypes'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
