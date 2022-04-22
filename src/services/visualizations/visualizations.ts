@@ -75,9 +75,11 @@ export const truncateLabels = function (value: string | number) {
   return label.length > 11 ? label.substr(0, 10) + '...' : label
 }
 
-const getDatasetColors = (count: number) => {
-  return [...VIZ_COLORS, ...chroma.scale(['navy','red','yellow','white']).correctLightness().colors(count)]
+export const getDatasetColors = (count: number) => {
+  return chroma.bezier(["#2b0b57", "#88226a", "#da4e3c", "#f1ec6d"]).scale().correctLightness().colors(count)
 }
+
+//['#5e4fa2', '#9e0142','#f47b4d','#feefa4','#7dc9a6'] spectral
 
 export const buildPieDataSets = ({ ranQuery, data, target, labels, datasetMapper }: buildVizDataSetsProps): any[] => {
   if (!ranQuery?.selectedFields) { return [] }

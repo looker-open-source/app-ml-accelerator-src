@@ -6,8 +6,11 @@ import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
 import { MODEL_EVAL_FUNCS } from '../../services/modelTypes'
 import { noDot, splitFieldName, titilize } from '../../services/string'
+import GlobalExplain from '../GlobalExplain'
 
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
+  if (activeTab === 'explain') { return <GlobalExplain /> }
+
   const { state } = useStore()
   const evalData = state.wizard.steps.step4.evaluateData[activeTab]?.data
 
@@ -62,14 +65,14 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
   })()
 
   const headers = [(
-    <td className="model-cm-item--placeholder"></td>
+    <td className="model-cm-item--placeholder" width="60" key="placeholder"></td>
   )]
 
   for (const key in firstRow) {
     if (key === 'expected_label') { continue }
     headers.push(
-      <td className={`model-cm-item--header ${cellSizeClass}`}>{titilize(splitFieldName(key))}</td>
-    )
+      <td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{key}</td>
+    ) //titilize(splitFieldName(key))
   }
 
   const tableHeader = (
@@ -83,12 +86,13 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
     for (const key in sortedData[rowKey]) {
       const value = sortedData[rowKey][key]
       if (key === 'expected_label') {
-        cells.push(<td className={`model-cm-item--header ${cellSizeClass}`}>{titilize(splitFieldName(value))}</td>)
+        cells.push(<td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{value}</td>) //titilize(splitFieldName(value))
       } else {
         cells.push(
           <td
             style={{ backgroundColor: matrixColor(Number(value))}}
-            className={`model-cm-item--value ${cellSizeClass}`}>
+            className={`model-cm-item--value ${cellSizeClass}`}
+            key={key}>
               {value}
           </td>
         )
@@ -103,10 +107,10 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
   }
 
   return (
-    <div className="model-grid-bg">
+    <div className="model-grid-bg fit-contents">
       <div className="model-cm-container">
         <div className="confusion-grid-target">
-          Selected Target: <span>{ target }</span>
+          Selected Target: <span>{ titilize(noDot(target || '')) }</span>
         </div>
         <table>
           <thead>
@@ -212,7 +216,7 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
             type: 'linear',
             title: {
               display: true,
-              text: 'Recall'
+              text: 'True Positive Rate (Recall)'
             }
           }
         }

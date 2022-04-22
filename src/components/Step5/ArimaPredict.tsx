@@ -47,6 +47,7 @@ export const ArimaPredict: React.FC<ArimaPredictProps> = ({ isLoading, setIsLoad
                 Generate Predictions
             </Button>
           }
+          getPredictions={getPredictions}
         />
       </QueryBuilderProvider>
     </>

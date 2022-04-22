@@ -1,0 +1,54 @@
+.global-explain-icon {
+  cursor: pointer;
+}
+
+.info-p {
+  white-space: normal;
+  width: 65%;
+}
+
+.explain-tabs {
+  display: flex;
+  justify-content: flex-start;
+  width: 42%;
+
+  .explain-tab {
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    color: #4285F4;
+
+
+    &.active {
+      color: black;
+      background-color: #f7f7f7;
+    }
+  }
+}
+
+.global-explain--charts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f7f7f7;
+  padding: 22px 22px 0;
+
+  h5 {
+    padding: 0;
+    margin: 10px 0;
+  }
+}
+
+.global-explain--charts {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  .global-explain--chart {
+    flex: 1;
+    flex-basis: 30%;
+    background-color: #f7f7f7;
+    padding: 22px;
+  }
+}

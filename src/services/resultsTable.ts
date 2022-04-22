@@ -72,8 +72,9 @@ export const findSortedHeader = (
   header: ResultsTableHeaderItem
 ) => {
   return find(sorts, (name) => {
-      let sortName = name.split(" ")[0]
-      return sortName === header.name
+    if (!name) { return false }
+    let sortName = name.split(" ")[0]
+    return sortName === header.name
   })
 }
 

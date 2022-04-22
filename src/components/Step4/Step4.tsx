@@ -12,7 +12,7 @@ import { ModelDataBody } from './ModelDataBody'
 import { IncompleteJob } from './IncompleteJob'
 import BinaryClassifierThreshold from '../BinaryClassifierThreshold'
 import { titilize } from '../../services/string'
-import { isBinaryClassifier, needsModelUpdate } from '../../services/summary'
+import { needsModelUpdate } from '../../services/summary'
 import './Step4.scss'
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -44,6 +44,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }, [jobStatus])
 
   useEffect(() => {
+    if (activeTab === 'explain') { return }
     fetchModelData()
   }, [jobComplete, activeTab, uiThreshold])
 
@@ -56,7 +57,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     ) { return }
 
     setIsLoading(true)
-    await getModelEvalFuncData?.(activeTab, thresholdChanged(tabEvalData))
+    await getModelEvalFuncData?.(activeTab)
     setIsLoading(false)
   }
 
@@ -97,15 +98,14 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const buildThreshold = () => {
-    if (!isBinaryClassifier(step1.objective || '', step3)) {
-      return <></>
+    if (bqModel.binaryClassifier) {
+      return (
+        <div className="binary-classifier-container">
+          <BinaryClassifierThreshold />
+        </div>
+      )
     }
-
-    return (
-      <div className="binary-classifier-container">
-        <BinaryClassifierThreshold />
-      </div>
-    )
+    return <></>
   }
 
   return (

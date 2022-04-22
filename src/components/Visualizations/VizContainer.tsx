@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { AllChartTypes, VIZ_HEIGHT } from "../../services/visualizations/vizConstants";
+import React from "react"
+import { AllChartTypes } from "../../services/visualizations/vizConstants";
 import { RanQuery } from "../../types";
 import { VizChart } from "./VizChart";
 import { VizSingleRecord } from "./VizSingleRecord";
