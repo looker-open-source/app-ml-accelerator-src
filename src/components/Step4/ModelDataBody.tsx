@@ -83,17 +83,24 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 
   for (const rowKey in sortedData) {
     const cells = []
-    for (const key in sortedData[rowKey]) {
-      const value = sortedData[rowKey][key]
+    const row = sortedData[rowKey]
+    const rowTotal = Object.keys(row).reduce(
+      (total: number, key: any, index: number) =>
+        (index > 0 ? total + Number(row[key]) : total + 0)
+      , 0)
+
+    for (const key in row) {
+      const value = row[key]
       if (key === 'expected_label') {
         cells.push(<td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{value}</td>) //titilize(splitFieldName(value))
       } else {
+        const cellAsPercent = Math.round(Number(value) / rowTotal * 100)
         cells.push(
           <td
-            style={{ backgroundColor: matrixColor(Number(value))}}
+            style={{ backgroundColor: matrixColor(cellAsPercent)}}
             className={`model-cm-item--value ${cellSizeClass}`}
             key={key}>
-              {value}
+              {cellAsPercent + '%'}
           </td>
         )
       }
