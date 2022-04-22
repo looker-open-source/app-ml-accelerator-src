@@ -23,20 +23,20 @@ export const MODEL_TYPES_AVAILABLE: string[] = ['BOOSTED_TREE_REGRESSOR', 'BOOST
 
 export const MODEL_TYPES: {[key: string]: any} = {
   BOOSTED_TREE_REGRESSOR: {
-    label: 'Regression',
+    label: 'Predict a Value',
     value: 'BOOSTED_TREE_REGRESSOR',
     detail: 'BOOSTED_TREE_REGRESSOR',
-    description: 'I want to recommend something',
+    description: 'Train a model to predict numeric values.',
     requiredFieldTypes: ['numeric'],
     targetDataType: 'numeric',
     exploreName: 'boosted_tree',
     modelTabs: () => [MODEL_EVAL_FUNCS.evaluate]
   },
   BOOSTED_TREE_CLASSIFIER: {
-    label: 'Classification',
+    label: 'Predict a Category',
     value: 'BOOSTED_TREE_CLASSIFIER',
     detail: 'BOOSTED_TREE_CLASSIFIER',
-    description: 'I want to classify something',
+    description: 'Train a model to predict a class.',
     exploreName: 'boosted_tree',
     modelTabs: (isBinary: boolean) => (
       isBinary ?
@@ -211,7 +211,6 @@ const formArimaSQL = ({
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
-      , ENABLE_GLOBAL_EXPLAIN = TRUE
       , HORIZON = ${ advancedSettings.horizon || DEFAULT_ARIMA_HORIZON }
       ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = ${advancedSettings.holidayRegion}` : ''}
       , AUTO_ARIMA = TRUE)

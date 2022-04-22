@@ -12,7 +12,7 @@ import { ModelDataBody } from './ModelDataBody'
 import { IncompleteJob } from './IncompleteJob'
 import BinaryClassifierThreshold from '../BinaryClassifierThreshold'
 import { titilize } from '../../services/string'
-import { isBinaryClassifier, needsModelUpdate } from '../../services/summary'
+import { needsModelUpdate } from '../../services/summary'
 import './Step4.scss'
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
@@ -44,6 +44,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }, [jobStatus])
 
   useEffect(() => {
+    if (activeTab === 'explain') { return }
     fetchModelData()
   }, [jobComplete, activeTab, uiThreshold])
 

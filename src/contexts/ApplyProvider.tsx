@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
 import { createArimaPredictSql, createBoostedTreePredictSql, getPredictSql, MODEL_TYPES } from '../services/modelTypes'
-import { bqResultsToLookerFormat, buildApplyFilters, getPredictedColumnName } from '../services/apply'
+import { bqResultsToLookerFormat, buildApplyFilters, buildPredictSorts, FORECAST_PREDICT_COLUMNS, getPredictedColumnName } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
 import { WizardContext } from './WizardProvider'
 import { BQMLContext } from './BQMLProvider'
@@ -220,25 +220,29 @@ export const ApplyProvider = ({ children }: any) => {
         predictSettings: step5.predictSettings
       })
 
+      const sorts = buildPredictSorts(step5.sorts, bqModel)
+
       const { ok, value: queryResult } = await coreSDK.create_query({
         model: BQML_LOOKER_MODEL,
         view: modelType.exploreName,
-        fields: ['arima_forecast.date_date', 'arima_forecast.total_forecast', 'arima_forecast.time_series_data_col'],
-        filters
+        fields: [FORECAST_PREDICT_COLUMNS.timeColumn, FORECAST_PREDICT_COLUMNS.predictColumn, FORECAST_PREDICT_COLUMNS.targetColumn],
+        filters,
+        sorts
       })
       if (!ok) { throw "Query creation failed" }
 
       const { ok: runOk, value } = await coreSDK.run_query({
         query_id: queryResult.id,
         result_format: "json_detail",
+        cache: false
       })
       if (!runOk) { throw "Query creation failed" }
 
       // Format results so that column names are reverted to their original names
       const formattedResults = value.data.map((datum: any) => ({
-        [getPredictedColumnName(bqModelTarget)]: datum['arima_forecast.total_forecast'],
-        [bqModelTarget]: datum['arima_forecast.time_series_data_col'],
-        [bqModelArimaTimeColumn]: datum['arima_forecast.date_date']
+        [getPredictedColumnName(bqModelTarget)]: datum[FORECAST_PREDICT_COLUMNS.predictColumn],
+        [bqModelTarget]: datum[FORECAST_PREDICT_COLUMNS.targetColumn],
+        [bqModelArimaTimeColumn]: datum[FORECAST_PREDICT_COLUMNS.timeColumn]
       }))
 
       // filter out unused fields

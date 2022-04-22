@@ -1,6 +1,13 @@
-import { ExploreData } from "../types"
+import { compact } from "lodash"
+import { BQModelState, ExploreData } from "../types"
 import { isArima, TABLE_SUFFIXES } from "./modelTypes"
 import { formatParameterFilter, noDot } from "./string"
+
+export const FORECAST_PREDICT_COLUMNS = {
+  targetColumn: 'arima_forecast.time_series_data_col',
+  timeColumn: 'arima_forecast.date_date',
+  predictColumn: 'arima_forecast.total_forecast'
+}
 
 type buildApplyFiltersProps = {
   modelType: any,
@@ -32,9 +39,7 @@ export const buildApplyFilters = ({
       [`${modelType.exploreName}.time_series_timestamp_col`]: formatParameterFilter(bqModelArimaTimeColumn)
     }
 
-    if (predictSettings.horizon) {
-      filters[`${modelType.exploreName}.set_horizon`] = predictSettings.horizon
-    }
+    filters[`${modelType.exploreName}.set_horizon`] = predictSettings.horizon || 30
 
     if (predictSettings.confidenceLevel) {
       filters[`${modelType.exploreName}.set_confidence_level`] = predictSettings.confidenceLevel
@@ -43,6 +48,23 @@ export const buildApplyFilters = ({
 
   return filters
 }
+
+export const buildPredictSorts = (sorts: string[], bqModel: BQModelState) => (
+  compact(sorts.map((sort) => {
+    if (!sort) { return }
+    const splitSort = sort.split(' ')
+    const sortName = splitSort[0]
+    let sortColumn = ''
+    if (sortName === bqModel.target) {
+      sortColumn = FORECAST_PREDICT_COLUMNS.targetColumn
+    } else if (sortName === bqModel.arimaTimeColumn) {
+      sortColumn = FORECAST_PREDICT_COLUMNS.timeColumn
+    } else {
+      sortColumn = FORECAST_PREDICT_COLUMNS.predictColumn
+    }
+    return splitSort.length <= 1 ? sortColumn : `${sortColumn} ${splitSort[1]}`
+  }))
+)
 
 export const getLookerColumnName = (views: string[], fieldName: string) => {
   let name: string = ''

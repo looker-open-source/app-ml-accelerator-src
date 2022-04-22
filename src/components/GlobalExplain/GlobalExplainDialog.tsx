@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { ButtonToggle, DialogContent } from '@looker/components'
+import { ButtonToggle } from '@looker/components'
 import { ExplainContext } from '../../contexts/ExplainProvider'
 import { useStore } from '../../contexts/StoreProvider'
 import LoadingOverlay from '../LoadingOverlay'
@@ -44,7 +44,7 @@ export const GlobalExplainDialog: React.FC = () => {
     isClassLevel(activeTab) ?
       setFormattedClassData(formatBQResults(data, true)) :
       setFormattedModelData(formatBQResults(data, true))
-  }, [explain.class, explain.model])
+  }, [explain.class, explain.model, activeTab])
 
   const fetchModelData = async () => {
     setIsLoading(true)
@@ -65,8 +65,9 @@ export const GlobalExplainDialog: React.FC = () => {
     if (!chartData || chartData.length <= 0) { return <></> }
 
     if (isClassLevel(activeTab)) {
+      // for every class value show a chart of the top 10 features
       return chartData.map((datum: any, i: number) => (
-        <ExplainBarChart data={datum.top_feature_attributions} label={`${displayTarget()}: ${titilize(datum[Object.keys(datum)[0]])}`} key={i}/>
+        <ExplainBarChart data={datum.top_feature_attributions.slice(0, 10)} label={`${displayTarget()}: ${titilize(datum[Object.keys(datum)[0]])}`} key={i}/>
       ))
     }
 
@@ -82,27 +83,23 @@ export const GlobalExplainDialog: React.FC = () => {
 
   return (
     <>
-      <DialogContent className="global-explain--content">
-        <h3>Global Explain</h3>
-        <p className="info-p">Aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce dignissim luctus sem eu dapibus. Pellentesque vulputate quam a quam volutpat, sed ullamcorper erat commodo. Vestibulum sit amet ipsum vitae mauris mattis vulputate lacinia nec neque. Aenean quis consectetur nisi, ac interdum elit. Aliquam sit amet luctus elit, id tempus purus.</p>
-        <div className="global-explain--container modal-pane">
-          <LoadingOverlay isLoading={isLoading}/>
-          { isClassifier(objective || '') &&
-            <GlobalExplainDialogTabs activeTab={activeTab} setActiveTab={setActiveTab} availableTabs={EXPLAIN_TABS} />
-          }
-          <div className="global-explain--charts-container" >
-            <div className="global-explain--charts-header">
-              <h5>Target: {displayTarget()}</h5>
-              <div className="global-explain--top-features">
-              { !isClassLevel(activeTab) && <ButtonToggle value={topFeatures} onChange={setTopFeatures} options={topFeaturesOptions} /> }
-              </div>
-            </div>
-            <div className="global-explain--charts">
-              { drawCharts() }
+      <div className="global-explain--container">
+        <LoadingOverlay isLoading={isLoading}/>
+        { isClassifier(objective || '') &&
+          <GlobalExplainDialogTabs activeTab={activeTab} setActiveTab={setActiveTab} availableTabs={EXPLAIN_TABS} />
+        }
+        <div className="global-explain--charts-container" >
+          <div className="global-explain--charts-header">
+            <h5>Target: {displayTarget()}</h5>
+            <div className="global-explain--top-features">
+            { !isClassLevel(activeTab) && <ButtonToggle value={topFeatures} onChange={setTopFeatures} options={topFeaturesOptions} /> }
             </div>
           </div>
+          <div className="global-explain--charts">
+            { drawCharts() }
+          </div>
         </div>
-      </DialogContent>
+      </div>
     </>
   )
 }

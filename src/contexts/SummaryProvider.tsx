@@ -3,7 +3,7 @@ import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { formBQInputDataSQL, isArima, MODEL_TYPE_CREATE_METHOD } from '../services/modelTypes'
 import { WizardContext } from './WizardProvider'
-import { JOB_STATUSES } from '../constants'
+import { DEFAULT_ARIMA_HORIZON, JOB_STATUSES } from '../constants'
 import { wizardInitialState } from '../reducers/wizard'
 import { BQModelState, WizardState } from '../types'
 import { bqModelInitialState } from '../reducers/bqModel'
@@ -155,7 +155,8 @@ export const SummaryProvider = ({ children }: any) => {
       exploreLabel: step3.inputData?.exploreLabel,
       limit: step3.inputData?.limit,
       selectedFields: step3.inputData?.selectedFields,
-      sorts: step3.inputData?.sorts,
+      // default arima to sort ascending for time
+      sorts: isArima(step1.objective || '') ? [step3.arimaTimeColumn] : step3.inputData?.sorts,
     }
 
     return {
@@ -169,7 +170,7 @@ export const SummaryProvider = ({ children }: any) => {
       arimaTimeColumn: step3.arimaTimeColumn,
       hasPredictions: false,
       predictSettings: {
-        horizon: advancedSettings.horizon
+        horizon: advancedSettings.horizon || '30'
       },
       selectedFeatures: [...features],
       advancedSettings: {...advancedSettings},
@@ -233,6 +234,7 @@ export const SummaryProvider = ({ children }: any) => {
 
       await persistModelState?.({ wizardState: tempWizard, bqModel: tempBQModel, isModelCreate, isModelUpdate: true })
 
+      const { step1, step3 } = wizard.steps
       dispatch({
         type: 'setBQModel',
         data: { ...tempBQModel }
@@ -253,6 +255,9 @@ export const SummaryProvider = ({ children }: any) => {
         data: {
           ...wizardInitialState.steps.step5,
           ...bqModel.inputDataQuery,
+          exploreName: wizard.steps.step2.exploreName,
+          modelName: wizard.steps.step2.modelName,
+          sorts: isArima(step1.objective || '') ? [tempBQModel.arimaTimeColumn] : step3.inputData?.sorts,
           showPredictions: false,
           predictSettings: tempBQModel.predictSettings || {}
         }

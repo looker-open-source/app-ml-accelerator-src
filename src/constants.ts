@@ -5,7 +5,7 @@ export const WIZARD_STEPS: { [key: string]: string } = {
   step2: 'source',
   step3: 'model',
   step4: 'review',
-  step5: 'apply'
+  step5: 'predict'
 }
 
 export const WIZARD_KEYS: {[key: number]: keyof WizardSteps} = {

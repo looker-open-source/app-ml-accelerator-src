@@ -7,7 +7,7 @@ export const TitleBar : React.FC = () => {
     <div className="TitleBar_container">
       <div className="title-logo">
         <Link to={'/'} className="title-logo-text">
-          BigQuery ML<span>app</span>
+          BigQuery ML <span>Accelerator</span>
         </Link>
       </div>
     </div>

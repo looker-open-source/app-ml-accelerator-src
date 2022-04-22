@@ -1,5 +1,4 @@
 import React from 'react'
-import GlobalExplain from '../GlobalExplain'
 import LoadingOverlay from '../LoadingOverlay'
 import StepComplete from '../StepComplete'
 
@@ -36,7 +35,6 @@ export const StepContainer: React.FC<StepContainerParams> = ({
       { children }
 
         <div className="wizard-footer-bar">
-          <GlobalExplain />
           {stepInfo}
           { !lastStep &&
             <StepComplete

@@ -27,8 +27,7 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
       <div className="modeltypes">
         {
-          Object.values(MODEL_TYPES_AVAILABLE).map((typeName) => {
-            const modelType = MODEL_TYPES[typeName]
+          Object.values(MODEL_TYPES).map((modelType) => {
             return (
               <ModelTypeCard
                 selected={modelType.value === objective}
@@ -61,8 +60,8 @@ export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, t
       className={`wizard-card modeltypecard ${selectedClass}`}
       onClick={() => handleSelect({ value: type })}
     >
-      <h2>{description}</h2>
-      <p>{title}</p>
+      <h2>{title}</h2>
+      <p>{description}</p>
     </div>
   )
 }

@@ -24,6 +24,12 @@
 .model-grid-bg {
   background-color: #f7f7f7;
   padding: 32px;
+
+  &.fit-contents {
+    width: auto;
+    display: inline-block;
+    max-width: 100%;
+  }
 }
 
 .model-sidebar {
@@ -143,8 +149,8 @@
   overflow: scroll;
   max-height: 800px;
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
+  flex-direction: column;
+  justify-content: flex-start;
 
   thead tr {
     position: sticky;
@@ -171,10 +177,10 @@
     text-align: center;
     padding: 8px;
 
-    &.xlarge { height: 120px; width: 120px; }
-    &.large { height: 95px; width: 95px; }
-    &.medium { height: 80px; width: 80px; }
-    &.small { height: 60px; width: 60px; }
+    &.xlarge { height: 120px; width: 120px; min-width: 120px; }
+    &.large { height: 95px; width: 95px; min-width: 95px; }
+    &.medium { height: 80px; width: 80px; min-width: 80px; }
+    &.small { height: 60px; width: 60px; min-width: 60px; }
   }
 }
 

@@ -95,7 +95,7 @@ export const BQMLProvider = ({ children }: any) => {
         if (canExpire) {
           setCanExpire(false)
           setExpired(true)
-          dispatch({ type: 'addError', error: 'Unauthorized request to google api.' })
+          dispatch({ type: 'addError', error: 'Unauthorized request to google api or session has expired.  Relogging in.' })
         }
       }
       return { ok, body, status }
