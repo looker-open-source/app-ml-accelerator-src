@@ -185,7 +185,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepNumber={3}
       buttonText={stepCompleteButtonText()}
       handleCompleteClick={buildHandleCompleteClick()}
-      stepInfo={(<AdvancedSettings objective={objective}/>)}
+      stepInfo={!isArima(objective || '') ? (<AdvancedSettings objective={objective}/>) : ''}
     >
       <div className="model-blocks">
         <ModelNameBlock
