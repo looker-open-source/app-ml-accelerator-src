@@ -9,6 +9,7 @@ import { VizContainer } from '../../Visualizations/VizContainer'
 import { VizButtons } from './VizButtons'
 import { AllChartTypes } from '../../../services/visualizations/vizConstants'
 import './QueryPane.scss'
+import { isArima } from '../../../services/modelTypes'
 
 export const QueryPane: React.FC = () => {
   const { stepData, stepName } = useContext(QueryBuilderContext)
@@ -33,23 +34,29 @@ export const QueryPane: React.FC = () => {
     dispatch({ type: 'addToStepData', step: stepName, data: { limit: value }})
   }
 
+  const showFilters = () => (
+    !(stepName === 'step5' && isArima(state.bqModel.objective || ''))
+  )
+
   return (
     <div>
-      <ExpanderBar
-        title="Filters"
-        expanderBodyClasses="filter-expander"
-        isOpen={state.ui.filtersOpen}
-        setIsOpen={() => dispatch({type: 'setFiltersOpen', value: !state.ui.filtersOpen})}
-        showFieldsEvenWhenClosed
-      >
-        <div>
-          <FilterPanel
-            filters={selectedFields.filters}
-            onChange={onFilterChange}
-            onRemove={onFilterRemove}
-          />
-        </div>
-      </ExpanderBar>
+      { showFilters() &&
+        <ExpanderBar
+          title="Filters"
+          expanderBodyClasses="filter-expander"
+          isOpen={state.ui.filtersOpen}
+          setIsOpen={() => dispatch({type: 'setFiltersOpen', value: !state.ui.filtersOpen})}
+          showFieldsEvenWhenClosed
+        >
+          <div>
+            <FilterPanel
+              filters={selectedFields.filters}
+              onChange={onFilterChange}
+              onRemove={onFilterRemove}
+            />
+          </div>
+        </ExpanderBar>
+      }
       { stepName === 'step5' &&
         <ExpanderBar
           title="Visualization"

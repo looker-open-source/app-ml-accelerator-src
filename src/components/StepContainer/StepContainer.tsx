@@ -33,19 +33,18 @@ export const StepContainer: React.FC<StepContainerParams> = ({
     <section className={`step-container ${loadingClass} ${customClass || ''}`}>
       <LoadingOverlay isLoading={!!isLoading} />
       { children }
-
+      { !lastStep &&
         <div className="wizard-footer-bar">
           {stepInfo}
-          { !lastStep &&
-            <StepComplete
-              isStepComplete={stepComplete}
-              isDisabled={isLoading || isDisabled}
-              stepNumber={stepNumber}
-              buttonText={buttonText}
-              handleCompleteClick={handleCompleteClick}
-            />
-          }
+          <StepComplete
+            isStepComplete={stepComplete}
+            isDisabled={isLoading || isDisabled}
+            stepNumber={stepNumber}
+            buttonText={buttonText}
+            handleCompleteClick={handleCompleteClick}
+          />
         </div>
+      }
     </section>
   )
 }

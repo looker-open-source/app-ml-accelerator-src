@@ -71,8 +71,8 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
   for (const key in firstRow) {
     if (key === 'expected_label') { continue }
     headers.push(
-      <td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{titilize(splitFieldName(key))}</td>
-    )
+      <td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{key}</td>
+    ) //titilize(splitFieldName(key))
   }
 
   const tableHeader = (
@@ -86,7 +86,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
     for (const key in sortedData[rowKey]) {
       const value = sortedData[rowKey][key]
       if (key === 'expected_label') {
-        cells.push(<td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{titilize(splitFieldName(value))}</td>)
+        cells.push(<td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{value}</td>) //titilize(splitFieldName(value))
       } else {
         cells.push(
           <td
