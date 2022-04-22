@@ -254,9 +254,7 @@ export const SummaryProvider = ({ children }: any) => {
         step: 'step5',
         data: {
           ...wizardInitialState.steps.step5,
-          ...bqModel.inputDataQuery,
-          exploreName: wizard.steps.step2.exploreName,
-          modelName: wizard.steps.step2.modelName,
+          ...tempBQModel.inputDataQuery,
           sorts: isArima(step1.objective || '') ? [tempBQModel.arimaTimeColumn] : step3.inputData?.sorts,
           showPredictions: false,
           predictSettings: tempBQModel.predictSettings || {}
