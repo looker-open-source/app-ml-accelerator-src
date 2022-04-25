@@ -5,6 +5,7 @@ import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
 import './Step1.scss'
+import { Button } from '@looker/components'
 
 const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { state, dispatch } = useStore()
@@ -23,8 +24,7 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   return (
     <StepContainer stepComplete={stepComplete} stepNumber={1}>
-      <h2>Choose your objective</h2>
-      <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
+      <h2>Select the objective</h2>
       <div className="modeltypes">
         {
           Object.values(MODEL_TYPES).map((modelType) => {
@@ -33,6 +33,7 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
                 selected={modelType.value === objective}
                 title={modelType.label}
                 type={modelType.value}
+                techLabel={modelType.techLabel}
                 description={modelType.description}
                 handleSelect={handleSelect}
                 key={modelType.value}
@@ -49,11 +50,12 @@ type ModelTypeCardProps = {
   selected: boolean,
   title: string,
   type: string,
+  techLabel: string,
   description: string,
   handleSelect: (selection: any) => void
 }
 
-export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, type, description, handleSelect }) => {
+export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, type, techLabel, description, handleSelect }) => {
   const selectedClass = selected ? 'active' : ''
   return (
     <div
@@ -62,6 +64,9 @@ export const ModelTypeCard: React.FC<ModelTypeCardProps> = ({ selected, title, t
     >
       <h2>{title}</h2>
       <p>{description}</p>
+      <div className="modeltypecard-button-container">
+        <Button className="action-Button modeltypecard-button">{techLabel}</Button>
+      </div>
     </div>
   )
 }

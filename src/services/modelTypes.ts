@@ -24,6 +24,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     label: 'Predict a Value',
     value: 'BOOSTED_TREE_REGRESSOR',
     detail: 'BOOSTED_TREE_REGRESSOR',
+    techLabel: 'Regression',
     description: 'Train a model to predict numeric values.',
     requiredFieldTypes: ['numeric'],
     targetDataType: 'numeric',
@@ -34,6 +35,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     label: 'Predict a Category',
     value: 'BOOSTED_TREE_CLASSIFIER',
     detail: 'BOOSTED_TREE_CLASSIFIER',
+    techLabel: 'Classification',
     description: 'Train a model to predict a class.',
     exploreName: 'boosted_tree',
     modelTabs: (isBinary: boolean) => (
@@ -46,6 +48,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     label: 'Time series forecasting',
     value: 'ARIMA_PLUS',
     detail: 'ARIMA_PLUS',
+    techLabel: 'Time series forecasting',
     description: 'I want to forecast a number (e.g. future sales)',
     requiredFieldTypes: ['date_date', 'numeric'],
     exploreName: 'arima',
