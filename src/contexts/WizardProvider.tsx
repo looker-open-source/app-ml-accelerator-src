@@ -88,7 +88,7 @@ export const WizardProvider = ({ children }: any) => {
       // Fetch and Populate Step2 Data
       const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName, 'step2')
       if (exploreData) {
-        const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID)
+        const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID, bqModel.inputDataQuery.limit)
         if (!ok) {
           throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
         }
@@ -341,13 +341,14 @@ export const WizardProvider = ({ children }: any) => {
     }
   }
 
-  const getBQInputData = async (bqModelName: string, uid: string) => {
+  const getBQInputData = async (bqModelName: string, uid: string, limit?: string) => {
     try {
       if (!bqmlModelDatasetName) { throw "No dataset provided" }
       const sql = getBQInputDataSql({
         bqmlModelDatasetName,
         bqModelName,
-        uid
+        uid,
+        limit
       })
       const { ok, body } = await queryJobAndWait?.(sql)
       if (!ok) {

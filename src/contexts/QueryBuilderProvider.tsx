@@ -73,7 +73,7 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBu
       const uid = state.bqModel.inputDataUID
       if (!bqmlModelDatasetName || !bqModelName || ! uid) { return }
 
-      const metadataSql = await getBQInputDataMetaDataSql({
+      const metadataSql = getBQInputDataMetaDataSql({
         bqmlModelDatasetName,
         bqModelName,
         uid

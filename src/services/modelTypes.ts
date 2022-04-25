@@ -119,15 +119,17 @@ export const formBQInputDataSQL = ({
 type GetBQInputDataSqlProps = {
   bqmlModelDatasetName: string,
   bqModelName: string,
-  uid: string
+  uid: string,
+  limit?: string
 }
 
 export const getBQInputDataSql = ({
   bqmlModelDatasetName,
   bqModelName,
-  uid
+  uid,
+  limit
 }: GetBQInputDataSqlProps) => (
-  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}`
+  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} ${ limit ? `LIMIT ${limit}` : ''}`
 )
 
 export const getBQInputDataMetaDataSql = ({
