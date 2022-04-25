@@ -29,7 +29,7 @@ const Step5: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       lastStep={true}
       stepNumber={5}>
         <h2>Apply Your Model</h2>
-        <p className="step1-sub-details">Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet.</p>
+        <p className="step1-sub-details">Select data and get predictions using your ML model.</p>
         { showModelTypePredictComponent() }
     </StepContainer>
   )

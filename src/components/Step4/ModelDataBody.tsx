@@ -68,11 +68,10 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
     <td className="model-cm-item--placeholder" width="60" key="placeholder"></td>
   )]
 
-  for (const key in firstRow) {
-    if (key === 'expected_label') { continue }
+  for (const row of sortedData) {
     headers.push(
-      <td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{key}</td>
-    ) //titilize(splitFieldName(key))
+      <td className={`model-cm-item--header ${cellSizeClass}`} key={row.expected_label}>{row.expected_label}</td>
+    )
   }
 
   const tableHeader = (
@@ -133,6 +132,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 }
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
+  const sortedData = sortBy(data, 'recall')
   const columns = Object.keys(data[0]).map((key) => {
     const formattedKey = noDot(key)
     return {
@@ -156,15 +156,17 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
     gridApi.sizeColumnsToFit();
   }
 
+  console.log({data})
+
   return (
     <div className="model-grid-bg">
-      <ROCCurveLineChart data={data} />
+      <ROCCurveLineChart data={sortedData} />
       <div className="ag-theme-balham" style={{height: 220}}>
         <AgGridReact
           defaultColDef={defaultColDef}
           getRowStyle={getRowStyle}
           onGridReady={onGridReady}
-          rowData={data}
+          rowData={sortedData}
           columnDefs={columns}>
         </AgGridReact>
       </div>
