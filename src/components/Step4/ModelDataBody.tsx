@@ -38,7 +38,7 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
     dataItems.push(
       <div className="model-data-item" key={key}>
         <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
-        <div className="model-data-item--value">{value}</div>
+        <div className="model-data-item--value">{Number(value).toPrecision(3)}</div>
       </div>
     )
   }
@@ -68,11 +68,10 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
     <td className="model-cm-item--placeholder" width="60" key="placeholder"></td>
   )]
 
-  for (const key in firstRow) {
-    if (key === 'expected_label') { continue }
+  for (const row of sortedData) {
     headers.push(
-      <td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{key}</td>
-    ) //titilize(splitFieldName(key))
+      <td className={`model-cm-item--header ${cellSizeClass}`} key={row.expected_label}>{row.expected_label}</td>
+    )
   }
 
   const tableHeader = (
@@ -83,17 +82,24 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 
   for (const rowKey in sortedData) {
     const cells = []
-    for (const key in sortedData[rowKey]) {
-      const value = sortedData[rowKey][key]
+    const row = sortedData[rowKey]
+    const rowTotal = Object.keys(row).reduce(
+      (total: number, key: any, index: number) =>
+        (index > 0 ? total + Number(row[key]) : total + 0)
+      , 0)
+
+    for (const key in row) {
+      const value = row[key]
       if (key === 'expected_label') {
         cells.push(<td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{value}</td>) //titilize(splitFieldName(value))
       } else {
+        const cellAsPercent = Math.round(Number(value) / rowTotal * 100)
         cells.push(
           <td
-            style={{ backgroundColor: matrixColor(Number(value))}}
+            style={{ backgroundColor: matrixColor(cellAsPercent)}}
             className={`model-cm-item--value ${cellSizeClass}`}
             key={key}>
-              {value}
+              {cellAsPercent + '%'}
           </td>
         )
       }
@@ -126,6 +132,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 }
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
+  const sortedData = sortBy(data, 'recall')
   const columns = Object.keys(data[0]).map((key) => {
     const formattedKey = noDot(key)
     return {
@@ -149,15 +156,17 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
     gridApi.sizeColumnsToFit();
   }
 
+  console.log({data})
+
   return (
     <div className="model-grid-bg">
-      <ROCCurveLineChart data={data} />
+      <ROCCurveLineChart data={sortedData} />
       <div className="ag-theme-balham" style={{height: 220}}>
         <AgGridReact
           defaultColDef={defaultColDef}
           getRowStyle={getRowStyle}
           onGridReady={onGridReady}
-          rowData={data}
+          rowData={sortedData}
           columnDefs={columns}>
         </AgGridReact>
       </div>

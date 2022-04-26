@@ -37,7 +37,7 @@ export const BrowseModelListItem: React.FC<BrowseModelListItemProps> = ({ model,
         </div>
       </DataTableCell>
       <DataTableCell>{model[createdByEmail]}</DataTableCell>
-      <DataTableCell>{model.objective ? MODEL_TYPES[model.objective].label : ''}</DataTableCell>
+      <DataTableCell>{model.objective ? MODEL_TYPES[model.objective].techLabel : ''}</DataTableCell>
       <DataTableCell>
         { model[modelUpdatedAt] ?
           (<><DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}

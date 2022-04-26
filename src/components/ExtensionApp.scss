@@ -101,7 +101,7 @@ body,
 }
 
 .bqml-app, #modal-root {
-  p {
+  p:not([role='tooltip']) {
     font-size: 14px;
     letter-spacing: 0.2px;
     color: #5F6368;

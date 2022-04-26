@@ -62,26 +62,24 @@ export const ResultsTable: React.FC = () => {
   }
 
   return (
-    <div className="results-table-container">
-      <div className="results-table">
-        <table>
-          <ResultsTableHeaders
+    <div className="results-table">
+      <table>
+        <ResultsTableHeaders
+          headers={tableHeaders || []}
+          onHeaderClick={onHeaderClick}
+          sorts={sorts}
+        />
+        <tbody>
+          <ResultsTableRows
             headers={tableHeaders || []}
-            onHeaderClick={onHeaderClick}
-            sorts={sorts}
+            data={ranQuery?.data}
           />
-          <tbody>
-            <ResultsTableRows
-              headers={tableHeaders || []}
-              data={ranQuery?.data}
-            />
-          </tbody>
-        </table>
-        {
-          state.ui.isLoading &&
-            (<div className="results-table-loading"><Spinner /></div>)
-        }
-      </div>
+        </tbody>
+      </table>
+      {
+        state.ui.isLoading &&
+          (<div className="results-table-loading"><Spinner /></div>)
+      }
     </div>
   )
 }

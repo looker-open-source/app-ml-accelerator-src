@@ -42,6 +42,7 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
       firstUpdate.current = false
       return
     }
+
     if (!stepData.ranQuery?.data) { return }
     setIsLoading(true)
     runQuery()

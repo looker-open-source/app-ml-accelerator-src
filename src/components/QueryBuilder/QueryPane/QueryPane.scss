@@ -41,3 +41,9 @@
     }
   }
 }
+
+.query-pane {
+  .expander-children__visible {
+    overflow: scroll;
+  }
+}

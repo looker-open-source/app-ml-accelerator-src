@@ -1,22 +1,16 @@
-.results-table-container {
+.results-table {
+  display: flex;
+  font-family: "Source Sans Pro", sans-serif;
+  width: 100%;
+  height: 100%;
   background: #F7F7F7;
   color: #7F889B;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
   font-size: 20px;
   font-weight: 100;
   margin-top: 20px;
   position: relative;
   opacity: 1;
-}
-
-.results-table {
-  display: flex;
-  font-family: "Source Sans Pro", sans-serif;
-  overflow-x: auto;
-  width: 100%;
-  height: 100%;
+  margin-bottom: -90px;
 
   .results-table-loading {
     display: flex;

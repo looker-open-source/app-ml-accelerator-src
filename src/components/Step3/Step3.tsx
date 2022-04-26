@@ -187,6 +187,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       handleCompleteClick={buildHandleCompleteClick()}
       stepInfo={!isArima(objective || '') ? (<AdvancedSettings objective={objective}/>) : ''}
     >
+      <h2>Select model target and features</h2>
       <div className="model-blocks">
         <ModelNameBlock
           nameCheckStatus={nameCheckStatus}
@@ -197,7 +198,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         />
         <div className="wizard-card">
           <h2>Select your target</h2>
-          <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
           <Select
             options={targetFieldOptions}
             value={targetField}
@@ -211,7 +211,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             (
               <div className="wizard-card">
                 <h2>Select your Time Column</h2>
-                <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
                 <Select
                   options={timeColumnFieldOptions}
                   value={arimaTimeColumn}

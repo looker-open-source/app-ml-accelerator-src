@@ -4,6 +4,7 @@ import { DateFormat, TimeFormat } from "@looker/components-date"
 import { MoreVert } from "@styled-icons/material"
 import { MODEL_STATE_TABLE_COLUMNS, WIZARD_STEPS } from "../../constants"
 import './BrowseModels.scss'
+import { MODEL_TYPES } from "../../services/modelTypes"
 
 const { modelName, createdByEmail, stateJson, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
 
@@ -53,7 +54,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
           fontWeight="semiBold"
           color="text1"
         >
-          { model[stateJson].bqModel.objective }
+          { model.objective ? MODEL_TYPES[model.objective].techLabel : '' }
         </Span>
         <Paragraph fontSize="small">
           { 'Created by ' + model[createdByEmail] }

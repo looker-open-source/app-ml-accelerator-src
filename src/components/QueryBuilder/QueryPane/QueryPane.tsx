@@ -77,9 +77,7 @@ export const QueryPane: React.FC = () => {
         setIsOpen={() => dispatch({type: 'setDataOpen', value: !state.ui.dataOpen})}
         fields={[(<QueryLimitField onChange={limitChange} limitValue={limit}/>)]}
       >
-        <div>
-          <ResultsTable />
-        </div>
+        <ResultsTable />
       </ExpanderBar>
     </div>
   )

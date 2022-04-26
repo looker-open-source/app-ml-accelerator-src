@@ -69,7 +69,6 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
   return (
     <div className="wizard-card">
       <h2>Name your model</h2>
-      <p>Ceserunt met minim mollit non des erunt ullamco est sit aliqua dolor.</p>
       <div className="wizard-card-text">
         <FieldText
           onChange={handleModelNameChange}
