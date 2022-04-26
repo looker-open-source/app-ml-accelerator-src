@@ -36,6 +36,7 @@ export const ShareModelDialog: React.FC<ShareModelDialogProps> = ({ model, close
     if (ok) {
       model[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails] = [...sharedEmailsWithPerms]
       setIsSaved(true)
+      closeDialog()
     }
   }
 

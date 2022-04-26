@@ -38,7 +38,7 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
     dataItems.push(
       <div className="model-data-item" key={key}>
         <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
-        <div className="model-data-item--value">{Number(value).toPrecision(3)}</div>
+        <div className="model-data-item--value">{Number(value).toFixed(3)}</div>
       </div>
     )
   }

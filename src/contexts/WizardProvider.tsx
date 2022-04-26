@@ -272,7 +272,7 @@ export const WizardProvider = ({ children }: any) => {
       data: {
         allFeatures,
         selectedFeatures: selectedFeatures || [...allFeatures],
-        advancedSettings: step3.advancedSettings || {},
+        advancedSettings: cloneDeep(step3.advancedSettings) || {},
         summary: {
           data: summaryData,
           fields: [...fields.dimensions, ...fields.measures]
@@ -288,17 +288,18 @@ export const WizardProvider = ({ children }: any) => {
     target,
     arimaTimeColumn
   }: SaveInputDataProps) => {
+    const queryClone: any  = cloneDeep(query)
     dispatch({
       type: 'addToStepData',
       step: 'step3',
       data: {
         inputData: {
-          exploreName: query?.exploreName,
-          modelName: query?.modelName,
-          exploreLabel: query?.exploreLabel,
-          limit: query?.limit,
-          selectedFields: query?.selectedFields,
-          sorts: query?.sorts,
+          exploreName: queryClone?.exploreName,
+          modelName: queryClone?.modelName,
+          exploreLabel: queryClone?.exploreLabel,
+          limit: queryClone?.limit,
+          selectedFields: queryClone?.selectedFields,
+          sorts: queryClone?.sorts,
           uid,
           bqModelName,
           target,

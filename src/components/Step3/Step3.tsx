@@ -129,6 +129,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       modelName,
       bqModelName,
       sourceColumns: sourceColumnsFormatted,
+      sourceFilters: ranQuery?.selectedFields.filters
     })
   )
 
