@@ -1,5 +1,6 @@
 import { WizardState, Step1State, SelectedFields, Step2State, Step3State, Step4State, Step5State, BQModelState } from "../types"
 import { initialStates } from '../reducers'
+import { cloneDeep } from "lodash"
 
 // ****************************
 // WARNING:           READ THIS
@@ -50,16 +51,16 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
 // build the wizard state from the saved model state
 export const buildWizardState = (savedState: SavedModelState): WizardState => {
   const { wizardInitialState, bqModelInitialState } = initialStates
-  const bqModelState = { ...bqModelInitialState, ...savedState.bqModel }
+  const bqModelState = { ...cloneDeep(bqModelInitialState), ...cloneDeep(savedState.bqModel) }
 
   const wizardState = {
     unlockedStep: savedState.unlockedStep,
     steps: {
       step1: { objective: bqModelState.objective },
-      step2: buildWizardStep2(bqModelState, wizardInitialState.steps.step2),
-      step3: buildWizardStep3(bqModelState, wizardInitialState.steps.step3),
-      step4: buildWizardStep4(bqModelState, wizardInitialState.steps.step4),
-      step5: buildWizardStep5(bqModelState, wizardInitialState.steps.step5)
+      step2: buildWizardStep2(bqModelState, cloneDeep(wizardInitialState.steps.step2)),
+      step3: buildWizardStep3(bqModelState, cloneDeep(wizardInitialState.steps.step3)),
+      step4: buildWizardStep4(bqModelState, cloneDeep(wizardInitialState.steps.step4)),
+      step5: buildWizardStep5(bqModelState, cloneDeep(wizardInitialState.steps.step5))
     }
   }
 
