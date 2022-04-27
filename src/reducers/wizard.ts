@@ -175,10 +175,11 @@ function wizardReducer(state: WizardState, action: Action): any {
       // if passing in a filter that already exists
       // remove it from list of selected filters
       if (filters[action.field.name] || filters[action.field.name] == '') {
-        delete filters[action.field.name]
+        const filtersClone = {...filters}
+        delete filtersClone[action.field.name]
         newState.steps[action.step].selectedFields = {
           ...newState.steps[action.step].selectedFields,
-          filters
+          filters: filtersClone
         }
         return newState
       }

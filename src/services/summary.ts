@@ -37,6 +37,7 @@ type HasSummaryProps = {
   modelName: string,
   bqModelName: string,
   sourceColumns: string[],
+  sourceFilters: any
 }
 
 // This method determines whether the summary has been ran with the current Source tab ui state.
@@ -48,12 +49,14 @@ export const hasSummaryForSourceData = ({
   modelName,
   bqModelName,
   sourceColumns,
+  sourceFilters
 }: HasSummaryProps): boolean => {
   const { summary, allFeatures } = step3Data
   return Boolean(inputData.exploreName === exploreName
     && inputData.modelName === modelName
     && inputData.bqModelName === bqModelName
     && allFeatures?.sort().join(',') === sourceColumns.join(',')
+    && isEqual(sourceFilters, inputData.selectedFields.filters)
     && summary.data
     && summary.data.length > 0)
 }
@@ -194,7 +197,7 @@ export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {
   },
   avg: {
     label: "Avg",
-    converter: (row) => row.data_type?.value !== "STRING" ? row._avg_value?.value : "",
+    converter: (row) => row.data_type?.value !== "STRING" ? Number(row._avg_value?.value).toFixed(2) : "",
     align: "right",
     order: 8
   }

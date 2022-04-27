@@ -31,6 +31,10 @@ export const advancedSettingsSql = (advancedSettings: any) => {
     sql = sql + ", BOOSTER_TYPE = 'GBTREE'"
   }
 
+  if (!advancedSettings) {
+    sql = sql + ", ENABLE_GLOBAL_EXPLAIN = TRUE"
+  }
+
   return sql
 }
 
@@ -179,7 +183,7 @@ const BOOSTED_CLASSIFIER_SETTINGS_DEFAULTS = {
   data_split_method: 'AUTO_SPLIT',
   data_split_eval_fraction: 0.2,
   data_split_col: undefined,
-  enable_global_explain: false
+  enable_global_explain: true
 }
 
 const BOOSTED_REGRESSOR_SETTINGS_DEFAULTS = {
@@ -203,7 +207,7 @@ const BOOSTED_REGRESSOR_SETTINGS_DEFAULTS = {
   data_split_method: 'AUTO_SPLIT',
   data_split_eval_fraction: 0.2,
   data_split_col: undefined,
-  enable_global_explain: false
+  enable_global_explain: true
 }
 
 export const getBoostedSettingsDefaults = (objective: string) => {
