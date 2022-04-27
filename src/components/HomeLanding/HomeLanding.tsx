@@ -55,20 +55,54 @@ export const HomeLanding : React.FC = () => {
 
   return (
     <div className="home-landing-container">
+      <h1 className="no-margin-top">Gain deeper insights with machine learning in BigQuery</h1>
       <div className="home-landing-grid">
         <div className="grid-item-large-left">
-          <h1 className="no-margin-top">Gain deeper insights with machine learning in BigQuery</h1>
+          <h3>Create New Models</h3>
+          <p>
+            The Create Model guide walks you through each step of the machine learning process.
+          </p>
           <div className="home-page-bumper">
-            <h3>Create New Models</h3>
-            <p>
-              The Create Model guide walks you through each step of the machine learning process.
-            </p>
-            <div className="home-landing-model-select">
-              <Button size="large" onClick={goToWizard} className="action-color" iconBefore={<Add />}>Create New Model</Button>
-            </div>
+            <Button size="large" onClick={goToWizard} className="action-color" iconBefore={<Add />}>Create New Model</Button>
           </div>
         </div>
-        <div className="grid-item-small-right">
+        <div className="grid-item-small-third-quarter">
+          <h3>BigQuery ML in a minute</h3>
+          <iframe
+            className="home-landing--video"
+            src="https://www.youtube.com/embed/0RMT8uEplbM"
+            title="YouTube video player"
+            // @ts-ignore
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div className="grid-item-small-fourth-quarter">
+          <h3 className="small-margin-bottom">Learn about BigQuery ML</h3>
+          <ul className="home-landing--linklist">
+            <li>
+              <a href="https://cloud.google.com/bigquery-ml/docs/introduction" target="_blank">What is BigQuery ML</a>
+            </li>
+            <li>
+              <a href="https://cloud.google.com/bigquery-ml/docs" target="_blank">BigQuery ML Docs</a>
+            </li>
+            <li>
+              <a href="https://cloud.google.com/bigquery-ml/docs/introduction" target="_blank">What is BigQuery ML</a>
+            </li>
+          </ul>
+          <h3 className="small-margin-bottom">Machine Learning Training</h3>
+          <ul className="home-landing--linklist">
+            <li>
+              <a href="https://developers.google.com/machine-learning/intro-to-ml" target="_blank">Introduction to Machine Learning</a>
+            </li>
+            <li>
+              <a href="https://developers.google.com/machine-learning/problem-framing" target="_blank">Problem Framing</a>
+            </li>
+            <li>
+              <a href="https://developers.google.com/machine-learning/data-prep" target="_blank">Data Prep</a>
+            </li>
+          </ul>
         </div>
       </div>
       {/* <h1>Get Started</h1> */}

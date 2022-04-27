@@ -14,6 +14,10 @@ h1 {
 h3 {
   font-size: 18px;
   font-weight: 400;
+
+  &.small-margin-bottom {
+    margin-bottom: 8px;
+  }
 }
 
 .home-landing-model-select {
@@ -23,8 +27,8 @@ h3 {
 
 .home-landing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 44px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 2.5rem;
 
   label {
     display: block;
@@ -43,13 +47,39 @@ h3 {
 }
 
 .grid-item-large-right {
-  grid-column: 2 / 4;
+  grid-column: 3 / 5;
 }
 
-.grid-item-small-left {
-  grid-column: 1 / 2;
-}
-
-.grid-item-small-right {
+.grid-item-small-third-quarter {
   grid-column: 3 / 4;
+}
+
+.grid-item-small-fourth-quarter {
+  grid-column: 4 / 5;
+}
+
+.home-landing--video {
+  margin-top: 8px;
+  height: 180px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.home-landing--linklist {
+  list-style-type: none;
+  margin-top: 0;
+  padding-left: 0;
+
+  li:not(:last-child) {
+    margin-bottom: 8px;
+  }
+
+  li a {
+    text-decoration: none;
+    color: #4285F4;
+
+    &:visited {
+      color: #4285F4;
+    }
+  }
 }
