@@ -82,9 +82,9 @@ export const AdminProvider = ({ children }: any) => {
 
   const getSharedModels = async () => {
     try {
-      const { ok, value } = await getSavedModelsSharedWithMe?.()
+      const { ok, value } = await getSavedModelsSharedWithMe?.(true)
       if (!ok) {
-        throw "Failed to fetch models shared with you."
+        return { ok }
       }
       const formattedData = formatSavedModelData(value.data)
       const pages = Math.ceil(formattedData.length / MODELS_PER_PAGE)
@@ -97,9 +97,9 @@ export const AdminProvider = ({ children }: any) => {
 
   const getMyModels = async () => {
     try {
-      const { ok, value } = await getAllMySavedModels?.()
+      const { ok, value } = await getAllMySavedModels?.(true)
       if (!ok) {
-        throw "Failed to fetch your models."
+        return { ok }
       }
       const formattedData = formatSavedModelData(value.data)
       const pages = Math.ceil(formattedData.length / MODELS_PER_PAGE)

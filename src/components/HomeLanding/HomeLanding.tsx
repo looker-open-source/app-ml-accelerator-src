@@ -72,10 +72,9 @@ export const HomeLanding : React.FC = () => {
             className="home-landing--video"
             src="https://www.youtube.com/embed/0RMT8uEplbM"
             title="YouTube video player"
-            // @ts-ignore
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;"
+            allowFullScreen>
           </iframe>
         </div>
         <div className="grid-item-small-fourth-quarter">
@@ -88,7 +87,7 @@ export const HomeLanding : React.FC = () => {
               <a href="https://cloud.google.com/bigquery-ml/docs" target="_blank">BigQuery ML Docs</a>
             </li>
             <li>
-              <a href="https://cloud.google.com/bigquery-ml/docs/introduction" target="_blank">What is BigQuery ML</a>
+              <a href="https://cloud.google.com/bigquery-ml/pricing" target="_blank">BigQuery ML Pricing</a>
             </li>
           </ul>
           <h3 className="small-margin-bottom">Machine Learning Training</h3>
