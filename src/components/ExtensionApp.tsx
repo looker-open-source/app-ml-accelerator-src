@@ -49,7 +49,8 @@ export const ExtensionApp: React.FC = () => {
       const userAttributes = await getAllUserAttributes(coreSDK, userId)
       dispatch({ type: "setAllAttributes", value: userAttributes })
       setClientId(userAttributes.googleClientId)
-      if (!userAttributes.googleClientId) {
+      const hasAllUserAttributes = Object.values(userAttributes).reduce((hasAttr, value) => hasAttr = !!value, true)
+      if (!hasAllUserAttributes) {
         dispatch({ type: 'addError', error: 'User Attributes have not been setup correctly.  Please see an administrator.' })
       }
     } catch (err) {
