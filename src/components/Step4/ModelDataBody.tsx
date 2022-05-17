@@ -38,7 +38,7 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
     dataItems.push(
       <div className="model-data-item" key={key}>
         <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
-        <div className="model-data-item--value">{Number(value).toFixed(3)}</div>
+        <div className="model-data-item--value">{Number(value).toFixed(4)}</div>
       </div>
     )
   }
@@ -132,7 +132,8 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 }
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
-  const sortedData = sortBy(data, 'recall')
+  const convertedData = data.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
+  const sortedData = sortBy(convertedData, 'recall')
   const columns = Object.keys(data[0]).map((key) => {
     const formattedKey = noDot(key)
     return {
@@ -155,8 +156,6 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
     const gridApi = params.api;
     gridApi.sizeColumnsToFit();
   }
-
-  console.log({data})
 
   return (
     <div className="model-grid-bg">

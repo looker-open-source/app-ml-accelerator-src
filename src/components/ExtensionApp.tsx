@@ -15,13 +15,18 @@ export const ExtensionApp: React.FC = () => {
   const [clientId, setClientId] = useState<string | null>()
 
   useEffect(() => {
-    if (!state.user.email) {
-      getUser()
-    }
-    if (!clientId) {
-      getUserAttributes()
-    }
+    init()
   }, [])
+
+  const init = async () => {
+    let userId
+    if (!state.user.email) {
+      userId = await getUser()
+    }
+    if (!clientId && userId) {
+      await getUserAttributes(userId)
+    }
+  }
 
   // get the user and their bqml-looks folder
   const getUser = async () => {
@@ -32,19 +37,24 @@ export const ExtensionApp: React.FC = () => {
         email: value.email,
         firstName: value.first_name
       }})
+      return value.id
     } catch (err) {
       dispatch({ type: 'addError', error: 'Failed to retrieve User - ' + err })
     } finally {
     }
   }
 
-  const getUserAttributes = async () => {
+  const getUserAttributes = async (userId: number) => {
     try {
-      const userAttributes = await getAllUserAttributes(extensionSDK)
+      const userAttributes = await getAllUserAttributes(coreSDK, userId)
       dispatch({ type: "setAllAttributes", value: userAttributes })
       setClientId(userAttributes.googleClientId)
+      const hasAllUserAttributes = Object.values(userAttributes).reduce((hasAttr, value) => hasAttr = !!value, true)
+      if (!hasAllUserAttributes) {
+        dispatch({ type: 'addError', error: 'User Attributes have not been setup correctly.  Please see an administrator.' })
+      }
     } catch (err) {
-      dispatch({ type: 'addError', error: 'Failed to retrieve User Attributes' })
+      dispatch({ type: 'addError', error: 'Failed to retrieve User Attributes - ' + err })
     }
   }
 
