@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React from "react"
 import { VIZ_HEIGHT } from "../../services/visualizations/vizConstants";
 import { RanQuery } from "../../types";
 import { AgGridReact } from 'ag-grid-react';
@@ -6,7 +6,6 @@ import { noDot, titilize } from "../../services/string";
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 import { compact } from "lodash";
-import { GridApi } from "ag-grid-community";
 
 
 type VizTableProps = {
@@ -15,8 +14,6 @@ type VizTableProps = {
 
 export const VizTable : React.FC<VizTableProps> = ({ ranQuery }) => {
   if (!ranQuery) { return <></> }
-
-  const eTextRef = useRef('eText')
 
   const { data } = ranQuery
   const { selectedFields } = ranQuery
@@ -46,20 +43,20 @@ export const VizTable : React.FC<VizTableProps> = ({ ranQuery }) => {
 
   const defaultColDef = {
     resizable: true,
-    headerComponentParams: {
-      template:
-        '<div class="ag-cell-label-container" role="presentation">' +
-        '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
-        '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
-        '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order"></span>' +
-        '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon"></span>' +
-        '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon"></span>' +
-        '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon"></span>' +
-        '    <span ref="eText" class="ag-header-cell-text" role="columnheader" style="white-space: normal;"></span>' +
-        '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
-        '  </div>' +
-        '</div>',
-    },
+    // headerComponentParams: {
+    //   template:
+    //     '<div class="ag-cell-label-container" role="presentation">' +
+    //     '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
+    //     '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
+    //     '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order"></span>' +
+    //     '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon"></span>' +
+    //     '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon"></span>' +
+    //     '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon"></span>' +
+    //     '    <span ref="eText" class="ag-header-cell-text" role="columnheader" style="white-space: normal;"></span>' +
+    //     '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
+    //     '  </div>' +
+    //     '</div>',
+    // },
   }
 
   // Dynamic header height example (refer to this when adding sorting as well)
