@@ -43,20 +43,6 @@ export const VizTable : React.FC<VizTableProps> = ({ ranQuery }) => {
 
   const defaultColDef = {
     resizable: true,
-    // headerComponentParams: {
-    //   template:
-    //     '<div class="ag-cell-label-container" role="presentation">' +
-    //     '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
-    //     '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
-    //     '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order"></span>' +
-    //     '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon"></span>' +
-    //     '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon"></span>' +
-    //     '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon"></span>' +
-    //     '    <span ref="eText" class="ag-header-cell-text" role="columnheader" style="white-space: normal;"></span>' +
-    //     '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
-    //     '  </div>' +
-    //     '</div>',
-    // },
   }
 
   // Dynamic header height example (refer to this when adding sorting as well)
