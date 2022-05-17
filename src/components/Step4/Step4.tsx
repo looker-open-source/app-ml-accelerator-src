@@ -116,8 +116,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       customClass="step4-container">
       <Prompt message={onRouteChange}/>
       { modelChangesMsg() }
-      <h2>Model evaluation overview</h2>
-      <p className="step1-sub-details">Review evaluation metrics and feature importance.</p>
+      <h2>Review evaluation metrics and feature importance</h2>
       { jobComplete?
         (
           <div className="model-grid">

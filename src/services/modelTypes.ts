@@ -185,7 +185,6 @@ const formBoostedTreeSQL = ({
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
           , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
-          , ENABLE_GLOBAL_EXPLAIN = TRUE
           ${settingsSql})
     AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}\`;
   `
@@ -258,6 +257,7 @@ export const formEvaluateSql = ({
   ) {
     return false
   }
+
   return `CREATE OR REPLACE TABLE
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.evaluate} AS (
     SELECT *
