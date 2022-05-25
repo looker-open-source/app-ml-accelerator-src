@@ -5,7 +5,6 @@ export function getBigQueryConnectionName(userAttributes: any) {
   try {
     const bigQueryConn = userAttributes.find((ua: any) => ua.name === BIGQUERY_CONN)
     if (!bigQueryConn || !bigQueryConn.value) { throw 'Unable to find BigQuery Connection Name'}
-    // const bigQueryConn = await extensionSDK.userAttributeGetItem(BIGQUERY_CONN)
     return bigQueryConn.value
   } catch (error) {
     try {
@@ -21,7 +20,6 @@ export function getGoogleClientID(userAttributes: any) {
   try {
     const googleClientId = userAttributes.find((ua: any) => ua.name === GOOGLE_CLIENT_ID)
     if (!googleClientId || !googleClientId.value) { throw 'Unable to find Google Client ID'}
-    // const bigQueryConn = await extensionSDK.user_attribute(googleClientId.id)
     return googleClientId.value
   } catch (error) {
     try {
@@ -37,7 +35,6 @@ export function getBqmlModelDatasetName(userAttributes: any) {
   try {
     const bqmlModelDatasetName = userAttributes.find((ua: any) => ua.name === BQML_MODEL_DATASET_NAME)
     if (!bqmlModelDatasetName || !bqmlModelDatasetName.value) { throw 'Unable to find Dataset Name'}
-    // const bqmlModelDatasetName = await extensionSDK.userAttributeGetItem(BQML_MODEL_DATASET_NAME)
     return bqmlModelDatasetName.value
   } catch (error) {
     try {
@@ -53,7 +50,6 @@ export function getGCPProject(userAttributes: any) {
   try {
     const gcpProject = userAttributes.find((ua: any) => ua.name === GCP_PROJECT)
     if (!gcpProject || !gcpProject.value) { throw 'Unable to find GCP Project'}
-    // const gcpProject = await extensionSDK.userAttributeGetItem(GCP_PROJECT)
     return gcpProject.value
   } catch (error) {
     try {
@@ -68,7 +64,7 @@ export function getGCPProject(userAttributes: any) {
 export async function getAllUserAttributes(coreSDK: Looker40SDK, userId: number) {
     if (!userId) { throw 'Failed to retrieve user attributes because no user was specified' }
   // @ts-ignore
-  const { ok, value } = await coreSDK.user_attribute_user_values({ user_id: 89 })
+  const { ok, value } = await coreSDK.user_attribute_user_values({ user_id: userId })
   if (!ok) {
     throw 'Failed to retrieve user attributes'
   }
