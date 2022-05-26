@@ -26,7 +26,7 @@ import { hot } from 'react-hot-loader/root'
 import { ExtensionApp } from './ExtensionApp'
 
 export const App = hot(() => (
-  <ExtensionProvider2 type={Looker40SDK}>
+  <ExtensionProvider2 type={Looker40SDK} chattyTimeout={300000}>
     <ComponentsProvider>
       <StoreProvider>
         <ExtensionApp />
