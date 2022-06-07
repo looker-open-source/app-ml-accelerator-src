@@ -65,7 +65,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
   })()
 
   const headers = [(
-    <td className="model-cm-item--placeholder" width="60" key="placeholder"></td>
+    <td colSpan={2} className="model-cm-item--placeholder" width="60" key="placeholder"></td>
   )]
 
   for (const row of sortedData) {
@@ -74,9 +74,23 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
     )
   }
 
-  const tableHeader = (
+  // Add col header (label for actual values)
+  const tableHeader = [(
+    <tr>
+      <th colSpan={sortedData.length + 2}>Actual Values</th>
+    </tr>
+  )]
+
+  tableHeader.push(
     <tr className="model-cm-item" key={'headers'}>
       {headers}
+    </tr>
+  )
+
+  // Add row header (label for predicted values)
+  dataItems.push(
+    <tr>
+      <th className='rotate' rowSpan={sortedData.length + 2}>Predicted Values</th>
     </tr>
   )
 
