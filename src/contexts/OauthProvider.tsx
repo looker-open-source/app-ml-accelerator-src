@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
+import { LOOKER_CLIENT_ID, LOOKER_CLIENT_SECRET, BQML_EXT_ACCESS_TOKEN_SERVER_ENDPOINT } from '../constants'
 
 type IOauthContext = {
   loggingIn?: boolean
@@ -44,11 +45,48 @@ export const OauthProvider = ({
     }
     try {
       setLoggingIn(true)
-      const response = await extensionSDK.oauth2Authenticate(authUrl, {
-        client_id: clientId,
-        scope: scopes,
-        response_type: 'token',
-      })
+      let response
+
+      // Check if extension app is configured to use a service account to authenticate with BQ
+      const accessTokenServerEndpoint = await extensionSDK.userAttributeGetItem(BQML_EXT_ACCESS_TOKEN_SERVER_ENDPOINT)
+      if (accessTokenServerEndpoint !== null || '') {
+        console.log('Using SERVICE ACCOUNT to request access token')
+
+        // Get Oauth access token using service account (call external access token server)
+        const resp = await extensionSDK.serverProxy(
+          `${accessTokenServerEndpoint}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              client_id: extensionSDK.createSecretKeyTag(LOOKER_CLIENT_ID),
+              client_secret: extensionSDK.createSecretKeyTag(LOOKER_CLIENT_SECRET),
+              scope: scopes
+            }),
+          }
+        )
+
+        if (resp.ok) {
+          response = resp.body
+        } else {
+          console.error(
+            `Failed to get access token for service account.
+            \nCheck that the necessary Looker user attributes are properly set.
+            \nStatus code: ${resp.status}
+            \nEndpoint: ${accessTokenServerEndpoint}`
+          )
+        }
+      } else {
+        console.log('Using OAuth implicit flow (end-user creds)')
+        // otherwise, assume authentication w/ end-user creds
+        response = await extensionSDK.oauth2Authenticate(authUrl, {
+          client_id: clientId,
+          scope: scopes,
+          response_type: 'token',
+        })
+      }
       const { access_token } = response
       setToken(access_token)
       setAttempts(0)
