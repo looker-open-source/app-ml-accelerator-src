@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
-import { LOOKER_CLIENT_ID, LOOKER_CLIENT_SECRET, BQML_EXT_ACCESS_TOKEN_SERVER_ENDPOINT } from '../constants'
+import { LOOKER_CLIENT_ID, LOOKER_CLIENT_SECRET, ACCESS_TOKEN_SERVER_ENDPOINT } from '../constants'
 
 type IOauthContext = {
   loggingIn?: boolean
@@ -48,7 +48,7 @@ export const OauthProvider = ({
       let response
 
       // Check if extension app is configured to use a service account to authenticate with BQ
-      const accessTokenServerEndpoint = await extensionSDK.userAttributeGetItem(BQML_EXT_ACCESS_TOKEN_SERVER_ENDPOINT)
+      const accessTokenServerEndpoint = await extensionSDK.userAttributeGetItem(ACCESS_TOKEN_SERVER_ENDPOINT)
       if (accessTokenServerEndpoint !== null || '') {
         console.log('Using SERVICE ACCOUNT to request access token')
 
@@ -74,8 +74,7 @@ export const OauthProvider = ({
           console.error(
             `Failed to get access token for service account.
             \nCheck that the necessary Looker user attributes are properly set.
-            \nStatus code: ${resp.status}
-            \nEndpoint: ${accessTokenServerEndpoint}`
+            \nStatus code: ${resp.status}`
           )
         }
       } else {
@@ -95,7 +94,8 @@ export const OauthProvider = ({
       setAttempts(attempts + 1)
       dispatch({
         type: 'addError',
-        error: 'Failed to sign in to Oauth.  Please reload.'
+        error: `Failed to sign in to Oauth.  Please reload.
+          If using a service account, check required Looker user attributes.`
       })
       return false
     } finally {
