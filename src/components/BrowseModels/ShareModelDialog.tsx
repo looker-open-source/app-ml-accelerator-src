@@ -45,6 +45,8 @@ export const ShareModelDialog: React.FC<ShareModelDialogProps> = ({ model, close
       <DialogHeader hideClose="true" borderBottom="transparent" className="share-dialog--header">
         Share
         <span className="share-dialog--modelname">{bqModelName}</span>
+        <p>Enter one or multiple email addresses, pressing 'enter' after each.</p>
+        <p>Then click 'save' button.</p>
       </DialogHeader>
       <DialogContent className="share-dialog--content">
         <div className="share-dialog--container modal-pane">
