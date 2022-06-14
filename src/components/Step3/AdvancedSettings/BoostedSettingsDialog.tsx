@@ -77,7 +77,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Num Parallel Tree
+                  Number Parallel Tree
                 </Label>
                 <FieldText
                   value={form.num_parallel_tree}
@@ -110,7 +110,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Min Tree Child Weight
+                  Minimum Tree Child Weight
                 </Label>
                 <FieldText
                   value={form.min_tree_child_weight}
@@ -121,7 +121,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Col sample by tree
+                  Column sample by tree
                 </Label>
                 <FieldText
                   value={form.colsample_bytree}
@@ -132,7 +132,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Col sample by level
+                  Column sample by level
                 </Label>
                 <FieldText
                   value={form.colsample_bylevel}
@@ -143,7 +143,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Col sample by node
+                  Column sample by node
                 </Label>
                 <FieldText
                   value={form.colsample_bynode}
@@ -154,7 +154,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Min split loss
+                  Minimum split loss
                 </Label>
                 <FieldText
                   value={form.min_split_loss}
@@ -165,7 +165,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Max Tree Depth
+                  Maximum Tree Depth
                 </Label>
                 <FieldText
                   value={form.max_tree_depth}
@@ -253,7 +253,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Max iterations
+                  Maximum iterations
                 </Label>
                 <FieldText
                   value={form.max_iterations}
@@ -264,7 +264,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               <div className="form-row">
                 <Label>
-                  Min rel progress
+                  Minimum relative progress
                 </Label>
                 <FieldText
                   value={form.min_rel_progress}
@@ -287,7 +287,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 showDataSplitEvalFraction(form.data_split_method) &&
                 (<div className="form-row">
                   <Label>
-                    Data split eval fraction
+                    Data split evaluation fraction
                   </Label>
                   <FieldText
                     value={form.data_split_eval_fraction}
@@ -301,7 +301,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 showDataSplitCol(form.data_split_method) &&
                 (<div className="form-row">
                   <Label>
-                    Data split col
+                    Data split column
                   </Label>
                   <Select
                     options={arrayToSelectOptions(state.wizard.steps.step3.selectedFeatures || [])}
