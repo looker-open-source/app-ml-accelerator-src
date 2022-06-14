@@ -8,7 +8,7 @@ export const WIZARD_STEPS: { [key: string]: string } = {
   step5: 'predict'
 }
 
-export const WIZARD_KEYS: {[key: number]: keyof WizardSteps} = {
+export const WIZARD_KEYS: { [key: number]: keyof WizardSteps } = {
   1: 'step1',
   2: 'step2',
   3: 'step3',
@@ -16,7 +16,7 @@ export const WIZARD_KEYS: {[key: number]: keyof WizardSteps} = {
   5: 'step5',
 }
 
-export const JOB_STATUSES: {[key: string]: string} = {
+export const JOB_STATUSES: { [key: string]: string } = {
   canceled: 'CANCELED',
   pending: 'PENDING',
   running: 'RUNNING',
@@ -30,12 +30,12 @@ export const NAME_CHECK_STATUSES = {
   error: 'error'
 }
 
-export const REQUIRE_FIELD_MESSAGES: {[key: string]: string} = {
+export const REQUIRE_FIELD_MESSAGES: { [key: string]: string } = {
   date_date: 'You must select one date field.',
   numeric: 'You must select one numeric field.'
 }
 
-export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
+export const MODEL_STATE_TABLE_COLUMNS: { [key: string]: string } = {
   modelName: 'model_info.model_name',
   createdByEmail: 'model_info.created_by_email',
   stateJson: 'model_info.state_json',
@@ -45,7 +45,7 @@ export const MODEL_STATE_TABLE_COLUMNS: {[key:string]: string} = {
   modelUpdatedAt: 'model_info.model_updated_at'
 }
 
-export const SHARE_PERMISSION_LEVEL: {[key: string]: number} = {
+export const SHARE_PERMISSION_LEVEL: { [key: string]: number } = {
   read: 0,
   edit: 1
 }
@@ -58,11 +58,14 @@ export const DESC_STRING = "desc"
 export const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/bigquery'
 
 // Model and explore where the summary data lives
-export const BQML_LOOKER_MODEL="bqml_extension"
-export const SUMMARY_EXPLORE="selection_summary"
+export const BQML_LOOKER_MODEL = "bqml_extension"
+export const SUMMARY_EXPLORE = "selection_summary"
 
 // user attribute keys from marketplace.json
 export const BIGQUERY_CONN = "bigquery_connection_name"
 export const GOOGLE_CLIENT_ID = "google_client_id"
 export const BQML_MODEL_DATASET_NAME = "bqml_model_dataset_name"
 export const GCP_PROJECT = "gcp_project"
+export const ACCESS_TOKEN_SERVER_ENDPOINT = "access_token_server_endpoint"
+export const LOOKER_CLIENT_ID = "looker_client_id"
+export const LOOKER_CLIENT_SECRET = "looker_client_secret"
