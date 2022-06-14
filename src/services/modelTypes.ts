@@ -3,7 +3,7 @@ import { advancedSettingsSql } from "./advancedSettings"
 import { noDot } from "./string"
 import { removeLimit } from "./summary"
 
-export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
+export const MODEL_EVAL_FUNCS: { [key: string]: string } = {
   trainingInfo: 'trainingInfo',
   evaluate: 'evaluate',
   arimaEvaluate: 'arimaEvaluate',
@@ -11,7 +11,7 @@ export const MODEL_EVAL_FUNCS: {[key:string]: string} = {
   rocCurve: 'rocCurve'
 }
 
-export const MODEL_TABS: {[key:string]: string} = {
+export const MODEL_TABS: { [key: string]: string } = {
   [MODEL_EVAL_FUNCS.trainingInfo]: 'TRAINING INFO',
   [MODEL_EVAL_FUNCS.evaluate]: 'EVALUATE',
   [MODEL_EVAL_FUNCS.arimaEvaluate]: 'ARIMA EVALUATE',
@@ -19,7 +19,7 @@ export const MODEL_TABS: {[key:string]: string} = {
   [MODEL_EVAL_FUNCS.rocCurve]: 'ROC CURVE'
 }
 
-export const MODEL_TYPES: {[key: string]: any} = {
+export const MODEL_TYPES: { [key: string]: any } = {
   BOOSTED_TREE_REGRESSOR: {
     label: 'Predict a Value',
     value: 'BOOSTED_TREE_REGRESSOR',
@@ -36,7 +36,7 @@ export const MODEL_TYPES: {[key: string]: any} = {
     value: 'BOOSTED_TREE_CLASSIFIER',
     detail: 'BOOSTED_TREE_CLASSIFIER',
     techLabel: 'Classification',
-    description: 'Train a model to predict a class.',
+    description: 'Train a model to predict a class or category.',
     exploreName: 'boosted_tree',
     modelTabs: (isBinary: boolean) => (
       isBinary ?
@@ -45,11 +45,11 @@ export const MODEL_TYPES: {[key: string]: any} = {
     )
   },
   ARIMA_PLUS: {
-    label: 'Time series forecasting',
+    label: 'Forecast Time-based Values',
     value: 'ARIMA_PLUS',
     detail: 'ARIMA_PLUS',
-    techLabel: 'Time series forecasting',
-    description: 'I want to forecast a number (e.g. future sales)',
+    techLabel: 'Time-series Forecasting',
+    description: 'Train a model to predict future values from historical data',
     requiredFieldTypes: ['date_date', 'numeric'],
     exploreName: 'arima',
     targetDataType: 'numeric',
@@ -78,7 +78,7 @@ export const isClassifier = (objective: string): boolean => (
   objective === MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value
 )
 
-export const TABLE_SUFFIXES:  {[key: string]: string} = {
+export const TABLE_SUFFIXES: { [key: string]: string } = {
   evaluate: '_evaluate',
   confusionMatrix: '_confusion_matrix',
   rocCurve: '_roc_curve',
@@ -129,7 +129,7 @@ export const getBQInputDataSql = ({
   uid,
   limit
 }: GetBQInputDataSqlProps) => (
-  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} ${ limit ? `LIMIT ${limit}` : ''}`
+  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} ${limit ? `LIMIT ${limit}` : ''}`
 )
 
 export const getBQInputDataMetaDataSql = ({
@@ -191,11 +191,11 @@ const formBoostedTreeSQL = ({
 }
 
 const formBoostedTreeClassifierSQL = (props: IFormModelCreateSQLProps): string => {
-  return formBoostedTreeSQL({...props, boostedType: 'classifier'})
+  return formBoostedTreeSQL({ ...props, boostedType: 'classifier' })
 }
 
 const formBoostedTreeRegressorSQL = (props: IFormModelCreateSQLProps): string => {
-  return formBoostedTreeSQL({...props, boostedType: 'regressor'})
+  return formBoostedTreeSQL({ ...props, boostedType: 'regressor' })
 }
 
 const formArimaSQL = ({
@@ -213,8 +213,8 @@ const formArimaSQL = ({
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
-      , HORIZON = ${ advancedSettings.horizon || DEFAULT_ARIMA_HORIZON }
-      ${ advancedSettings.holidayRegion ? `, HOLIDAY_REGION = '${advancedSettings.holidayRegion}'` : ''}
+      , HORIZON = ${advancedSettings.horizon || DEFAULT_ARIMA_HORIZON}
+      ${advancedSettings.holidayRegion ? `, HOLIDAY_REGION = '${advancedSettings.holidayRegion}'` : ''}
       , AUTO_ARIMA = TRUE)
     AS (SELECT ${target.replace(".", "_")}, ${arimaTimeColumn.replace(".", "_")} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}\`) ;
   `
@@ -265,9 +265,9 @@ export const formEvaluateSql = ({
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (SELECT ${selectedFeatures.join(', ')}
       FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
-      ${ threshold ?
-        `, STRUCT(${threshold} as threshold)` : ''
-      }
+      ${threshold ?
+      `, STRUCT(${threshold} as threshold)` : ''
+    }
     ))
   `
 }
@@ -304,9 +304,9 @@ export const formConfusionMatrixSql = ({
       MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (SELECT ${selectedFeatures.join(', ')}
       FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
-      ${ threshold ?
-        `, STRUCT(${threshold} as threshold)` : ''
-      }
+      ${threshold ?
+      `, STRUCT(${threshold} as threshold)` : ''
+    }
     ))
   `
 }
@@ -442,7 +442,7 @@ export const createClassifierGlobalExplainSql = ({
       SELECT *
       FROM ML.GLOBAL_EXPLAIN(
         MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
-        STRUCT(${ classLevelExplain ? 'TRUE' : 'FALSE' } AS class_level_explain)
+        STRUCT(${classLevelExplain ? 'TRUE' : 'FALSE'} AS class_level_explain)
       )
     )
   `
@@ -499,9 +499,9 @@ export const createBoostedTreePredictSql = ({
     ( SELECT * FROM ML.PREDICT(
       MODEL ${bqmlModelDatasetName}.${bqModelName},
       (${removeLimit(lookerSql)})
-      ${ threshold ?
-        `, STRUCT(${threshold} as threshold)` : ''
-      }))
+      ${threshold ?
+      `, STRUCT(${threshold} as threshold)` : ''
+    }))
   `
 }
 

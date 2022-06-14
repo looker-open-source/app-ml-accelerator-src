@@ -24,7 +24,7 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   return (
     <StepContainer stepComplete={stepComplete} stepNumber={1}>
-      <h2>Select the objective</h2>
+      <h2>Choose your objective</h2>
       <div className="modeltypes">
         {
           Object.values(MODEL_TYPES).map((modelType) => {
