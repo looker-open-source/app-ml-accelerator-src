@@ -18,7 +18,8 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepNumber={2}
       customClass="step2-container"
       stepInfo={stepName === 'step2' && <RequiredFieldMessages />}>
-      <h2>Select the source for your input data</h2>
+      <h2>Select your input data</h2>
+      <p>NOTE: A row limit of 5,000 will be applied to the Explore below, but this limit will not be applied during model training.</p>
       <QueryBuilder setIsLoading={setIsLoading}/>
     </StepContainer>
   )
