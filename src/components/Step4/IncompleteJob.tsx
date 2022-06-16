@@ -27,7 +27,7 @@ export const IncompleteJob: React.FC<IncompleteJobProps> = ({ jobCanceled, setIs
         {/* @ts-ignore */}
         <Icon icon={<Alarm />} size="large" className="model-job-pending--icon"/>
         <h2>Creating Model...</h2>
-        <p>This process may take any where from 10 minutes to several hours to complete.</p>
+        <p>This process may take a few minutes to several hours to complete. You can close your browser tab and return later to check on its progress.</p>
         <TimeRunning startTime={startTime} />
         <CancelModelButton setIsLoading={setIsLoading}/>
       </div>

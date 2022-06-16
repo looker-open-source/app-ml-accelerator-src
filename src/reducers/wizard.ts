@@ -3,17 +3,17 @@ import { toggleArrayEntry } from '../services/array'
 import { getStepStateClone } from '../services/wizard'
 
 type Action = { type: 'clearState' } |
-  { type: 'populateWizard', wizardState: WizardState } |
-  { type: 'setUnlockedStep', step: number } |
-  { type: 'setExplain', explainLevel: 'model' | 'class', data: any } |
-  { type: 'addToStepData', step: keyof WizardSteps, data: any } |
-  { type: 'setSelectedDimension', field: Field, step: 'step2' | 'step5'  } |
-  { type: 'setSelectedMeasure', field: Field, step: 'step2' | 'step5' } |
-  { type: 'setSelectedParameter', field: Field, step: 'step2' | 'step5' } |
-  { type: 'setSelectedFilter', field: Field, step: 'step2' | 'step5' } |
-  { type: 'setFilterValue', key: string, expression: string, step: 'step2' | 'step5' } |
-  { type: 'setExploreFilterText', filterText: string } |
-  { type: 'clearExplore' }
+{ type: 'populateWizard', wizardState: WizardState } |
+{ type: 'setUnlockedStep', step: number } |
+{ type: 'setExplain', explainLevel: 'model' | 'class', data: any } |
+{ type: 'addToStepData', step: keyof WizardSteps, data: any } |
+{ type: 'setSelectedDimension', field: Field, step: 'step2' | 'step5' } |
+{ type: 'setSelectedMeasure', field: Field, step: 'step2' | 'step5' } |
+{ type: 'setSelectedParameter', field: Field, step: 'step2' | 'step5' } |
+{ type: 'setSelectedFilter', field: Field, step: 'step2' | 'step5' } |
+{ type: 'setFilterValue', key: string, expression: string, step: 'step2' | 'step5' } |
+{ type: 'setExploreFilterText', filterText: string } |
+{ type: 'clearExplore' }
 
 // UI state of the wizard
 const wizardInitialState: WizardState = {
@@ -26,7 +26,7 @@ const wizardInitialState: WizardState = {
       exploreLabel: undefined,
       exploreData: undefined,
       exploreFilterText: "",
-      limit: "500",
+      limit: "5000",
       selectedFields: {
         dimensions: [],
         measures: [],
@@ -68,7 +68,7 @@ const wizardInitialState: WizardState = {
         exploreName: undefined,
         modelName: undefined,
         exploreLabel: undefined,
-        limit: "500",
+        limit: "5000",
         sorts: [],
         selectedFields: {
           dimensions: [],
@@ -85,7 +85,7 @@ const wizardInitialState: WizardState = {
     step5: {
       showPredictions: false,
       exploreData: undefined,
-      limit: "500",
+      limit: "5000",
       selectedFields: {
         dimensions: [],
         measures: [],
@@ -105,17 +105,17 @@ const wizardInitialState: WizardState = {
 
 // the ui state of the wizard
 function wizardReducer(state: WizardState, action: Action): any {
-  console.log({ reducer: action.type, action, state})
+  console.log({ reducer: action.type, action, state })
   switch (action.type) {
     case 'clearState': {
       return { ...wizardInitialState }
     }
     case 'populateWizard': {
-      console.log({wizardState: action.wizardState})
+      console.log({ wizardState: action.wizardState })
       return { ...action.wizardState }
     }
     case 'setUnlockedStep': {
-      return {...state, unlockedStep: action.step}
+      return { ...state, unlockedStep: action.step }
     }
     case 'setExplain': {
       return {
@@ -175,7 +175,7 @@ function wizardReducer(state: WizardState, action: Action): any {
       // if passing in a filter that already exists
       // remove it from list of selected filters
       if (filters[action.field.name] || filters[action.field.name] == '') {
-        const filtersClone = {...filters}
+        const filtersClone = { ...filters }
         delete filtersClone[action.field.name]
         newState.steps[action.step].selectedFields = {
           ...newState.steps[action.step].selectedFields,
@@ -218,11 +218,11 @@ function wizardReducer(state: WizardState, action: Action): any {
     }
     case 'clearExplore': {
       const newState = getStepStateClone(state, 'step2')
-      newState.steps.step2 = {...wizardInitialState.steps.step2}
+      newState.steps.step2 = { ...wizardInitialState.steps.step2 }
       return newState
     }
     default: {
-      return {...state}
+      return { ...state }
     }
   }
 }

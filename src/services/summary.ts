@@ -80,7 +80,7 @@ export const needsModelUpdate = ({
   uiTarget,
   uiArimaTimeColumn
 }: NeedsModelUpdateProps) => {
-  return (bqModel.jobStatus === JOB_STATUSES.failed || bqModel.jobStatus ===JOB_STATUSES.canceled) ||
+  return (bqModel.jobStatus === JOB_STATUSES.failed || bqModel.jobStatus === JOB_STATUSES.canceled) ||
     bqModel.objective !== uiObjective ||
     !isEqual(bqModel.advancedSettings, uiAdvancedSettings) ||
     bqModel.inputDataUID !== uiInputDataUID ||
@@ -109,7 +109,7 @@ const fieldIsType = (field: any, dataType?: string) => {
   if (dataType === 'date') {
     return field.type === 'date_date' // this is the only supported date type by BigQuery for Arima models
   }
-  if(dataType === 'numeric') {
+  if (dataType === 'numeric') {
     return field.is_numeric
   }
   return field.type === dataType
@@ -127,7 +127,7 @@ export const buildFieldSelectOptions = (fieldDetails: any, fieldNames: string[],
     let formattedLabel
     if (field.label) {
       formattedLabel = field.label
-        titilize(field.name).replace(".", " ")
+      titilize(field.name).replace(".", " ")
         .trim();
     }
     return {
@@ -174,31 +174,22 @@ export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {
     align: "right",
     order: 4
   },
-  corrWithTarget: {
-    label: "Correlation w/target",
-    converter: (row) => {
-      const tCorr = row.target_correlation?.value
-      return isNaN(tCorr) ? null : tCorr * 100 + '%'
-    },
+  max: {
+    label: "Max",
+    converter: (row) => row.data_type?.value !== "STRING" ? row._max_value?.value : "NA",
     align: "right",
     order: 5
   },
-  max: {
-    label: "Max",
-    converter: (row) => row.data_type?.value !== "STRING" ? row._max_value?.value : "",
+  min: {
+    label: "Min",
+    converter: (row) => row.data_type?.value !== "STRING" ? row._min_value?.value : "NA",
     align: "right",
     order: 6
   },
-  min: {
-    label: "Min",
-    converter: (row) => row.data_type?.value !== "STRING" ? row._min_value?.value : "",
-    align: "right",
-    order: 7
-  },
   avg: {
     label: "Avg",
-    converter: (row) => row.data_type?.value !== "STRING" ? Number(row._avg_value?.value).toFixed(2) : "",
+    converter: (row) => row.data_type?.value !== "STRING" ? Number(row._avg_value?.value).toFixed(2) : "NA",
     align: "right",
-    order: 8
+    order: 7
   }
 }

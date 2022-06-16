@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react'
 import ExpanderBar from '../Expander'
 import FilterPanel from '../FilterPanel'
-import QueryLimitField from '../QueryLimitField'
 import ResultsTable from '../ResultsTable'
 import { useStore } from '../../../contexts/StoreProvider'
 import { QueryBuilderContext } from '../../../contexts/QueryBuilderProvider'
@@ -14,7 +13,7 @@ import { isArima } from '../../../services/modelTypes'
 export const QueryPane: React.FC = () => {
   const { stepData, stepName } = useContext(QueryBuilderContext)
   const { state, dispatch } = useStore()
-  const { selectedFields, limit } = stepData
+  const { selectedFields } = stepData
   const [ chartType, setChartType ] = useState<AllChartTypes>('line')
 
   const onFilterChange = (filter: string, expression: string) => {
@@ -28,10 +27,6 @@ export const QueryPane: React.FC = () => {
 
   const onFilterRemove = (filter: string) => {
     dispatch({ type: 'setSelectedFilter', field: {name: filter}, step: stepName })
-  }
-
-  const limitChange = (value: string) => {
-    dispatch({ type: 'addToStepData', step: stepName, data: { limit: value }})
   }
 
   const showFilters = () => (
@@ -75,7 +70,6 @@ export const QueryPane: React.FC = () => {
         expanderBodyClasses="filter-expander"
         isOpen={state.ui.dataOpen}
         setIsOpen={() => dispatch({type: 'setDataOpen', value: !state.ui.dataOpen})}
-        fields={[(<QueryLimitField onChange={limitChange} limitValue={limit}/>)]}
       >
         <ResultsTable />
       </ExpanderBar>

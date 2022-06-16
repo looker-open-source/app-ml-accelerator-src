@@ -69,6 +69,7 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
   return (
     <div className="wizard-card">
       <h2>Name your model</h2>
+      <p>NOTE: Model names can only contain letters, numbers, and underscores.</p>
       <div className="wizard-card-text">
         <FieldText
           onChange={handleModelNameChange}

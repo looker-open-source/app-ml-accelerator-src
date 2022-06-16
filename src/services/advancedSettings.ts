@@ -11,13 +11,13 @@ export const advancedSettingsSql = (advancedSettings: any) => {
       }
     } else if (key === 'data_split_eval_fraction' &&
       !showDataSplitEvalFraction(advancedSettings.data_split_method)) {
-        continue
+      continue
     } else if (key === 'data_split_col' &&
       !showDataSplitCol(advancedSettings.data_split_method)) {
-        continue
+      continue
     } else if (key === 'dart_normalize_type' &&
       !showDartNormalizeType(advancedSettings.booster_type)) {
-        continue
+      continue
     } else if (advancedSettings[key] !== undefined) {
       const value = quotedSettings.includes(key) ?
         `'${advancedSettings[key]}'` :
@@ -171,8 +171,8 @@ const BOOSTED_CLASSIFIER_SETTINGS_DEFAULTS = {
   colsample_bynode: 1,
   min_split_loss: 0,
   max_tree_depth: 6,
-  subsample: 1.0,
-  auto_class_weights: true,
+  subsample: '1.0',
+  auto_class_weights: false,
   class_weights: {},
   l1_reg: 0,
   l2_reg: 0,
@@ -197,7 +197,7 @@ const BOOSTED_REGRESSOR_SETTINGS_DEFAULTS = {
   colsample_bynode: 1,
   min_split_loss: 0,
   max_tree_depth: 6,
-  subsample: 1.0,
+  subsample: '1.0',
   l1_reg: 0,
   l2_reg: 0,
   early_stop: true,
