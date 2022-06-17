@@ -66,7 +66,7 @@ export const MODEL_TYPES: { [key: string]: any } = {
 }
 
 export const isArima = (objective: string): boolean => (
-  objective === MODEL_TYPES.ARIMA_PLUS.value
+  objective === 'ARIMA_PLUS'
 )
 
 export const isBoostedTree = (objective: string): boolean => (
