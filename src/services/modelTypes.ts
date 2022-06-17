@@ -236,24 +236,17 @@ type FormEvaluateSqlProps = {
   bqmlModelDatasetName?: string,
   bqModelName: string,
   target?: string,
-  uid?: string
-  selectedFeatures: string[],
-  threshold?: string
 }
 
 export const formEvaluateSql = ({
   gcpProject,
   bqmlModelDatasetName,
   bqModelName,
-  uid,
-  selectedFeatures,
-  threshold
 }: FormEvaluateSqlProps) => {
   if (
     !gcpProject ||
     !bqmlModelDatasetName ||
-    !bqModelName ||
-    !uid
+    !bqModelName
   ) {
     return false
   }
@@ -262,12 +255,7 @@ export const formEvaluateSql = ({
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.evaluate} AS (
     SELECT *
     FROM ML.EVALUATE(
-      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
-      (SELECT ${selectedFeatures.join(', ')}
-      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
-      ${threshold ?
-      `, STRUCT(${threshold} as threshold)` : ''
-    }
+      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}
     ))
   `
 }
