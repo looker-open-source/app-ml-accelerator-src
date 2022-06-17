@@ -87,12 +87,12 @@ export const ApplyProvider = ({ children }: any) => {
       if (!bqmlModelDatasetName) { throw "No dataset provided" }
       let sql
       switch (bqModel.objective) {
-        case MODEL_TYPES.ARIMA_PLUS.value:
-          sql = createArimaPredictSql({
-            bqmlModelDatasetName,
-            bqModelName: bqModel.name
-          })
-          break;
+        // case MODEL_TYPES.ARIMA_PLUS.value:
+        //   sql = createArimaPredictSql({
+        //     bqmlModelDatasetName,
+        //     bqModelName: bqModel.name
+        //   })
+        //   break;
         case MODEL_TYPES.BOOSTED_TREE_REGRESSOR.value:
         case MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value:
         default:
