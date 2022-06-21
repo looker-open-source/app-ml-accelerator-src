@@ -97,16 +97,6 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return <></>
   }
 
-  const buildThreshold = () => {
-    if (bqModel.binaryClassifier) {
-      return (
-        <div className="binary-classifier-container">
-          <BinaryClassifierThreshold />
-        </div>
-      )
-    }
-    return <></>
-  }
 
   return (
     <StepContainer
@@ -126,7 +116,6 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
                 setActiveTab={setActiveTab}
                 bqModel={bqModel}
               />
-              {buildThreshold()}
             </div>
             <div className="model-grid--body">
               { !isLoading && activeTab &&
