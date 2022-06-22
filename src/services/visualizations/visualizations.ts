@@ -23,10 +23,13 @@ export const buildVizDataSets = ({ ranQuery, data, target, labels, datasetMapper
   if (measures.length > 0) {
     chartMeasures.push(...measures)
   }
-  const targetIndex = chartMeasures.indexOf(target)
-  if (targetIndex < 0) {
-    // insert the target if its a dimension
-    chartMeasures.splice(1, 0, target)
+
+  if (target) {
+    const targetIndex = chartMeasures.indexOf(target)
+    if (targetIndex < 0) {
+      // insert the target if its a dimension
+      chartMeasures.splice(1, 0, target)
+    }
   }
 
   const datasetColors = getDatasetColors(chartMeasures.length)
@@ -48,16 +51,18 @@ export const buildVizDataSets = ({ ranQuery, data, target, labels, datasetMapper
 export const buildVizLabels = (ranQuery: RanQuery, data: any, target: string) => {
   if (!ranQuery?.selectedFields) { return [] }
   const dimensions = [...ranQuery.selectedFields.dimensions]
-  const targetIndex = dimensions.indexOf(target)
 
-  if (targetIndex >= 0) {
-    dimensions.splice(targetIndex, 1)
+  if (target) {
+    const targetIndex = dimensions.indexOf(target)
+    if (targetIndex >= 0) {
+      dimensions.splice(targetIndex, 1)
+    }
   }
 
   return data.map((datum: any) => {
     let label = ""
     dimensions.forEach((dim) => {
-      if (label) { label += " - "}
+      if (label) { label += " - " }
       label += datum[dim] ? datum[dim].value : ''
     })
     return label
