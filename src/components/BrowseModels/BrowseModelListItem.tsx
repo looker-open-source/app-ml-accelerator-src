@@ -3,6 +3,8 @@ import { DataTableAction, DataTableCell, DataTableItem } from "@looker/component
 import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 import { DateFormat, TimeFormat } from "@looker/components-date"
 import { MODEL_TYPES } from "../../services/modelTypes"
+import { startCase } from 'lodash'
+
 
 const { modelName, createdByEmail, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
 
@@ -33,7 +35,7 @@ export const BrowseModelListItem: React.FC<BrowseModelListItemProps> = ({ model,
     >
       <DataTableCell className="model-list-item--name">
         <div className="model-list-item--title">
-          {model[modelName]}
+          {startCase(model[modelName])}
         </div>
       </DataTableCell>
       <DataTableCell>{model[createdByEmail]}</DataTableCell>

@@ -5,6 +5,8 @@ import { MoreVert } from "@styled-icons/material"
 import { MODEL_STATE_TABLE_COLUMNS, WIZARD_STEPS } from "../../constants"
 import './BrowseModels.scss'
 import { MODEL_TYPES } from "../../services/modelTypes"
+import { startCase } from 'lodash'
+
 
 const { modelName, createdByEmail, stateJson, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
 
@@ -46,7 +48,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
       </CardMedia>
       <CardContent onClick={handleModelSelect} className="model-card-content">
         <Heading as="h4" fontSize="medium" fontWeight="semiBold" truncate>
-          { model[modelName] }
+          { startCase(model[modelName]) }
         </Heading>
         <Span
           fontSize="xsmall"
