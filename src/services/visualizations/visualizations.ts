@@ -96,9 +96,11 @@ export const buildPieDataSets = ({ ranQuery, data, target, labels, datasetMapper
   if (measures.length > 0) {
     chartMeasures.push(...measures)
   }
-  const targetIndex = chartMeasures.indexOf(target)
-  if (targetIndex < 0) {
-    chartMeasures.splice(1, 0, target)
+  if (target) {
+    const targetIndex = chartMeasures.indexOf(target)
+    if (targetIndex < 0) {
+      chartMeasures.splice(1, 0, target)
+    }
   }
 
   const datasetColors = getDatasetColors(chartMeasures.length)
