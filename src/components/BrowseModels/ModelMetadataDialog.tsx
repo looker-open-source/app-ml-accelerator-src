@@ -6,7 +6,6 @@ import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 import { AdminContext } from "../../contexts/AdminProvider"
 import { formatMetaData, METADATA_LABEL_MAP } from '../../services/admin'
 import Spinner from "../Spinner"
-import { ModelMetadataLabels } from './ModelMetadataLabels'
 
 type ModelMetadataDialogProps = {
   model: any,
@@ -46,6 +45,12 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
     setIsSaved(false)
   }
 
+  const onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow setting/updating only one label, always with key 'accelerator'
+    setLabels({...labels, ['accelerator']: e.target.value})
+    setIsSaved(false)
+  }
+
   const handleSave = async () => {
     setIsSaved(false)
     if (!metadataRaw || !bqModelName) {
@@ -73,7 +78,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
           fieldValue = <FieldText value={description} onChange={onDescChange}/>
           break
         case 'labels':
-          fieldValue = <ModelMetadataLabels labels={labels} setLabels={setLabels} />
+          fieldValue = <FieldText value={labels.accelerator} onChange={onLabelChange} />
           break
         case 'creationTime':
         case 'modifiedTime':
