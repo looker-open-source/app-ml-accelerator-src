@@ -52,7 +52,7 @@ export const QueryPane: React.FC = () => {
           </div>
         </ExpanderBar>
       }
-      { stepName === 'step5' &&
+      { stepName === 'step2' &&
         <ExpanderBar
           title="Visualization"
           expanderBodyClasses="filter-expander"

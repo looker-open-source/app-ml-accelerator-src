@@ -26,7 +26,7 @@ export const VizChart : React.FC<VizChartProps> = ({ ranQuery, type }) => {
   }, [type, data])
 
   const buildChartObj = () => {
-    if (!ranQuery || !target) { return }
+    if (!ranQuery) { return }
 
     switch (type) {
       case 'line':
