@@ -66,7 +66,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
             <div className="model-card-time">
               Updated { ' ' }
               <DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}
-              <TimeFormat>{new Date(model[modelUpdatedAt])}</TimeFormat>
+              {new Date(model[modelUpdatedAt]).toTimeString()}
             </div>
           ) : ''
         }

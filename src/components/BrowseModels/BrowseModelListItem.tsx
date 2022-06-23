@@ -43,7 +43,7 @@ export const BrowseModelListItem: React.FC<BrowseModelListItemProps> = ({ model,
       <DataTableCell>
         { model[modelUpdatedAt] ?
           (<><DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}
-          <TimeFormat>{new Date(model[modelUpdatedAt])}</TimeFormat></>) : ''
+          {new Date(model[modelUpdatedAt]).toTimeString()}</>) : ''
         }
       </DataTableCell>
     </DataTableItem>
