@@ -78,7 +78,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
           fieldValue = <FieldText value={description} onChange={onDescChange}/>
           break
         case 'labels':
-          fieldValue = <FieldText value={labels.bqmlAccelerator} onChange={onLabelChange} />
+          fieldValue = <FieldText value={labels.bqmlAccelerator || ''} onChange={onLabelChange} />
           break
         case 'creationTime':
         case 'modifiedTime':
