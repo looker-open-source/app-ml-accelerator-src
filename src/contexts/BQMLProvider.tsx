@@ -251,6 +251,8 @@ export const BQMLProvider = ({ children }: any) => {
                   (model_name             STRING,
                    state_json             STRING,
                    created_by_email       STRING,
+                   created_by_first_name  STRING,
+                   created_by_last_name   STRING,
                    shared_with_emails     STRING,
                    model_created_at       INTEGER,
                    model_updated_at       INTEGER)
@@ -265,7 +267,7 @@ export const BQMLProvider = ({ children }: any) => {
     isModelUpdate = false
   }: insertOrUpdateModelStateProps) => {
     const  { name: bqModelName } = bqModel
-    const { email: userEmail } = state.user
+    const { email: userEmail, firstName: firstName, lastName: lastName } = state.user
     const stateJson = JSON.stringify(generateModelState(wizardState, bqModel))
 
     let timeSql: string = ''
@@ -286,14 +288,16 @@ export const BQMLProvider = ({ children }: any) => {
           USING (SELECT '${bqModelName}' AS model_name
                   , '${stateJson}' as state_json
                   , '${userEmail}' as created_by_email
+                  , '${firstName}' as created_by_first_name
+                  , '${lastName}' as created_by_last_name
                   ${timeSql}
                 ) AS S
           ON T.model_name = S.model_name
           WHEN MATCHED THEN
             UPDATE SET state_json=S.state_json ${timestampUpdate}
           WHEN NOT MATCHED THEN
-            INSERT (model_name, state_json, created_by_email${timestampCreate})
-            VALUES(model_name, state_json, created_by_email${timestampCreate})
+            INSERT (model_name, state_json, created_by_first_name, created_by_last_name, created_by_email${timestampCreate})
+            VALUES(model_name, state_json, created_by_first_name, created_by_last_name, created_by_email${timestampCreate})
     `
     return queryJobAndWait(sql)
   }

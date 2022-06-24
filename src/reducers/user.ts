@@ -1,20 +1,21 @@
 import { UserState } from '../types'
 
-type Action = {type: 'setUser', user: UserState}
+type Action = { type: 'setUser', user: UserState }
 
 const userInitialState = {
   id: undefined,
   email: undefined,
-  firstName: undefined
+  firstName: undefined,
+  lastName: undefined
 }
 
 function userReducer(state: UserState, action: Action): any {
   switch (action.type) {
     case 'setUser': {
-      return {...state, ...action.user}
+      return { ...state, ...action.user }
     }
     default: {
-      return {...state}
+      return { ...state }
     }
   }
 }

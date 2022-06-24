@@ -6,7 +6,7 @@ import { MODEL_TYPES } from "../../services/modelTypes"
 import { startCase } from 'lodash'
 
 
-const { modelName, createdByEmail, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
+const { modelName, createdByFirstName, createdByLastName, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
 
 type BrowseModelListItemProps = {
   model: any,
@@ -38,12 +38,13 @@ export const BrowseModelListItem: React.FC<BrowseModelListItemProps> = ({ model,
           {startCase(model[modelName])}
         </div>
       </DataTableCell>
-      <DataTableCell>{model[createdByEmail]}</DataTableCell>
+      <DataTableCell>{model[createdByFirstName] + ' ' + model[createdByLastName]}</DataTableCell>
       <DataTableCell>{model.objective ? MODEL_TYPES[model.objective].techLabel : ''}</DataTableCell>
       <DataTableCell>
         { model[modelUpdatedAt] ?
           (<><DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}
-          {new Date(model[modelUpdatedAt]).toTimeString()}</>) : ''
+          <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{model[modelUpdatedAt]}</TimeFormat>
+          </>) : ''
         }
       </DataTableCell>
     </DataTableItem>

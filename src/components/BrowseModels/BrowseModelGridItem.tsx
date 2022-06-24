@@ -8,7 +8,7 @@ import { MODEL_TYPES } from "../../services/modelTypes"
 import { startCase } from 'lodash'
 
 
-const { modelName, createdByEmail, stateJson, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
+const { modelName, createdByFirstName, createdByLastName, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
 
 type BrowseModelGridItemProps = {
   model: any,
@@ -59,14 +59,14 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
           { model.objective ? MODEL_TYPES[model.objective].techLabel : '' }
         </Span>
         <Paragraph fontSize="small">
-          { 'Created by ' + model[createdByEmail] }
+          { 'Created by ' + model[createdByFirstName] + ' ' + model[createdByLastName]}
         </Paragraph>
         {
           model[modelUpdatedAt] ? (
             <div className="model-card-time">
-              Updated { ' ' }
+              Updated: { ' ' }
               <DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}
-              {new Date(model[modelUpdatedAt]).toTimeString()}
+              <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{model[modelUpdatedAt]}</TimeFormat>
             </div>
           ) : ''
         }

@@ -86,7 +86,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
           if (typeof formattedMetadata[key] !== 'string') {
             fieldValue = (<>
               <DateFormat>{formattedMetadata[key]}</DateFormat> { ' ' }
-              {formattedMetadata[key].toTimeString()}
+              <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{formattedMetadata[key]}</TimeFormat>
             </>)
             break
           }
