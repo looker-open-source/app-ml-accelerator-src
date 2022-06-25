@@ -1,11 +1,12 @@
-import { Button, ButtonTransparent, DialogContent, DialogFooter, DialogHeader, FieldChips, Icon } from '@looker/components'
+import { Button, ButtonTransparent, DialogContent, DialogFooter, DialogHeader, FieldSelectMulti, Icon } from '@looker/components'
 import { Check, Save } from '@styled-icons/material'
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 // import { Add } from "@styled-icons/material"
 import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 // import { toggleArrayEntry } from "../../services/array"
 import { AdminContext } from "../../contexts/AdminProvider"
 import { addSharedPermissions, removeSharedPermissions } from '../../services/admin'
+import { ShareUser } from '../../types/lookerUser'
 import Spinner from "../Spinner"
 
 type ShareModelDialogProps = {
@@ -19,8 +20,18 @@ export const ShareModelDialog: React.FC<ShareModelDialogProps> = ({ model, close
   const [ sharedList, setSharedList ] = useState<string[]>(sharedWithEmails)
   const [ isLoading, setIsLoading ] = useState<boolean>(false)
   const [ isSaved, setIsSaved ] = useState<boolean>(false)
-  const { updateSharedEmails } = useContext(AdminContext)
+  const { updateSharedEmails, getLookerUsers } = useContext(AdminContext)
   const bqModelName = model[MODEL_STATE_TABLE_COLUMNS.modelName]
+  const [ lookerUserList, setLookerUserList ] = useState<ShareUser[]>()
+
+  useEffect(() => {
+    fetchLookerUsers()
+  }, [])
+
+  const fetchLookerUsers = async () => {
+    const users = await getLookerUsers?.()
+    setLookerUserList(users)
+  }
 
   const onChangeEmails = (values: string[]) => {
     setIsSaved(false)
@@ -45,14 +56,15 @@ export const ShareModelDialog: React.FC<ShareModelDialogProps> = ({ model, close
       <DialogHeader hideClose="true" borderBottom="transparent" className="share-dialog--header">
         Share
         <span className="share-dialog--modelname">{bqModelName}</span>
-        <p>Enter one or multiple email addresses, pressing 'enter' after each.</p>
-        <p>Then click 'save' button.</p>
       </DialogHeader>
       <DialogContent className="share-dialog--content">
         <div className="share-dialog--container modal-pane">
-          <FieldChips
+          <FieldSelectMulti
+            label="Choose from list or enter a valid email address"
+            options={lookerUserList}
+            defaultValues={sharedList}
+            freeInput
             onChange={onChangeEmails}
-            values={sharedList}
           />
         </div>
       </DialogContent>
