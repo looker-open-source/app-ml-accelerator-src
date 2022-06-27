@@ -3,8 +3,10 @@ import { DataTableAction, DataTableCell, DataTableItem } from "@looker/component
 import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 import { DateFormat, TimeFormat } from "@looker/components-date"
 import { MODEL_TYPES } from "../../services/modelTypes"
+import { startCase } from 'lodash'
 
-const { modelName, createdByEmail, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
+
+const { modelName, createdByFirstName, createdByLastName, modelUpdatedAt } = MODEL_STATE_TABLE_COLUMNS
 
 type BrowseModelListItemProps = {
   model: any,
@@ -33,15 +35,16 @@ export const BrowseModelListItem: React.FC<BrowseModelListItemProps> = ({ model,
     >
       <DataTableCell className="model-list-item--name">
         <div className="model-list-item--title">
-          {model[modelName]}
+          {startCase(model[modelName])}
         </div>
       </DataTableCell>
-      <DataTableCell>{model[createdByEmail]}</DataTableCell>
+      <DataTableCell>{model[createdByFirstName] + ' ' + model[createdByLastName]}</DataTableCell>
       <DataTableCell>{model.objective ? MODEL_TYPES[model.objective].techLabel : ''}</DataTableCell>
       <DataTableCell>
         { model[modelUpdatedAt] ?
           (<><DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}
-          <TimeFormat>{new Date(model[modelUpdatedAt])}</TimeFormat></>) : ''
+          <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{model[modelUpdatedAt]}</TimeFormat>
+          </>) : ''
         }
       </DataTableCell>
     </DataTableItem>

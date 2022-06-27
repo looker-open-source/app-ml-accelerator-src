@@ -6,7 +6,6 @@ import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 import { AdminContext } from "../../contexts/AdminProvider"
 import { formatMetaData, METADATA_LABEL_MAP } from '../../services/admin'
 import Spinner from "../Spinner"
-import { ModelMetadataLabels } from './ModelMetadataLabels'
 
 type ModelMetadataDialogProps = {
   model: any,
@@ -19,7 +18,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
   const [ metadataRaw, setMetadataRaw ] = useState<any>()
   const [ formattedMetadata, setFormattedMetadata ] = useState<any>({})
   const [ description, setDescription ] = useState<string>('')
-  const [ labels, setLabels ] = useState<any>({})
+  const [ labels, setLabels ] = useState<any>({['bqmlAccelerator']: ''})
   const { getModelMetadata, saveModelMetadata } = useContext(AdminContext)
   const bqModelName = model[MODEL_STATE_TABLE_COLUMNS.modelName]
 
@@ -29,7 +28,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
 
   useEffect(() => {
     setDescription(formattedMetadata.description || '')
-    setLabels(formattedMetadata.labels || {})
+    setLabels(formattedMetadata.labels || {['bqmlAccelerator']: ''})
   }, [formattedMetadata])
 
   const fetchMetadata = async (modelName: string) => {
@@ -43,6 +42,12 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.target.value)
+    setIsSaved(false)
+  }
+
+  const onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow setting/updating only one label, always with key 'bqmlAccelerator'
+    setLabels({...labels, ['bqmlAccelerator']: e.target.value})
     setIsSaved(false)
   }
 
@@ -73,7 +78,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
           fieldValue = <FieldText value={description} onChange={onDescChange}/>
           break
         case 'labels':
-          fieldValue = <ModelMetadataLabels labels={labels} setLabels={setLabels} />
+          fieldValue = <FieldText value={labels.bqmlAccelerator || ''} onChange={onLabelChange} />
           break
         case 'creationTime':
         case 'modifiedTime':
@@ -81,7 +86,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
           if (typeof formattedMetadata[key] !== 'string') {
             fieldValue = (<>
               <DateFormat>{formattedMetadata[key]}</DateFormat> { ' ' }
-              <TimeFormat>{formattedMetadata[key]}</TimeFormat>
+              <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{formattedMetadata[key]}</TimeFormat>
             </>)
             break
           }

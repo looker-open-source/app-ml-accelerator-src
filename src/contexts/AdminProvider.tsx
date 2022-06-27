@@ -1,10 +1,12 @@
 import React, { createContext, useContext } from 'react'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
 import { BQMLContext } from './BQMLProvider'
 import { formatSavedModelData, MODELS_PER_PAGE } from '../services/modelList'
 import { BigQueryModelMetadata } from '../types/BigQueryModel'
 import { TABLE_SUFFIXES, getAllInputDataTablesSql } from '../services/modelTypes'
 import { formatBQResults } from '../services/common'
+import {LookerUser, ShareUser} from '../types/lookerUser'
 
 type IAdminContext = {
   getModelMetadata?: (modelName: string) => Promise<any>
@@ -13,6 +15,7 @@ type IAdminContext = {
   getSharedModels?: () => Promise<any>,
   getMyModels?: () => Promise<any>,
   removeModel?: (modelName: string) => Promise<any>,
+  getLookerUsers?: () => Promise<any>
 }
 
 export const AdminContext = createContext<IAdminContext>({})
@@ -31,6 +34,8 @@ export const AdminProvider = ({ children }: any) => {
     deleteModelFromModelState
   } = useContext(BQMLContext)
   const { bqmlModelDatasetName } = state.userAttributes
+  const { coreSDK: sdk } = useContext(ExtensionContext2)
+
 
   const getModelMetadata = async (modelName: string) => {
     try {
@@ -63,6 +68,30 @@ export const AdminProvider = ({ children }: any) => {
       return { ok: false }
     }
   }
+
+  const getLookerUsers = async () => {
+    const response: LookerUser[] = await sdk.ok(sdk.all_users({
+      fields: "first_name,last_name,display_name,email",
+      limit: 1000,
+      offset: 1,
+      sorts: "last_name"
+    }))
+
+    let users: ShareUser[] = []
+    response.forEach(u => {
+      if (u.display_name && u.email) {
+        const user = {
+          detail: u.display_name,
+          value: u.email
+        }
+
+        users.push(user)
+      }
+    })
+
+    return users
+  }
+
 
   const updateSharedEmails = async (bqModelName: string, sharedWithEmails: any[]) => {
     try {
@@ -180,6 +209,7 @@ export const AdminProvider = ({ children }: any) => {
       value={{
         getModelMetadata,
         saveModelMetadata,
+        getLookerUsers,
         updateSharedEmails,
         getSharedModels,
         getMyModels,

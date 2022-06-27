@@ -15,6 +15,8 @@ export const formatSavedModelData = (models: any[]) => (
     return {
       [MODEL_STATE_TABLE_COLUMNS.modelName]: model[MODEL_STATE_TABLE_COLUMNS.modelName]?.value,
       [MODEL_STATE_TABLE_COLUMNS.createdByEmail]: model[MODEL_STATE_TABLE_COLUMNS.createdByEmail]?.value,
+      [MODEL_STATE_TABLE_COLUMNS.createdByFirstName]: model[MODEL_STATE_TABLE_COLUMNS.createdByFirstName]?.value,
+      [MODEL_STATE_TABLE_COLUMNS.createdByLastName]: model[MODEL_STATE_TABLE_COLUMNS.createdByLastName]?.value,
       [MODEL_STATE_TABLE_COLUMNS.stateJson]: state,
       objective: state.bqModel.objective,
       [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: safelyParseJson(model[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]?.value),

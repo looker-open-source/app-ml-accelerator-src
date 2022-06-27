@@ -33,7 +33,7 @@ const getFirstTrainingOptions = (metadata: any) => {
 export const METADATA_LABEL_MAP: { [key: string]: string } = {
   modelId: "Model ID",
   description: "Description",
-  labels: "Labels",
+  labels: "Label",
   creationTime: "Date created",
   expiration: "Model expiration",
   modifiedTime: "Date modified",

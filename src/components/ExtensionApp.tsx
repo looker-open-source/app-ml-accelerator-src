@@ -35,7 +35,8 @@ export const ExtensionApp: React.FC = () => {
       dispatch({ type: "setUser", user: {
         id: value.id,
         email: value.email,
-        firstName: value.first_name
+        firstName: value.first_name,
+        lastName: value.last_name
       }})
       return value.id
     } catch (err) {
