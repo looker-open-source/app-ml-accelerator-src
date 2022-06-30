@@ -64,7 +64,6 @@ export const ModelProvider = ({ children }: any) => {
       }
 
       const { promise, cancel } = pollJobStatus(job.jobId, 20000)
-      console.log('setting canceler')
       setPollCanceler({ cancel })
 
       // this will wait here until the polling is finished

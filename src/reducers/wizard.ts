@@ -105,13 +105,11 @@ const wizardInitialState: WizardState = {
 
 // the ui state of the wizard
 function wizardReducer(state: WizardState, action: Action): any {
-  console.log({ reducer: action.type, action, state })
   switch (action.type) {
     case 'clearState': {
       return { ...wizardInitialState }
     }
     case 'populateWizard': {
-      console.log({ wizardState: action.wizardState })
       return { ...action.wizardState }
     }
     case 'setUnlockedStep': {

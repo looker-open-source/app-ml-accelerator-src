@@ -7,7 +7,7 @@ export const findFieldDetail = (fieldDetails: any, fieldName: string) => {
     ...fieldDetails.parameters || [],
   ]
 
-  return find(allFields, {name: fieldName})
+  return find(allFields, { name: fieldName })
 }
 
 type pollProps = {
@@ -26,16 +26,14 @@ export const poll = ({
 } => {
   let canceled = false
   const cancel = () => canceled = true
-  const executeWrapper = async() => {
+  const executeWrapper = async () => {
     let attempts = 0
 
     const executePoll = async (resolve: any, reject: any) => {
       if (canceled) {
-        console.log('resolving the cancelation')
         return resolve({ canceled: true })
       }
 
-      console.log('Attempt #' + attempts)
       const result = await fn(props)
       attempts++
 
@@ -107,7 +105,7 @@ export const formatBQResults = (data: any, nested?: boolean) => (
             schema: data.schema.fields[i]
           })
         } else {
-          rowObj[columnName] = col.v.map((obj: any) =>  obj.v).join(', ')
+          rowObj[columnName] = col.v.map((obj: any) => obj.v).join(', ')
         }
         return
       }
