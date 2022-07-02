@@ -60,7 +60,7 @@ export const DESC_STRING = "desc"
 export const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/bigquery'
 
 // Model and explore where the summary data lives
-export const BQML_LOOKER_MODEL = "bqml_extension"
+export const BQML_LOOKER_MODEL = "bqml_accelerator"
 export const SUMMARY_EXPLORE = "selection_summary"
 
 // user attribute keys from marketplace.json
