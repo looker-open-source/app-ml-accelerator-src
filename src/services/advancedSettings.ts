@@ -31,8 +31,8 @@ export const advancedSettingsSql = (advancedSettings: any) => {
     sql = sql + ", BOOSTER_TYPE = 'GBTREE'"
   }
 
-  if (!advancedSettings) {
-    sql = sql + ", ENABLE_GLOBAL_EXPLAIN = TRUE"
+  if (!advancedSettings || !Object.getOwnPropertyNames(advancedSettings).includes('enable_global_explain')) {
+    sql = sql + ", ENABLE_GLOBAL_EXPLAIN = true"
   }
 
   return sql
