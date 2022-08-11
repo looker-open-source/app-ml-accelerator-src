@@ -6,7 +6,7 @@ export const advancedSettingsSql = (advancedSettings: any) => {
   for (const key in advancedSettings) {
     let clause = ''
     if (key === 'class_weights') {
-      if (showClassWeights(advancedSettings.auto_class_weights)) {
+      if (showClassWeights(advancedSettings.auto_class_weights) && Object.keys(advancedSettings[key]).length > 0) {
         clause = `, ${key.toUpperCase()} = ${classWeightSql(advancedSettings[key])}`
       }
     } else if (key === 'data_split_eval_fraction' &&
