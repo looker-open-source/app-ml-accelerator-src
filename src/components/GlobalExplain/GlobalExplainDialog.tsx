@@ -15,11 +15,11 @@ export const GlobalExplainDialog: React.FC = () => {
 
   const { state } = useStore()
   const { getGlobalExplainData } = useContext(ExplainContext)
-  const [ isLoading, setIsLoading ] = useState<boolean>(false)
-  const [ activeTab, setActiveTab ] = useState<string>(EXPLAIN_TABS[0])
-  const [ formattedModelData, setFormattedModelData ] = useState<any>()
-  const [ formattedClassData, setFormattedClassData ] = useState<any>()
-  const [ topFeatures, setTopFeatures ] = useState<string>('all')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [activeTab, setActiveTab] = useState<string>(EXPLAIN_TABS[0])
+  const [formattedModelData, setFormattedModelData] = useState<any>()
+  const [formattedClassData, setFormattedClassData] = useState<any>()
+  const [topFeatures, setTopFeatures] = useState<string>('all')
   const { explain } = state.wizard
   const { target, objective } = state.bqModel
   const topFeaturesOptions = [
@@ -65,9 +65,30 @@ export const GlobalExplainDialog: React.FC = () => {
     if (!chartData || chartData.length <= 0) { return <></> }
 
     if (isClassLevel(activeTab)) {
+      const datumKey = Object.keys(chartData[0]).filter((int: any) => int !== 'feature' && int !== 'attribution');
+
+      let datumSeperatedChartData = [];
+      let datum = [];
+      for (let a = 0; a < chartData.length; a++) {
+        if (a === 0) {
+          datum.push(chartData[a])
+        }
+        if (a > 0 && chartData[a][datumKey[0]] === chartData[a - 1][datumKey[0]]) {
+          datum.push(chartData[a])
+        }
+        if (a > 0 && chartData[a][datumKey[0]] !== chartData[a - 1][datumKey[0]]) {
+          datumSeperatedChartData.push(datum.sort((a: any, b: any) => parseFloat(a.attribution) < parseFloat(b.attribution) ? 1 : -1));
+          datum = [];
+          datum.push(chartData[a])
+        }
+        if (a + 1 === chartData.length) {
+          datumSeperatedChartData.push(datum.sort((a: any, b: any) => parseFloat(a.attribution) < parseFloat(b.attribution) ? 1 : -1));
+        }
+      }
+
       // for every class value show a chart of the top 10 features
-      return chartData.map((datum: any, i: number) => (
-        <ExplainBarChart data={datum.top_feature_attributions.slice(0, 10)} label={`${displayTarget()}: ${titilize(datum[Object.keys(datum)[0]])}`} key={i}/>
+      return datumSeperatedChartData.map((datum: any, i: number) => (
+        <ExplainBarChart data={datum} label={`${displayTarget()}: ${titilize(datum[0][datumKey[0]])}`} key={i} />
       ))
     }
 
@@ -84,19 +105,19 @@ export const GlobalExplainDialog: React.FC = () => {
   return (
     <>
       <div className="global-explain--container">
-        <LoadingOverlay isLoading={isLoading}/>
-        { isClassifier(objective || '') &&
+        <LoadingOverlay isLoading={isLoading} />
+        {isClassifier(objective || '') &&
           <GlobalExplainDialogTabs activeTab={activeTab} setActiveTab={setActiveTab} availableTabs={EXPLAIN_TABS} />
         }
         <div className="global-explain--charts-container" >
           <div className="global-explain--charts-header">
             <h5>Target: {displayTarget()}</h5>
             <div className="global-explain--top-features">
-            { !isClassLevel(activeTab) && <ButtonToggle value={topFeatures} onChange={setTopFeatures} options={topFeaturesOptions} /> }
+              {!isClassLevel(activeTab) && <ButtonToggle value={topFeatures} onChange={setTopFeatures} options={topFeaturesOptions} />}
             </div>
           </div>
           <div className="global-explain--charts">
-            { drawCharts() }
+            {drawCharts()}
           </div>
         </div>
       </div>
