@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useStore } from '../../../contexts/StoreProvider'
 import { FieldText, IconButton, Label, Select } from '@looker/components'
 import { arrayToSelectOptions, floatOnly } from '../../../services/common'
@@ -12,10 +12,17 @@ type ClassWeightsProps = {
 
 export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => {
   const { state } = useStore()
-  const { selectedFeatures } = state.wizard.steps.step3
-  const [ features, setFeatures ] = useState(selectedFeatures || [])
+  const [features, setFeatures] = useState([])
 
-  if (!selectedFeatures || selectedFeatures.length <= 0) {
+  useEffect(() => {
+    const target = state.wizard.steps.step3.inputData.target;
+    const data = state?.wizard?.steps?.step2?.ranQuery?.data ? state.wizard.steps.step2.ranQuery.data : [];
+    const filteredData = data.map((int: any) => int[`${target}`].value);
+    const uniqueFilteredData = [...new Set(filteredData)];
+    setFeatures(uniqueFilteredData)
+  }, [state]);
+
+  if (!features || features.length <= 0) {
     return (
       <div className="advanced-settings-class-weights">
         <div>Class Weights</div>
@@ -75,7 +82,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
         ...classWeightsWithoutColumn
       }
     })
-    if (column && selectedFeatures.includes(column)) {
+    if (column && features.includes(column)) {
       setFeatures([...features, column])
     }
   }
@@ -106,12 +113,15 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
                 label="Weight"
               />
             </div>
-            <IconButton icon={<Delete/>} onClick={() => handleRemove(column)} label="Remove Class Weight" size="large"/>
+            <IconButton icon={<Delete />} onClick={() => handleRemove(column)} label="Remove Class Weight" size="large" />
           </div>
         ))
       }
       <div className="form-row">
-        <IconButton icon={<Add />} onClick={handleAdd}  label="Add Class Weight" size='large'/>
+        <IconButton icon={<Add />} onClick={handleAdd} label="Add Class Weight" size='large' />
+      </div>
+      <div className="form-row">
+        {'* Assign a weight for all Class Weights'}
       </div>
     </div>
   )
