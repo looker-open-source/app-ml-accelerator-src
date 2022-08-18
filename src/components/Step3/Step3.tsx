@@ -195,7 +195,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           setNameCheckStatus={setNameCheckStatus}
           loadingNameStatus={loadingNameStatus}
           setLoadingNameStatus={setLoadingNameStatus}
-          disabled={!!modelNameParam}
+          disabled={!!modelNameParam || (!!summary.data && !!inputData.target) === true}
         />
         <div className="wizard-card">
           <h2>Select your target</h2>
