@@ -13,6 +13,7 @@ type ClassWeightsProps = {
 export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => {
   const { state } = useStore()
   const [features, setFeatures] = useState([])
+  const [allFeatures, setAllFeatures] = useState([])
 
   useEffect(() => {
     const target = state.wizard.steps.step3.inputData.target;
@@ -20,13 +21,14 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
     const filteredData = data.map((int: any) => int[`${target}`].value);
     const uniqueFilteredData = [...new Set(filteredData)];
     setFeatures(uniqueFilteredData)
+    setAllFeatures(uniqueFilteredData)
   }, [state]);
 
-  if (!features || features.length <= 0) {
+  if (!allFeatures || allFeatures.length <= 0) {
     return (
       <div className="advanced-settings-class-weights">
         <div>Class Weights</div>
-        <div className="small-text">You must first generate the summary before setting class weights.</div>
+        <div className="small-text" style={{ color: 'grey' }}>You must generate a summary of your input data before setting class weights. Exit the Advanced Options modal and click Generate Summary.</div>
       </div>
     )
   }
@@ -91,6 +93,9 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
   return (
     <div className="advanced-settings-class-weights">
       <h3>Class Weights</h3>
+      <div className="form-row" style={{ fontSize: '12px', color: 'grey' }}>
+        {'A weight must be set for every class label. The weights are not required to add up to one.'}
+      </div>
       {
         (Object.keys(classWeights)).map((column, i) => (
           <div className="form-row" key={i}>
@@ -119,9 +124,6 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
       }
       <div className="form-row">
         <IconButton icon={<Add />} onClick={handleAdd} label="Add Class Weight" size='large' />
-      </div>
-      <div className="form-row">
-        {'* Assign a weight for all Class Weights'}
       </div>
     </div>
   )
