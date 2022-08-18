@@ -47,16 +47,34 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBu
         throw "User Attribute 'bigquery_connection_name' must be defined"
       }
 
-      const { ok, value } = await sdk.all_lookml_models({})
+      const { ok, value } = await sdk.all_lookml_models({fields: "name,label,explores"});
+
+      let modelExplores = []
+      for (let a = 0; a < value.length; a++) {
+        let explores = []
+        for (let b = 0; b < value[a].explores.length; b++) {
+          const modelName = value[a].name;
+          const exploreName = value[a].explores[b].name
+          const modelExplore = await sdk.lookml_model_explore(
+            modelName,
+            exploreName,
+          );
+          modelExplore.ok && explores.push(modelExplore.value)
+        }
+        if (explores.length > 0){
+          modelExplores.push({
+            name: value[a].name,
+            label: value[a].label,
+            explores: explores.sort(alphabeticSortByLabel),
+          })
+        }
+      }
+
       if (!ok) {
         throw "Failed to fetch models"
       }
 
-      const modelExplores = (value || [])
-        .filter(filterExploresByConn(bigQueryConn))
-        .sort(alphabeticSortByLabel)
-        .map(mapExploresByModel)
-      return modelExplores
+      return modelExplores.sort(alphabeticSortByLabel).map(mapExploresByModel)
     } catch(error) {
       dispatch({type: 'addError', error})
       return false
