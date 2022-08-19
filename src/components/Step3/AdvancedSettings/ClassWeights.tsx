@@ -22,7 +22,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
     const uniqueFilteredData = [...new Set(filteredData)];
     setFeatures(uniqueFilteredData)
     setAllFeatures(uniqueFilteredData)
-  }, [state]);
+  }, []);
 
   if (!allFeatures || allFeatures.length <= 0) {
     return (
@@ -84,7 +84,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
         ...classWeightsWithoutColumn
       }
     })
-    if (column && features.includes(column)) {
+    if (column && !features.includes(column)) {
       setFeatures([...features, column])
     }
   }
