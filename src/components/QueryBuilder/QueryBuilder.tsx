@@ -66,6 +66,8 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
         }
         setIsLoading(true)
         const {results, exploreUrl} = await createAndRunQuery?.(stepData)
+        const modelRowCount = await createAndRunQuery?.({...stepData, limit: "100000"}, 'json')
+        results.modelDataLength = modelRowCount.results.length;
         saveQueryToState?.(stepName, stepData, results, exploreUrl)
         runCallback?.()
       }
