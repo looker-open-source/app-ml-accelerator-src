@@ -138,7 +138,7 @@ export const WizardProvider = ({ children }: any) => {
         predictions: []
       },
       data: results.data,
-      rowCount: results.modelDataLength,
+      rowCount: results.data.length >= 5000 ? '> 5000' : results?.data?.length,
       sql: results.sql,
       exploreUrl,
       exploreName: stepData.exploreName,
