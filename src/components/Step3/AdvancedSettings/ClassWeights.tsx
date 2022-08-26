@@ -18,7 +18,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
   useEffect(() => {
     const target = state.wizard.steps.step3.inputData.target;
     const data = state?.wizard?.steps?.step2?.ranQuery?.data ? state.wizard.steps.step2.ranQuery.data : [];
-    const filteredData = data.map((int: any) => int[`${target}`].value);
+    const filteredData = data.map((int: any) => int[`${target}`]?.value);
     const uniqueFilteredData = [...new Set(filteredData)];
     setFeatures(uniqueFilteredData)
     setAllFeatures(uniqueFilteredData)
@@ -90,13 +90,14 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
   }
 
   const classWeights = Object.keys(form.class_weights).length <= 0 ? { ['']: '' } : form.class_weights
+
   return (
     <div className="advanced-settings-class-weights">
       <h3>Class Weights</h3>
       <div className="form-row" style={{ fontSize: '12px', color: 'grey' }}>
         {'A weight must be set for every class label. The weights are not required to add up to one.'}
       </div>
-      {
+      { 
         (Object.keys(classWeights)).map((column, i) => (
           <div className="form-row" key={i}>
             <div className="form-row--item">
