@@ -107,7 +107,7 @@ export const SummaryProvider = ({ children }: any) => {
 
       // second condition here is for backwards compatibility with old models,
       // when a UID strategy was being used (rather than a/b alternation)
-      if(!inputDataUID || (inputDataUID != "selected" && inputDataUID != "model_training_data")) {
+      if(!inputDataUID || (inputDataUID != "selected" && inputDataUID != "model_training")) {
         // Create "selected" table on first run
         setPreviousBQValues({
           sql: querySql,
@@ -128,7 +128,7 @@ export const SummaryProvider = ({ children }: any) => {
         (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model || !summaryUpToDate)
       ) {
         // switch to whichever table is not currently locked to model to write new summary 'snapshot'
-        inputDataUID = (inputDataUID === "model_training_data") ? "selected" : "model_training_data"
+        inputDataUID = (inputDataUID === "model_training") ? "selected" : "model_training"
         setPreviousBQValues({
           sql: querySql,
           model: bqModelName
