@@ -36,6 +36,8 @@ export const ArimaPredict: React.FC<ArimaPredictProps> = ({ isLoading, setIsLoad
   return (
     <>
       <QueryBuilderProvider stepName="step5" lockFields={true}>
+      <br/>
+        {state?.wizard?.steps?.step5?.showPredictions && <p>{`Model predictions are accessible via a new Big Query View and ready for Looker data modeling. Project: ${state?.bqModel?.job?.projectId}, Model Name: ${state?.bqModel?.name}, View: ${state?.bqModel?.name}_predictions`}</p>}
         <QueryBuilder
           setIsLoading={setIsLoading}
           showPredictionsButton={true}
