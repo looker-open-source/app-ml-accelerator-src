@@ -164,7 +164,7 @@ export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {
   },
   missingPCT: {
     label: "Missing % (Count)",
-    converter: (row) => `${row.pct_null?.value}% (${row.count_nulls?.value})`,
+    converter: (row) => `${(Number(row.pct_null?.value) * 100)}% (${row.count_nulls?.value})`,
     align: "right",
     order: 3
   },
@@ -209,7 +209,7 @@ export const SUMMARY_TABLE_HEADERS_STEP3: SummaryTableHeaders = {
   },
   missingPCT: {
     label: "Missing % (Count)",
-    converter: (row) => `${Number(row.pct_null?.value).toLocaleString('en-US', {maximumFractionDigits: 2})}% (${row.count_nulls?.value})`,
+    converter: (row) => `${(Number(row.pct_null?.value) * 100).toLocaleString('en-US', {maximumFractionDigits: 2})}% (${row.count_nulls?.value})`,
     align: "right",
     order: 3
   },

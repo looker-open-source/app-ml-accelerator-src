@@ -225,13 +225,19 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
         }]
       },
       options: {
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
+        responsive: false,
         scales: {
           x: {
             type: 'linear',
             title: {
               display: true,
               text: 'False Positive Rate'
+            },
+            ticks: {
+              callback: function(value: any) {
+                  return (value * 100)  + '%';
+              }
             }
           },
           y: {
@@ -239,6 +245,11 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
             title: {
               display: true,
               text: 'True Positive Rate (Recall)'
+            },
+            ticks: {
+              callback: function(value: any) {
+                  return (value * 100)  + '%';
+              }
             }
           }
         }
@@ -247,8 +258,8 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
   }
 
   return (
-    <div className="roc-line-chart">
-      <canvas id="VizChart" ref={chartRef} height={300}/>
+    <div className="roc-line-chart" style={{height: '400px'}}>
+      <canvas id="VizChart" ref={chartRef} height={400} width={500}/>
     </div>
   )
 }
