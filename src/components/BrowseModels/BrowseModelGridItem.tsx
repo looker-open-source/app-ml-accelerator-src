@@ -27,7 +27,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
   return (
     <Card ref={hoverRef} className="model-card">
       <CardMedia
-        image="https://placeimg.com/640/480/nature"
+        image='https://codelabs.developers.google.com/ml-for-developers/img/ml-for-developers.svg'
         className="model-card-media"
       >
         <div className="model-card-hover-overlay"></div>
