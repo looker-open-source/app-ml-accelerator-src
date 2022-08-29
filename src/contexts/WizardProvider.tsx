@@ -73,7 +73,7 @@ export const WizardProvider = ({ children }: any) => {
       const savedModelState = await getSavedModelState?.(modelNameParam)
       if (!savedModelState) {
         history.push(`/ml/create/${WIZARD_STEPS['step1']}`)
-        throw `Model does not exist: ${modelNameParam}`
+        throw 'That model does not exist or you have not been given access to it.'
       }
       const bqModel = { ...bqModelInitialState, ...cloneDeep(savedModelState.bqModel) }
       const loadedWizardState = buildWizardState(savedModelState)
