@@ -2,8 +2,7 @@ import { compact } from "lodash"
 import { MODEL_STATE_TABLE_COLUMNS } from "../constants"
 import { BQModelState } from "../types"
 import { MODEL_TYPES } from "./modelTypes"
-import 'moment-timezone';
-import moment from 'moment';
+import { zonedTimeToUtc } from "date-fns-tz"
 
 export const MODELS_PER_PAGE = 16
 
@@ -29,9 +28,9 @@ export const formatSavedModelData = (models: any[]) => (
 )
 
 const toDate = (dateStr: string, timezone: string) => {
-  if (dateStr) {
-    const gtmOffset = moment().tz(timezone).toString().split('GMT')[1];
-    return new Date(`${dateStr} GMT${gtmOffset}`)
+  if (dateStr && timezone) {
+    const utcDate = zonedTimeToUtc(dateStr, timezone)
+    return utcDate;
   }
   else return undefined;
 };
