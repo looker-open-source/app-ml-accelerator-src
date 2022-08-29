@@ -55,7 +55,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
   const sortedData = sortBy(data, 'expected_label')
   const valueCount = sortedData.length
   const firstRow = sortedData[0]
-  const matrixColor = (pct: number) => `rgba(230,0,0, ${pct / 100})`
+  const matrixColor = (pct: number) => `rgba(66, 133, 244, ${pct / 100})`
 
   const cellSizeClass = (() => {
     if (valueCount <= 2) return 'xlarge'

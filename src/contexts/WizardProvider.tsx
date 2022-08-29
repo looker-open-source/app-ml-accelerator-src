@@ -213,13 +213,14 @@ export const WizardProvider = ({ children }: any) => {
       if (!baseQuery.client_id || !baseQuery.id || !stepData.modelName) {
         throw "Missing Parameters"
       }
-
+    
       const { ok, value: results } = await sdk.run_query({
         query_id: baseQuery.id,
         limit: Number(stepData.limit) || 500,
         result_format: "json_detail",
+        apply_formatting: true
       })
-
+     
       if (!ok) { throw "Failed to run query" }
       return { ok, results, exploreUrl: baseQuery.share_url }
     } catch (error) {
@@ -232,7 +233,7 @@ export const WizardProvider = ({ children }: any) => {
     try {
       // fetch explore to retrieve all field names
       const { value: explore } = await sdk.lookml_model_explore(BQML_LOOKER_MODEL, SUMMARY_EXPLORE)
-
+    
       // query the summary table filtering on our newly created BQML data
       const { value: query } = await sdk.create_query({
         model:  BQML_LOOKER_MODEL,
@@ -247,7 +248,8 @@ export const WizardProvider = ({ children }: any) => {
       const { ok, value } = await sdk.run_query({
         query_id: query.id,
         result_format: "json_detail",
-        cache: false
+        cache: false,
+        apply_formatting: true
       })
       if (!ok) { throw "Failed to run query" }
       return { ok, value }

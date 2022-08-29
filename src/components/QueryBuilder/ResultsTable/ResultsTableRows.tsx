@@ -28,8 +28,13 @@ export const ResultsTableRows: React.FC<ResultsTableRowsProps> = ({ data, header
         }
         className += ` ${colDataType[col.name]}`
       }
+
+      if (col.type === 'prediction' && !!Number(value)) {
+        value = Number(value).toLocaleString('en-US', {maximumFractionDigits: 4})
+      }
+
       return (
-        <td className={className} key={j}>{ value || value == 0 ? value : "∅" }</td>
+        <td className={className} key={j}>{ value || (value == 0 ? value : "∅") }</td>
       )
     })
     return (<tr key={i}>{tds}</tr>)

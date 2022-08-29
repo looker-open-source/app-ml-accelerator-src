@@ -246,14 +246,15 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         target={inputData.target}
         objective={objective}
       />
-      { summary.data && inputData.target &&
+      { summary.data && inputData.target && 
         (
           <Summary
             targetField={inputData.target}
             arimaTimeColumn={inputData.arimaTimeColumn}
             summaryData={summary.data}
             selectedFeatures={selectedFeatures || []}
-            updateSelectedFeatures={updateSelectedFeatures} />
+            updateSelectedFeatures={updateSelectedFeatures} 
+            stepNumber={3} />
         )
       }
     </StepContainer>
