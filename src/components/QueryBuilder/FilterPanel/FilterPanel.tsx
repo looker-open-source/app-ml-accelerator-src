@@ -26,7 +26,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
   const filterItem = (filter: string, field: any, expression?: string) => (
     <div className="filter-container" key={filter}>
-      <span className="filter-label">
+      <span className="filter-label" style={{fontSize: '12px'}}>
         {field.view_label || "unknown view"}
         <strong>
           {field.label_short || "unknown field"}

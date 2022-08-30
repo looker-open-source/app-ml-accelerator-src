@@ -43,7 +43,7 @@ export const QueryPane: React.FC = () => {
           setIsOpen={() => dispatch({type: 'setFiltersOpen', value: !state.ui.filtersOpen})}
           showFieldsEvenWhenClosed
         >
-          <div>
+          <div style={{maxHeight: '200px', overflowY: 'auto'}}>
             <FilterPanel
               filters={selectedFields.filters}
               onChange={onFilterChange}
