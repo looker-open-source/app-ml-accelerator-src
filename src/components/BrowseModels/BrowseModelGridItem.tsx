@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Card, CardContent, CardMedia, Heading, IconButton, Menu, MenuItem, Paragraph, Span } from "@looker/components"
 import { DateFormat, TimeFormat } from "@looker/components-date"
 import { MoreVert } from "@styled-icons/material"
@@ -29,6 +29,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
       <CardMedia
         image='https://codelabs.developers.google.com/ml-for-developers/img/ml-for-developers.svg'
         className="model-card-media"
+        style={{ height: 100, width: 100, marginRight: 'auto', marginLeft: 'auto' }}
       >
         <div className="model-card-hover-overlay"></div>
         <Menu
