@@ -24,7 +24,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
     setAllFeatures(uniqueFilteredData)
   }, []);
 
-  if (!allFeatures || allFeatures.length <= 0) {
+  if (!allFeatures || allFeatures.length <= 0 || !state?.wizard?.steps?.step3?.summary?.data) {
     return (
       <div className="advanced-settings-class-weights">
         <div>Class Weights</div>
@@ -97,7 +97,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
       <div className="form-row" style={{ fontSize: '12px', color: 'grey' }}>
         {'A weight must be set for every class label. The weights are not required to add up to one.'}
       </div>
-      { 
+      {
         (Object.keys(classWeights)).map((column, i) => (
           <div className="form-row" key={i}>
             <div className="form-row--item">
@@ -123,6 +123,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
           </div>
         ))
       }
+
       <div className="form-row">
         <IconButton icon={<Add />} onClick={handleAdd} label="Add Class Weight" size='large' />
       </div>
