@@ -232,25 +232,38 @@ export const WizardProvider = ({ children }: any) => {
     try {
       // fetch explore to retrieve all field names
       const { value: explore } = await sdk.lookml_model_explore(BQML_LOOKER_MODEL, SUMMARY_EXPLORE)
-
+      
       // query the summary table filtering on our newly created BQML data
-      const { value: query } = await sdk.create_query({
-        model:  BQML_LOOKER_MODEL,
-        view: SUMMARY_EXPLORE,
-        fields: explore.fields.dimensions.map((d: any) => d.name),
-        filters: {
-          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data^_${inputDataUID}`,
-          [`${SUMMARY_EXPLORE}.target_field_name`]: formatParameterFilter(targetField || "")
-        }
-      })
+      let queryId
+      try {
+        const { value: query } = await sdk.create_query({
+          model:  BQML_LOOKER_MODEL,
+          view: SUMMARY_EXPLORE,
+          fields: explore.fields.dimensions.map((d: any) => d.name),
+          filters: {
+            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data^_${formatParameterFilter(inputDataUID || "")}`,
+            [`${SUMMARY_EXPLORE}.target_field_name`]: formatParameterFilter(targetField || "")
+          }
+        })
+        queryId = query.id
+      } catch (err) {
+        dispatch({type: 'addError', error: "Error fetchSummary create_query"})
+      }
 
-      const { ok, value } = await sdk.run_query({
-        query_id: query.id,
-        result_format: "json_detail",
-        cache: false
-      })
-      if (!ok) { throw "Failed to run query" }
-      return { ok, value }
+      try {
+        const { ok, value } = await sdk.run_query({
+          // query_id: query.id,
+          query_id: queryId,
+          result_format: "json_detail",
+          cache: false
+        })
+        if (!ok) { throw "Failed to run query" }
+        return { ok, value }
+      } catch (err) {
+        dispatch({type: 'addError', error: "Error fetchSummary run_query"})
+      }
+
+
     } catch (error) {
       dispatch({type: 'addError', error: "Error fetching summary"})
       return { ok: false }
