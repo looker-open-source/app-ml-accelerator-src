@@ -148,6 +148,15 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const convertedData = data.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
   const sortedData = sortBy(convertedData, 'recall')
+  const sortedDataFormatted = sortedData.map((int: any) => {
+    return {
+      ...int,
+      threshold: Number(int.threshold).toFixed(4),
+      recall: `${(int.recall * 100).toFixed(2)}%`,
+      false_positive_rate: `${(int.false_positive_rate * 100).toFixed(2)}%`
+    }
+  });
+
   const columns = Object.keys(data[0]).map((key) => {
     const formattedKey = noDot(key)
     return {
@@ -179,7 +188,7 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
           defaultColDef={defaultColDef}
           getRowStyle={getRowStyle}
           onGridReady={onGridReady}
-          rowData={sortedData}
+          rowData={sortedDataFormatted}
           columnDefs={columns}>
         </AgGridReact>
       </div>
