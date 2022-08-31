@@ -23,6 +23,7 @@ export const formatSavedModelData = (models: any[]) => (
       [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: safelyParseJson(model[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]?.value),
       [MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]?.value, model.timezone),
       [MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]?.value, model.timezone),
+      timezone: model.timezone,
     }
   }))
 )

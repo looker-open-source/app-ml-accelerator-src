@@ -66,7 +66,8 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
             <div className="model-card-time">
               Updated: { ' ' }
               <DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}
-              <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{model[modelUpdatedAt]}</TimeFormat>
+              {/* <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{model[modelUpdatedAt]}</TimeFormat> */}
+              <TimeFormat timeZone={model.timezone}>{model[modelUpdatedAt]}</TimeFormat>
             </div>
           ) : ''
         }
