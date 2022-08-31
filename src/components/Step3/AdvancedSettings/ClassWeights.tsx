@@ -102,7 +102,7 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
           <div className="form-row" key={i}>
             <div className="form-row--item">
               <Label>
-                Column
+                Class Label
               </Label>
               <Select
                 options={arrayToSelectOptions(features)}
