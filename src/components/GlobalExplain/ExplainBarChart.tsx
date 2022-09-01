@@ -10,6 +10,7 @@ export const ExplainBarChart: React.FC<{ data: any[],label: string }> = ({ data,
   useEffect(() => {
     if (chart) { chart.destroy() }
     const ctx = chartRef.current.getContext("2d")
+    console.log('data', data)
     createChart(ctx)
   }, [data])
 
@@ -54,6 +55,11 @@ export const ExplainBarChart: React.FC<{ data: any[],label: string }> = ({ data,
             title: {
               display: true,
               text: 'Attribution'
+            },
+          },
+          y: {
+            ticks: {
+              autoSkip: false
             }
           }
         }

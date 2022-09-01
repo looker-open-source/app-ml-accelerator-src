@@ -41,9 +41,10 @@
 }
 
 .global-explain--charts {
-  display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  background-color: #f7f7f7;
 
   .global-explain--chart {
     flex: 1;
