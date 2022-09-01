@@ -81,7 +81,12 @@ export const truncateLabels = function (value: string | number) {
 }
 
 export const getDatasetColors = (count: number) => {
-  return chroma.bezier(["#1A73E8", "#12B5CB", "#E52592", "#E8710A", "#F9AB00", "#7CB342", "#9334E6", "#80868B", "#079c98", "#A8A116", "#EA4335", "#FF8168"]).scale().correctLightness().colors(count)
+  let colors = ["#1A73E8", "#12B5CB", "#E52592", "#E8710A", "#F9AB00", "#7CB342", "#9334E6", "#80868B", "#079c98", "#A8A116", "#EA4335", "#FF8168"];
+  if (count < colors.length) {
+    return colors.slice(0, count)
+  } else {
+    return chroma.bezier(["#1A73E8", "#12B5CB", "#E52592", "#E8710A", "#F9AB00", "#7CB342", "#9334E6", "#80868B", "#079c98", "#A8A116", "#EA4335", "#FF8168"]).scale().correctLightness().colors(count)
+  }
 }
 
 //['#5e4fa2', '#9e0142','#f47b4d','#feefa4','#7dc9a6'] spectral
