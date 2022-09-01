@@ -228,7 +228,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             Columns: <span className="factoid-bold">{sourceColumns.length}</span>
           </div>
           <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{ranQuery?.rowCount || '???'}</span>
+            Rows: <span className="factoid-bold">{summary?.data[0]?.count_corr_not_nulls?.value || '???'}</span>
           </div>
           <GenerateSummaryButton
             setIsLoading={setIsLoading}
