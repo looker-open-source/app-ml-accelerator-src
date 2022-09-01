@@ -25,11 +25,17 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
   }
 
   return (
-    <Card ref={hoverRef} className="model-card">
+    <Card ref={hoverRef} className="model-card" style={{backgroundColor: '#CCC'}}>
       <CardMedia
         image='https://codelabs.developers.google.com/ml-for-developers/img/ml-for-developers.svg'
         className="model-card-media"
-        style={{ height: 100, width: 100, marginRight: 'auto', marginLeft: 'auto' }}
+        style={{ 
+          height: 100, 
+          width: 100, 
+          marginRight: 'auto', 
+          marginLeft: 'auto', 
+          backgroundColor: '#CCC',
+        }}
       >
         <div className="model-card-hover-overlay"></div>
         <Menu
@@ -47,7 +53,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
           <IconButton icon={<MoreVert />} label="More Options" className="model-card-more-button"/>
         </Menu>
       </CardMedia>
-      <CardContent onClick={handleModelSelect} className="model-card-content">
+      <CardContent onClick={handleModelSelect} className="model-card-content" style={{backgroundColor: '#FFF'}}>
         <Heading as="h4" fontSize="medium" fontWeight="semiBold" truncate>
           { startCase(model[modelName]) }
         </Heading>
