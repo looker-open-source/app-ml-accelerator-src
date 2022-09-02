@@ -35,7 +35,7 @@ type IWizardContext = {
     results: any,
     exploreUrl?: string,
     tableHeaders?: ResultsTableHeaderItem[]) => void,
-  createAndRunQuery?: (stepData: Step2State) => Promise<any>,
+  createAndRunQuery?: (stepData: Step2State, type?: string) => Promise<any>,
   fetchSummary?: (bqModelName: string, targetField: string, uid: string) => Promise<any>,
   saveSummary?: (props: SaveSummaryProps) => void,
   saveInputData?: (props: SaveInputDataProps) => void,
@@ -73,7 +73,7 @@ export const WizardProvider = ({ children }: any) => {
       const savedModelState = await getSavedModelState?.(modelNameParam)
       if (!savedModelState) {
         history.push(`/ml/create/${WIZARD_STEPS['step1']}`)
-        throw `Model does not exist: ${modelNameParam}`
+        throw "That BQML Accelerator model doesn't exist or its owner has not shared it with you. If the URL is correct, ask the model owner to share the model."
       }
       const bqModel = { ...bqModelInitialState, ...cloneDeep(savedModelState.bqModel) }
       const loadedWizardState = buildWizardState(savedModelState)
@@ -138,7 +138,7 @@ export const WizardProvider = ({ children }: any) => {
         predictions: []
       },
       data: results.data,
-      rowCount: results.data.length,
+      rowCount: results.data.length >= 5000 ? '> 5000' : results?.data?.length,
       sql: results.sql,
       exploreUrl,
       exploreName: stepData.exploreName,
@@ -207,6 +207,7 @@ export const WizardProvider = ({ children }: any) => {
 
   const createAndRunQuery = async (
     stepData: Step2State,
+    type?: string
   ) => {
     try {
       const baseQuery = await createBaseQuery(stepData)
@@ -233,26 +234,38 @@ export const WizardProvider = ({ children }: any) => {
     try {
       // fetch explore to retrieve all field names
       const { value: explore } = await sdk.lookml_model_explore(BQML_LOOKER_MODEL, SUMMARY_EXPLORE)
-    
+      
       // query the summary table filtering on our newly created BQML data
-      const { value: query } = await sdk.create_query({
-        model:  BQML_LOOKER_MODEL,
-        view: SUMMARY_EXPLORE,
-        fields: explore.fields.dimensions.map((d: any) => d.name),
-        filters: {
-          [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data^_${inputDataUID}`,
-          [`${SUMMARY_EXPLORE}.target_field_name`]: formatParameterFilter(targetField || "")
-        }
-      })
+      let queryId
+      try {
+        const { value: query } = await sdk.create_query({
+          model:  BQML_LOOKER_MODEL,
+          view: SUMMARY_EXPLORE,
+          fields: explore.fields.dimensions.map((d: any) => d.name),
+          filters: {
+            [`${SUMMARY_EXPLORE}.input_data_view_name`]: `${formatParameterFilter(bqModelName || "")}^_input^_data^_${formatParameterFilter(inputDataUID || "")}`,
+            [`${SUMMARY_EXPLORE}.target_field_name`]: formatParameterFilter(targetField || "")
+          }
+        })
+        queryId = query.id
+      } catch (err) {
+        dispatch({type: 'addError', error: "Error fetchSummary create_query"})
+      }
 
-      const { ok, value } = await sdk.run_query({
-        query_id: query.id,
-        result_format: "json_detail",
-        cache: false,
-        apply_formatting: true
-      })
-      if (!ok) { throw "Failed to run query" }
-      return { ok, value }
+      try {
+        const { ok, value } = await sdk.run_query({
+          query_id: queryId,
+          result_format: "json_detail",
+          cache: false,
+          apply_formatting: true
+        })
+        if (!ok) { throw "Failed to run query" }
+        return { ok, value }
+      } catch (err) {
+        dispatch({type: 'addError', error: "Error fetchSummary run_query"})
+      }
+
+
     } catch (error) {
       dispatch({type: 'addError', error: "Error fetching summary"})
       return { ok: false }
