@@ -421,7 +421,7 @@ export const BQMLProvider = ({ children }: any) => {
     } catch (error) {
       dispatch({
         type: 'addError',
-        error: 'Failed to retrieve model: ' + error
+        error: 'Failed to retrieve model' // + error
       })
       return false
     }

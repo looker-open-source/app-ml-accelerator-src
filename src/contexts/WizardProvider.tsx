@@ -73,7 +73,7 @@ export const WizardProvider = ({ children }: any) => {
       const savedModelState = await getSavedModelState?.(modelNameParam)
       if (!savedModelState) {
         history.push(`/ml/create/${WIZARD_STEPS['step1']}`)
-        throw `Model does not exist: ${modelNameParam}`
+        throw "That BQML Accelerator model doesn't exist or its owner has not shared it with you. If the URL is correct, ask the model owner to share the model."
       }
       const bqModel = { ...bqModelInitialState, ...cloneDeep(savedModelState.bqModel) }
       const loadedWizardState = buildWizardState(savedModelState)
