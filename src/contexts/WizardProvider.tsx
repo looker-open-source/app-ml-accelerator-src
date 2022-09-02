@@ -214,13 +214,14 @@ export const WizardProvider = ({ children }: any) => {
       if (!baseQuery.client_id || !baseQuery.id || !stepData.modelName) {
         throw "Missing Parameters"
       }
-
+    
       const { ok, value: results } = await sdk.run_query({
         query_id: baseQuery.id,
         limit: Number(stepData.limit) || 500,
-        result_format: type ? type : "json_detail",
+        result_format: "json_detail",
+        apply_formatting: true
       })
-
+     
       if (!ok) { throw "Failed to run query" }
       return { ok, results, exploreUrl: baseQuery.share_url }
     } catch (error) {
@@ -253,10 +254,10 @@ export const WizardProvider = ({ children }: any) => {
 
       try {
         const { ok, value } = await sdk.run_query({
-          // query_id: query.id,
           query_id: queryId,
           result_format: "json_detail",
-          cache: false
+          cache: false,
+          apply_formatting: true
         })
         if (!ok) { throw "Failed to run query" }
         return { ok, value }

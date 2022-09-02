@@ -54,6 +54,11 @@ export const ExplainBarChart: React.FC<{ data: any[],label: string }> = ({ data,
             title: {
               display: true,
               text: 'Attribution'
+            },
+          },
+          y: {
+            ticks: {
+              autoSkip: false
             }
           }
         }
