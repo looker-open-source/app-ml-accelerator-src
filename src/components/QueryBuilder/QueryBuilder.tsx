@@ -22,7 +22,7 @@ type QueryBuilderProps = {
   predictionsButton?: any
 }
 
-export const QueryBuilder: React.FC<QueryBuilderProps> = ({
+export const QueryBuilder : React.FC<QueryBuilderProps> = ({
   setIsLoading,
   runCallback,
   getPredictions,
@@ -38,7 +38,7 @@ export const QueryBuilder: React.FC<QueryBuilderProps> = ({
   // re-run the query when a sort is applied
   useEffect(() => {
     // don't run on component mount
-    if (firstUpdate.current) {
+    if(firstUpdate.current) {
       firstUpdate.current = false
       return
     }
@@ -49,7 +49,7 @@ export const QueryBuilder: React.FC<QueryBuilderProps> = ({
       .finally(() => setIsLoading(false))
   }, [stepData.sorts])
 
-  const runQuery = async (forceLookerQuery?: boolean) => {
+  const runQuery = async(forceLookerQuery?: boolean) => {
     try {
       if (!forceLookerQuery && stepName === 'step5' && step5.showPredictions) {
         await getPredictions?.()
@@ -61,11 +61,11 @@ export const QueryBuilder: React.FC<QueryBuilderProps> = ({
         ) {
           // case when a sort is applied to a column that no longer exists in the query
           // clearing the sorts will trigger another runQuery execution in the useEffect above
-          dispatch({ type: 'addToStepData', step: stepName, data: { sorts: [] } })
+          dispatch({type: 'addToStepData', step: stepName, data: { sorts: [] }})
           return
         }
         setIsLoading(true)
-        const { results, exploreUrl } = await createAndRunQuery?.(stepData)
+        const {results, exploreUrl} = await createAndRunQuery?.(stepData)
         saveQueryToState?.(stepName, stepData, results, exploreUrl)
         runCallback?.()
       }
@@ -78,17 +78,13 @@ export const QueryBuilder: React.FC<QueryBuilderProps> = ({
     if (!stepData.exploreName) { return (<ExploreSelect />) }
 
     if (stepName === 'step5' && isArima(state.bqModel.objective || '')) {
-      return <ArimaParamsPicker setIsLoading={setIsLoading} />
+      return <ArimaParamsPicker setIsLoading={setIsLoading}/>
     }
-    return (<FieldsSelect />)
+    return (<FieldsSelect/>)
   }
 
   const queryPaneContents = stepData.exploreName && stepData.exploreData ?
-    (<QueryPane />) : (<NoExplorePlaceHolder />)
-
-  const domain = window?.location?.ancestorOrigins['0']
-  const targetLookML = state?.wizard?.steps?.step5?.exploreData?.fieldDetails?.dimensions?.find((int: any) => int.name === state?.bqModel?.target)?.lookml_link
-  const targetLookMLFormat = `${targetLookML?.split('/files')[0]}/views/new`
+    (<QueryPane/>) : (<NoExplorePlaceHolder />)
 
   return (
     <div>
@@ -97,18 +93,17 @@ export const QueryBuilder: React.FC<QueryBuilderProps> = ({
           <ExploreFilter />
         </div>
         <div className="query-header-actions">
-          {stepData.exploreData && (<>
-            {stepName === 'step2' && <StaticDataTimeStamp />}
-            {stepName === 'step5' && showPredictionsButton && <BinaryClassifierThreshold />}
-            {showPredictionsButton ? predictionsButton :
-              <Button
-                onClick={() => runQuery(true)}
-                className="action-button">
-                Run
-              </Button>
-            }
-
-          </>)
+          { stepData.exploreData && (<>
+              { stepName === 'step2' && <StaticDataTimeStamp /> }
+              { stepName === 'step5' && showPredictionsButton && <BinaryClassifierThreshold /> }
+              { showPredictionsButton ? predictionsButton :
+                <Button
+                  onClick={() => runQuery(true)}
+                  className="action-button">
+                    Run
+                </Button>
+              }
+            </>)
           }
         </div>
       </div>
@@ -117,15 +112,6 @@ export const QueryBuilder: React.FC<QueryBuilderProps> = ({
           {directoryPaneContents()}
         </div>
         <div className="pane query-pane">
-          {
-            state?.wizard?.steps?.step5?.showPredictions &&
-            <div style={{ backgroundColor: '#dfefd8', padding: '10px', color: '#80847d', marginBottom: '10px', height: 'auto' }}>
-              <p style={{ marginLeft: '20px' }}>{`Predictions are now available in a new BigQuery view: ${state?.userAttributes?.gcpProject}.${state?.userAttributes?.bqmlModelDatasetName}.${state?.bqModel?.name}_predictions. Ask a LookML Developer to add predictions to the LookML project. `}
-                <a href={`${domain}${targetLookMLFormat}`} target="_blank">Add predictions to the LookML project.</a>
-              </p>
-            </div>
-          }
-
           {queryPaneContents}
         </div>
       </div>

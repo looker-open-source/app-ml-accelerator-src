@@ -3,7 +3,7 @@ import { WizardState } from './wizard'
 
 export type Summary = {
   fields?: SummaryField[]
-  data?: any
+  data?: any[]
 }
 
 export type SummaryTableHeader = {

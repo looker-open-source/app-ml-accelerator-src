@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Card, CardContent, CardMedia, Heading, IconButton, Menu, MenuItem, Paragraph, Span } from "@looker/components"
 import { DateFormat, TimeFormat } from "@looker/components-date"
 import { MoreVert } from "@styled-icons/material"
@@ -25,10 +25,17 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
   }
 
   return (
-    <Card ref={hoverRef} className="model-card">
+    <Card ref={hoverRef} className="model-card" style={{backgroundColor: '#CCC'}}>
       <CardMedia
-        image="https://placeimg.com/640/480/nature"
+        image='https://codelabs.developers.google.com/ml-for-developers/img/ml-for-developers.svg'
         className="model-card-media"
+        style={{ 
+          height: 100, 
+          width: 100, 
+          marginRight: 'auto', 
+          marginLeft: 'auto', 
+          backgroundColor: '#CCC',
+        }}
       >
         <div className="model-card-hover-overlay"></div>
         <Menu
@@ -46,7 +53,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
           <IconButton icon={<MoreVert />} label="More Options" className="model-card-more-button"/>
         </Menu>
       </CardMedia>
-      <CardContent onClick={handleModelSelect} className="model-card-content">
+      <CardContent onClick={handleModelSelect} className="model-card-content" style={{backgroundColor: '#FFF'}}>
         <Heading as="h4" fontSize="medium" fontWeight="semiBold" truncate>
           { startCase(model[modelName]) }
         </Heading>
@@ -66,8 +73,7 @@ export const BrowseModelGridItem: React.FC<BrowseModelGridItemProps> = ({ model,
             <div className="model-card-time">
               Updated: { ' ' }
               <DateFormat>{new Date(model[modelUpdatedAt])}</DateFormat>{' '}
-              {/* <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{model[modelUpdatedAt]}</TimeFormat> */}
-              <TimeFormat timeZone={model.timezone}>{model[modelUpdatedAt]}</TimeFormat>
+              <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{model[modelUpdatedAt]}</TimeFormat>
             </div>
           ) : ''
         }

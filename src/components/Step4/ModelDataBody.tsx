@@ -55,7 +55,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
   const sortedData = sortBy(data, 'expected_label')
   const valueCount = sortedData.length
   const firstRow = sortedData[0]
-  const matrixColor = (pct: number) => `rgba(66, 133, 244, ${pct / 100})`
+  const matrixColor = (pct: number) => `rgba(230,0,0, ${pct / 100})`
 
   const cellSizeClass = (() => {
     if (valueCount <= 2) return 'xlarge'
@@ -148,15 +148,6 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const convertedData = data.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
   const sortedData = sortBy(convertedData, 'recall')
-  const sortedDataFormatted = sortedData.map((int: any) => {
-    return {
-      ...int,
-      threshold: Number(int.threshold).toFixed(4),
-      recall: `${(int.recall * 100).toFixed(2)}%`,
-      false_positive_rate: `${(int.false_positive_rate * 100).toFixed(2)}%`
-    }
-  });
-
   const columns = Object.keys(data[0]).map((key) => {
     const formattedKey = noDot(key)
     return {
@@ -188,7 +179,7 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
           defaultColDef={defaultColDef}
           getRowStyle={getRowStyle}
           onGridReady={onGridReady}
-          rowData={sortedDataFormatted}
+          rowData={sortedData}
           columnDefs={columns}>
         </AgGridReact>
       </div>
@@ -234,19 +225,13 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
         }]
       },
       options: {
-        maintainAspectRatio: true,
-        responsive: false,
+        maintainAspectRatio: false,
         scales: {
           x: {
             type: 'linear',
             title: {
               display: true,
               text: 'False Positive Rate'
-            },
-            ticks: {
-              callback: function(value: any) {
-                  return (value * 100)  + '%';
-              }
             }
           },
           y: {
@@ -254,11 +239,6 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
             title: {
               display: true,
               text: 'True Positive Rate (Recall)'
-            },
-            ticks: {
-              callback: function(value: any) {
-                  return (value * 100)  + '%';
-              }
             }
           }
         }
@@ -267,8 +247,8 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
   }
 
   return (
-    <div className="roc-line-chart" style={{height: '400px'}}>
-      <canvas id="VizChart" ref={chartRef} height={400} width={500}/>
+    <div className="roc-line-chart">
+      <canvas id="VizChart" ref={chartRef} height={300}/>
     </div>
   )
 }

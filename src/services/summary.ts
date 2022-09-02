@@ -164,7 +164,7 @@ export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {
   },
   missingPCT: {
     label: "Missing % (Count)",
-    converter: (row) => `${(Number(row.pct_null?.value) * 100)}% (${row.count_nulls?.value})`,
+    converter: (row) => `${row.pct_null?.value}% (${row.count_nulls?.value})`,
     align: "right",
     order: 3
   },
@@ -189,51 +189,6 @@ export const SUMMARY_TABLE_HEADERS: SummaryTableHeaders = {
   avg: {
     label: "Avg",
     converter: (row) => row.data_type?.value !== "STRING" ? Number(row._avg_value?.value).toFixed(2) : "NA",
-    align: "right",
-    order: 7
-  }
-}
-
-export const SUMMARY_TABLE_HEADERS_STEP3: SummaryTableHeaders = {
-  fieldName: {
-    label: "Field Name",
-    converter: (row) => titilize(row.column_name?.value),
-    align: "left",
-    order: 1
-  },
-  type: {
-    label: "Type",
-    converter: (row) => row.data_type?.value,
-    align: "left",
-    order: 2
-  },
-  missingPCT: {
-    label: "Missing % (Count)",
-    converter: (row) => `${(Number(row.pct_null?.value) * 100).toLocaleString('en-US', {maximumFractionDigits: 2})}% (${row.count_nulls?.value})`,
-    align: "right",
-    order: 3
-  },
-  distinctValues: {
-    label: "Distinct Values",
-    converter: (row) => Number(row.count_distinct_values?.value).toLocaleString('en-US', {maximumFractionDigits: 2}),
-    align: "right",
-    order: 4
-  },
-  max: {
-    label: "Max",
-    converter: (row) => row.data_type?.value !== "STRING" ? Number(row._max_value?.value).toLocaleString('en-US', {maximumFractionDigits: 2}) : "NA",
-    align: "right",
-    order: 5
-  },
-  min: {
-    label: "Min",
-    converter: (row) => row.data_type?.value !== "STRING" ? Number(row._min_value?.value).toLocaleString('en-US', {maximumFractionDigits: 2}) : "NA",
-    align: "right",
-    order: 6
-  },
-  avg: {
-    label: "Avg",
-    converter: (row) => row.data_type?.value !== "STRING" ? Number(row._avg_value?.value).toLocaleString('en-US', {maximumFractionDigits: 2}) : "NA",
     align: "right",
     order: 7
   }

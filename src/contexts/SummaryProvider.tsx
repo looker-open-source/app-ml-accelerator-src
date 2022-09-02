@@ -107,19 +107,19 @@ export const SummaryProvider = ({ children }: any) => {
 
       // second condition here is for backwards compatibility with old models,
       // when a UID strategy was being used (rather than a/b alternation)
-      if(!inputDataUID || (inputDataUID != "selected" && inputDataUID != "model_training")) {
-        // Create "selected" table on first run
+      if(!inputDataUID || (inputDataUID != "a" && inputDataUID != "b")) {
+        // Create "a" table on first run
         setPreviousBQValues({
           sql: querySql,
           model: bqModelName
         })
-        const result = await createBQInputData(querySql, bqModelName, "selected")
+        const result = await createBQInputData(querySql, bqModelName, "a")
         if (!result.ok) {
           throw "Failed to create BQML View"
         }
 
-        // initialize to start on "selected" table
-        inputDataUID = "selected"
+        // initialize to start on "a" table
+        inputDataUID = "a"
       }
 
       // in an effort to limit the number of calls to BigQuery
@@ -128,7 +128,7 @@ export const SummaryProvider = ({ children }: any) => {
         (querySql !== previousBQValues.sql || bqModelName !== previousBQValues.model || !summaryUpToDate)
       ) {
         // switch to whichever table is not currently locked to model to write new summary 'snapshot'
-        inputDataUID = (inputDataUID === "model_training") ? "selected" : "model_training"
+        inputDataUID = (inputDataUID === "b") ? "a" : "b"
         setPreviousBQValues({
           sql: querySql,
           model: bqModelName
