@@ -84,7 +84,11 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
   }
 
   const queryPaneContents = stepData.exploreName && stepData.exploreData ?
-    (<QueryPane/>) : (<NoExplorePlaceHolder />)
+    (<QueryPane />) : (<NoExplorePlaceHolder />)
+
+  const domain = window?.location?.ancestorOrigins['0']
+  const targetLookML = state?.wizard?.steps?.step5?.exploreData?.fieldDetails?.dimensions?.find((int: any) => int.name === state?.bqModel?.target)?.lookml_link
+  const targetLookMLFormat = `${targetLookML?.split('/files')[0]}/views/new`
 
   return (
     <div>
@@ -112,6 +116,14 @@ export const QueryBuilder : React.FC<QueryBuilderProps> = ({
           {directoryPaneContents()}
         </div>
         <div className="pane query-pane">
+          {
+            state?.wizard?.steps?.step5?.showPredictions &&
+            <div style={{ backgroundColor: '#dfefd8', padding: '10px', color: '#80847d', marginBottom: '10px', height: 'auto' }}>
+              <p style={{ marginLeft: '20px' }}>{`Predictions are now available in a new BigQuery view: ${state?.userAttributes?.gcpProject}.${state?.userAttributes?.bqmlModelDatasetName}.${state?.bqModel?.name}_predictions. Ask a LookML Developer to add predictions to the LookML project. `}
+                <a href={`${domain}${targetLookMLFormat}`} target="_blank">Add predictions to the LookML project.</a>
+              </p>
+            </div>
+          }
           {queryPaneContents}
         </div>
       </div>

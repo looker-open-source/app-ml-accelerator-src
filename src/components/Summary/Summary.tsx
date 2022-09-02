@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { toggleSelectedFeature, SUMMARY_TABLE_HEADERS } from '../../services/summary'
+import { toggleSelectedFeature, SUMMARY_TABLE_HEADERS, SUMMARY_TABLE_HEADERS_STEP3 } from '../../services/summary'
 import { SummaryTableHeaders } from '../../types'
 import { Checkbox } from "@looker/components"
 import { SummaryTableRows } from './SummaryTableRows'
@@ -10,12 +10,13 @@ type SummaryParams = {
   arimaTimeColumn?: string,
   summaryData: any[],
   selectedFeatures: string[],
+  stepNumber: number,
   updateSelectedFeatures: (selectedFeatures: string[]) =>  void
 }
 
-export const Summary: React.FC<SummaryParams> = ({ targetField, arimaTimeColumn, summaryData, selectedFeatures, updateSelectedFeatures }) => {
+export const Summary: React.FC<SummaryParams> = ({ targetField, arimaTimeColumn, summaryData, selectedFeatures, updateSelectedFeatures, stepNumber }) => {
   const [allChecked, setAllChecked] = useState(summaryData.length === selectedFeatures.length)
-  const headers: SummaryTableHeaders = SUMMARY_TABLE_HEADERS
+  const headers: SummaryTableHeaders = stepNumber === 3 ? SUMMARY_TABLE_HEADERS_STEP3 : SUMMARY_TABLE_HEADERS
   const targetFieldFormatted = noDot(targetField)
 
   const checkboxChange = (fieldName: string): void => {
