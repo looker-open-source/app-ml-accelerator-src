@@ -2,6 +2,7 @@ import { compact } from "lodash"
 import { MODEL_STATE_TABLE_COLUMNS } from "../constants"
 import { BQModelState } from "../types"
 import { MODEL_TYPES } from "./modelTypes"
+import { zonedTimeToUtc } from "date-fns-tz"
 
 export const MODELS_PER_PAGE = 16
 
@@ -20,15 +21,20 @@ export const formatSavedModelData = (models: any[]) => (
       [MODEL_STATE_TABLE_COLUMNS.stateJson]: state,
       objective: state.bqModel.objective,
       [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: safelyParseJson(model[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]?.value),
-      [MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]?.value),
-      [MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]?.value),
+      [MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelCreatedAt]?.value, model.timezone),
+      [MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]: toDate(model[MODEL_STATE_TABLE_COLUMNS.modelUpdatedAt]?.value, model.timezone),
+      timezone: model.timezone,
     }
   }))
 )
 
-const toDate = (dateStr: string) => (
-  dateStr ? new Date(dateStr) : undefined
-)
+const toDate = (dateStr: string, timezone: string) => {
+  if (dateStr && timezone) {
+    const utcDate = zonedTimeToUtc(dateStr, timezone)
+    return utcDate;
+  }
+  else return undefined;
+};
 
 const parseModelInfoJson = (json: string): { bqModel: BQModelState } | undefined => {
   const parsed = safelyParseJson(json)

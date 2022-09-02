@@ -130,6 +130,7 @@ export const AdminProvider = ({ children }: any) => {
       if (!ok) {
         return { ok }
       }
+      value.data.forEach((val: any) => val.timezone = value.timezone)
       const formattedData = formatSavedModelData(value.data)
       const pages = Math.ceil(formattedData.length / MODELS_PER_PAGE)
       return { ok, data: formattedData, pages }
