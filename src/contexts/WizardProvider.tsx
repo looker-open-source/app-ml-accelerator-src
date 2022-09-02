@@ -35,7 +35,7 @@ type IWizardContext = {
     results: any,
     exploreUrl?: string,
     tableHeaders?: ResultsTableHeaderItem[]) => void,
-  createAndRunQuery?: (stepData: Step2State) => Promise<any>,
+  createAndRunQuery?: (stepData: Step2State, type?: string) => Promise<any>,
   fetchSummary?: (bqModelName: string, targetField: string, uid: string) => Promise<any>,
   saveSummary?: (props: SaveSummaryProps) => void,
   saveInputData?: (props: SaveInputDataProps) => void,
@@ -138,7 +138,7 @@ export const WizardProvider = ({ children }: any) => {
         predictions: []
       },
       data: results.data,
-      rowCount: results.data.length,
+      rowCount: results.data.length >= 5000 ? '> 5000' : results?.data?.length,
       sql: results.sql,
       exploreUrl,
       exploreName: stepData.exploreName,
@@ -207,6 +207,7 @@ export const WizardProvider = ({ children }: any) => {
 
   const createAndRunQuery = async (
     stepData: Step2State,
+    type?: string
   ) => {
     try {
       const baseQuery = await createBaseQuery(stepData)
@@ -217,7 +218,7 @@ export const WizardProvider = ({ children }: any) => {
       const { ok, value: results } = await sdk.run_query({
         query_id: baseQuery.id,
         limit: Number(stepData.limit) || 500,
-        result_format: "json_detail",
+        result_format: type ? type : "json_detail",
       })
 
       if (!ok) { throw "Failed to run query" }
