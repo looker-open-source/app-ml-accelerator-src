@@ -113,7 +113,8 @@ export const BQMLProvider = ({ children }: any) => {
       `projects/${gcpProject}/queries`,
       {
         query: sql.replace(/\n/g, ' '),
-        useLegacySql: false
+        useLegacySql: false,
+        useQueryCache: false
       }
     )
     return result

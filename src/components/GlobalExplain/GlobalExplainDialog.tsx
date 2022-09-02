@@ -30,8 +30,6 @@ export const GlobalExplainDialog: React.FC = () => {
   ]
 
   useEffect(() => {
-    const data = isClassLevel(activeTab) ? explain.class : explain.model
-    if (data) { return }
     fetchModelData()
   }, [activeTab])
 
