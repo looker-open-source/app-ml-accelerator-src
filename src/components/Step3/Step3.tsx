@@ -178,6 +178,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
   }
 
+  useEffect(() => {
+    console.log('summary?.data', summary?.data)
+  }, [summary])
+
   return (
     <StepContainer
       isLoading={isLoading}
@@ -228,7 +232,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             Columns: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.value ? sourceColumns?.length : '???'}</span>
           </div>
           <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.value ? summary?.data[0]?.count_corr_not_nulls?.value  : '???'}</span>
+            Rows: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.rendered ? summary?.data[0]?.count_corr_not_nulls?.rendered  : '???'}</span>
           </div>
           <GenerateSummaryButton
             setIsLoading={setIsLoading}
