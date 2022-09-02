@@ -178,6 +178,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
   }
 
+  useEffect(() => {
+    console.log('summary?.data', summary?.data)
+  }, [summary])
+
   return (
     <StepContainer
       isLoading={isLoading}
@@ -225,10 +229,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         <div className="wizard-card">
           <h2>Data Summary Statistics</h2>
           <div className="summary-factoid">
-            Columns: <span className="factoid-bold">{sourceColumns.length}</span>
+            Columns: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.value ? sourceColumns?.length : '???'}</span>
           </div>
           <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{ranQuery?.rowCount || '???'}</span>
+            Rows: <span className="factoid-bold">{(summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.value) ? summary?.data[0]?.count_corr_not_nulls?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")  : '???'}</span>
           </div>
           <GenerateSummaryButton
             setIsLoading={setIsLoading}

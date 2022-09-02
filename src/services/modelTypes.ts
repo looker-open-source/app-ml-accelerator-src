@@ -113,6 +113,10 @@ export const formBQInputDataSQL = ({
   ) {
     return false
   }
+
+  if (uid === 'a' || uid === 'selected') {
+    return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} AS (${removeLimit(sql)})`
+  }
   return `CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} AS (${removeLimit(sql)})`
 }
 
@@ -251,7 +255,7 @@ export const formEvaluateSql = ({
     return false
   }
 
-  return `CREATE OR REPLACE TABLE
+  return `CREATE OR REPLACE VIEW
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.evaluate} AS (
     SELECT *
     FROM ML.EVALUATE(
@@ -285,7 +289,7 @@ export const formConfusionMatrixSql = ({
   ) {
     return false
   }
-  return `CREATE OR REPLACE TABLE
+  return `CREATE OR REPLACE VIEW
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.confusionMatrix} AS (
     SELECT *
     FROM ML.CONFUSION_MATRIX (
@@ -322,7 +326,7 @@ export const formROCCurveSql = ({
   ) {
     return false
   }
-  return `CREATE OR REPLACE TABLE
+  return `CREATE OR REPLACE VIEW
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.rocCurve} AS (
     SELECT *
     FROM ML.ROC_CURVE(
@@ -354,7 +358,7 @@ export const formArimaEvaluateSql = ({
   ) {
     return false
   }
-  return `CREATE OR REPLACE TABLE
+  return `CREATE OR REPLACE VIEW
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.evaluate} AS (
     SELECT *
     FROM ML.ARIMA_EVALUATE(
@@ -425,7 +429,7 @@ export const createClassifierGlobalExplainSql = ({
 }: BoostedTreeGlobalExplainProps) => {
   const suffix = classLevelExplain ? TABLE_SUFFIXES.globalExplainClass : TABLE_SUFFIXES.globalExplainModel
   return `
-    CREATE OR REPLACE TABLE
+    CREATE OR REPLACE VIEW
       \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${suffix} AS (
       SELECT *
       FROM ML.GLOBAL_EXPLAIN(
@@ -442,7 +446,7 @@ export const createRegressorGlobalExplainSql = ({
   bqModelName
 }: BoostedTreeGlobalExplainProps) => {
   return `
-    CREATE OR REPLACE TABLE
+    CREATE OR REPLACE VIEW
       \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.globalExplainModel} AS (
       SELECT *
       FROM ML.GLOBAL_EXPLAIN(
@@ -483,7 +487,7 @@ export const createBoostedTreePredictSql = ({
   threshold
 }: BoostedTreePredictProps) => {
   return `
-    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
+    CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
     ( SELECT * FROM ML.PREDICT(
       MODEL ${bqmlModelDatasetName}.${bqModelName},
       (${removeLimit(lookerSql)})
@@ -507,7 +511,7 @@ export const createArimaPredictSql = ({
   confidenceLevel = 0.95
 }: ArimaPredictProps) => {
   return `
-    CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
+    CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
     ( SELECT * FROM ML.FORECAST(MODEL ${bqmlModelDatasetName}.${bqModelName}
       , STRUCT(${horizon} AS horizon
       , ${confidenceLevel} AS confidence_level)))
