@@ -232,7 +232,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             Columns: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.value ? sourceColumns?.length : '???'}</span>
           </div>
           <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.rendered ? summary?.data[0]?.count_corr_not_nulls?.rendered  : '???'}</span>
+            Rows: <span className="factoid-bold">{(summary?.data?.length > 0 && summary?.data[0]?.count_corr_not_nulls?.value) ? summary?.data[0]?.count_corr_not_nulls?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")  : '???'}</span>
           </div>
           <GenerateSummaryButton
             setIsLoading={setIsLoading}
