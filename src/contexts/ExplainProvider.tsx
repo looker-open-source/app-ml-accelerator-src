@@ -34,24 +34,20 @@ export const ExplainProvider = ({ children }: any) => {
       if (!selectSql) { throw 'Failed to generate select sql' }
 
       // check if evaluate table already exists
-      const { ok, body } = await queryJobAndWait?.(selectSql)
-      queryResults = body
 
-      if (!ok) {
-        // if the evaluate table doesnt exist yet, create it and select from it again
-        const createSql = isClassifier(state.bqModel.objective || '') ?
-          createClassifierGlobalExplainSql({ gcpProject, bqmlModelDatasetName, bqModelName, classLevelExplain }) :
-          createRegressorGlobalExplainSql({ gcpProject, bqmlModelDatasetName, bqModelName })
-        if (!createSql) { throw 'Failed to generate create sql' }
+      // if the evaluate table doesnt exist yet, create it and select from it again
+      const createSql = isClassifier(state.bqModel.objective || '') ?
+        createClassifierGlobalExplainSql({ gcpProject, bqmlModelDatasetName, bqModelName, classLevelExplain }) :
+        createRegressorGlobalExplainSql({ gcpProject, bqmlModelDatasetName, bqModelName })
+      if (!createSql) { throw 'Failed to generate create sql' }
 
-        const { ok: createOk } = await queryJobAndWait?.(createSql)
-        if (!createOk) { throw 'Failed to create explain table' }
+      const { ok: createOk } = await queryJobAndWait?.(createSql)
+      if (!createOk) { throw 'Failed to create explain table' }
 
-        // fetch table results now that table is created
-        const { ok: selectOk, body: selectBody } = await queryJobAndWait?.(selectSql)
-        if (!selectOk) { throw 'Failed to fetch explain data' }
-        queryResults = selectBody
-      }
+      // fetch table results now that table is created
+      const { ok: selectOk, body: selectBody } = await queryJobAndWait?.(selectSql)
+      if (!selectOk) { throw 'Failed to fetch explain data' }
+      queryResults = selectBody
 
       dispatch({ type: 'setExplain', explainLevel: classLevelExplain ? 'class' : 'model', data: queryResults })
       return { ok: true, body: queryResults }
