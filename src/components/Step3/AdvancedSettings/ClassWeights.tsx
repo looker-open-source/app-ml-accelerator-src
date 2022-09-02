@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useStore } from '../../../contexts/StoreProvider'
 import { FieldText, IconButton, Label, Select } from '@looker/components'
 import { arrayToSelectOptions, floatOnly } from '../../../services/common'
@@ -12,14 +12,23 @@ type ClassWeightsProps = {
 
 export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => {
   const { state } = useStore()
-  const { selectedFeatures } = state.wizard.steps.step3
-  const [ features, setFeatures ] = useState(selectedFeatures || [])
+  const [features, setFeatures] = useState([])
+  const [allFeatures, setAllFeatures] = useState([])
 
-  if (!selectedFeatures || selectedFeatures.length <= 0) {
+  useEffect(() => {
+    const target = state.wizard.steps.step3.inputData.target;
+    const data = state?.wizard?.steps?.step2?.ranQuery?.data ? state.wizard.steps.step2.ranQuery.data : [];
+    const filteredData = data.map((int: any) => int[`${target}`]?.value);
+    const uniqueFilteredData = [...new Set(filteredData)];
+    setFeatures(uniqueFilteredData)
+    setAllFeatures(uniqueFilteredData)
+  }, []);
+
+  if (!allFeatures || allFeatures.length <= 0 || !state?.wizard?.steps?.step3?.summary?.data) {
     return (
       <div className="advanced-settings-class-weights">
         <div>Class Weights</div>
-        <div className="small-text">You must first generate the summary before setting class weights.</div>
+        <div className="small-text" style={{ color: 'grey' }}>You must generate a summary of your input data before setting class weights. Exit the Advanced Options modal and click Generate Summary.</div>
       </div>
     )
   }
@@ -75,21 +84,25 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
         ...classWeightsWithoutColumn
       }
     })
-    if (column && selectedFeatures.includes(column)) {
+    if (column && !features.includes(column)) {
       setFeatures([...features, column])
     }
   }
 
   const classWeights = Object.keys(form.class_weights).length <= 0 ? { ['']: '' } : form.class_weights
+
   return (
     <div className="advanced-settings-class-weights">
       <h3>Class Weights</h3>
+      <div className="form-row" style={{ fontSize: '12px', color: 'grey' }}>
+        {'A weight must be set for every class label. The weights are not required to add up to one.'}
+      </div>
       {
         (Object.keys(classWeights)).map((column, i) => (
           <div className="form-row" key={i}>
             <div className="form-row--item">
               <Label>
-                Column
+                Class Label
               </Label>
               <Select
                 options={arrayToSelectOptions(features)}
@@ -106,12 +119,13 @@ export const ClassWeights: React.FC<ClassWeightsProps> = ({ form, setForm }) => 
                 label="Weight"
               />
             </div>
-            <IconButton icon={<Delete/>} onClick={() => handleRemove(column)} label="Remove Class Weight" size="large"/>
+            <IconButton icon={<Delete />} onClick={() => handleRemove(column)} label="Remove Class Weight" size="large" />
           </div>
         ))
       }
+
       <div className="form-row">
-        <IconButton icon={<Add />} onClick={handleAdd}  label="Add Class Weight" size='large'/>
+        <IconButton icon={<Add />} onClick={handleAdd} label="Add Class Weight" size='large' />
       </div>
     </div>
   )
