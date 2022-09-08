@@ -2,6 +2,7 @@ import React, { createContext, useContext } from 'react'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { createClassifierGlobalExplainSql, createRegressorGlobalExplainSql, isClassifier, selectBoostedTreeGlobalExplainSql } from '../services/modelTypes'
+import { OauthContext } from './OauthProvider'
 
 type IExplainContext = {
   getGlobalExplainData?: (
@@ -18,6 +19,7 @@ export const ExplainProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { queryJobAndWait } = useContext(BQMLContext)
   const { gcpProject, bqmlModelDatasetName } = state.userAttributes
+  const { expiry, signIn } = useContext(OauthContext)
 
 
   // Create & Fetch Evaluate function data in BigQuery
@@ -25,6 +27,7 @@ export const ExplainProvider = ({ children }: any) => {
     classLevelExplain: boolean
   ) => {
     try {
+      if (expiry < new Date()) { await signIn(); }
       if (!gcpProject || !bqmlModelDatasetName) { throw 'Gcp project and dataset are incorrectly set up.'}
 
       const { name: bqModelName } = state.bqModel

@@ -33,6 +33,7 @@ export const OauthProvider = ({
   const { dispatch } = useStore()
   const [ loggingIn, setLoggingIn ] = useState<boolean>(false)
   const [ token, setToken ] = useState<string>()
+  const [ expiry, setExpiry ] = useState<Date | undefined>()
   const [ attempts, setAttempts ] = useState<number>(0)
 
   /**
@@ -87,6 +88,7 @@ export const OauthProvider = ({
         })
       }
       const { access_token } = response
+      setExpiry(response.expiry_date)
       setToken(access_token)
       setAttempts(0)
       return true
@@ -116,7 +118,7 @@ export const OauthProvider = ({
   }
 
   return (
-    <OauthContext.Provider value={{ loggingIn, token, signIn, signOut }}>
+    <OauthContext.Provider value={{ loggingIn, token, signIn, signOut, expiry }}>
       {children}
     </OauthContext.Provider>
   )
