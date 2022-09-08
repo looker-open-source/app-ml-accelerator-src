@@ -93,7 +93,7 @@ export const isFloat = (float: string) => {
 }
 
 export const formatBQResults = (data: any, nested?: boolean) => (
-  data.rows.map((row: any) => {
+  data?.rows?.map((row: any) => {
     const rowObj: any = {}
     const arr = row.f
     arr.forEach((col: any, i: number) => {

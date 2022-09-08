@@ -178,10 +178,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
   }
 
-  useEffect(() => {
-    console.log('steps', wizard.steps)
-  }, [wizard])
-
   return (
     <StepContainer
       isLoading={isLoading}
