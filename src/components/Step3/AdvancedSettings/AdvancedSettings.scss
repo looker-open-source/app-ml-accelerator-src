@@ -46,17 +46,30 @@
       }
 
       label {
-        width: 140px;
+        width: 180px;
         padding-bottom: 0.25rem;
         display: block;
         line-height: 1rem;
         align-self: center;
+        align-items: center;
+        display: flex;
+        gap: 0.1rem;
+        div[role='img'] {
+          max-height: 1rem;
+        }
       }
 
       p {
         font-size: 10px !important;
         line-height: 0 !important;
       }
+    }
+    .label-with-icon {
+      display: flex;
+      icon {
+        height: 10px;
+      }
+
     }
 
     .settings-form-checkbox {

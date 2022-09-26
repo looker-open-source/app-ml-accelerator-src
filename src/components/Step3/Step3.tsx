@@ -181,6 +181,10 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   // TODO: could make this a function with more specific criteria depending on current state
   const preContinueToolTipText = "You must name your model, select your target and generate summary stats to continue."
 
+  //TODO input_data_row_count?.value is the row count -> compare this to each row in summary.ts and untick + warn 
+  // when the row count matches the distinct values and the type is STRING = must be the primary key
+  // investigate adding this at the explore stage
+
   return (
     <StepContainer
       isLoading={isLoading}

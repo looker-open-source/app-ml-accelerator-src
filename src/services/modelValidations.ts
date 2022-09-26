@@ -30,12 +30,12 @@ const getTargetRow = (data: any[], target: string) => {
 
 const noNullsValidation = (targetRow: any | undefined) => {
   if (targetRow.length > 0 && targetRow[0].count_nulls.value > 0) {
-    return 'Target rows Missing % must be 0%'
+    return 'Missing % for target row(s) must be 0%. Return to "Source" tab and filter out null values'
   }
 }
 
 const countDistinctValidation = (targetRow: any | undefined) => {
   if (targetRow.length > 0 && targetRow[0].count_distinct_values.value > 50) {
-    return 'Target rows Distinct Values must be less than or equal to 50'
+    return 'Distinct Values for target row(s) must be less than or equal to 50'
   }
 }

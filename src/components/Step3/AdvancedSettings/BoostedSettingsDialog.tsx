@@ -1,11 +1,27 @@
-import { Button, ButtonTransparent, Checkbox, DialogContent, DialogFooter, DialogHeader, FieldText, Label, Select } from '@looker/components'
+import { Button, ButtonTransparent, Checkbox, DialogContent, DialogFooter, DialogHeader, FieldText, Icon, Label, Select, Tooltip } from '@looker/components'
 import { Save } from '@styled-icons/material'
+import { Info } from '@styled-icons/material-outlined'
 import React, { useState } from 'react'
 import { useStore } from '../../../contexts/StoreProvider'
-import { getBoostedSettingsDefaults, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, showClassWeights, showDataSplitCol, showDataSplitEvalFraction, TREE_METHOD } from '../../../services/advancedSettings'
+import { getBoostedSettingsDefaults, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, showClassWeights, showDataSplitCol, showDataSplitEvalFraction, TREE_METHOD, SettingsLabelsAndTooltips } from '../../../services/advancedSettings'
 import { arrayToSelectOptions, floatOnly, numericOnly } from '../../../services/common'
 import { MODEL_TYPES } from '../../../services/modelTypes'
 import { ClassWeights } from './ClassWeights'
+
+
+type TooltipLabelProps = {
+  setting: string;
+}
+
+const TooltipLabel: React.FC<TooltipLabelProps> = ({setting}) => {
+  return (
+    <Tooltip content={SettingsLabelsAndTooltips[setting].tooltip}>
+      <Label>{SettingsLabelsAndTooltips[setting].label}
+        <Icon icon={<Info/>} />
+      </Label>
+    </Tooltip>
+  )
+}
 
 type BoostedSettingsDialogProps = {
   closeDialog: () => void
@@ -61,14 +77,14 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
   return (
     <>
       <DialogHeader hideClose="true" borderBottom="transparent">Advanced Settings</DialogHeader>
+      {/* TODO: add a link to the documentation here */}
+      {/* https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-create-boosted-tree */}
       <DialogContent className="settings-dialog--content">
         <div className="settings-dialog--container modal-pane">
           <form className="settings-dialog-form">
             <div className="form-content">
               <div className="form-row">
-                <Label>
-                  Booster Type
-                </Label>
+                <TooltipLabel setting='boosterType'/>
                 <Select
                   options={arrayToSelectOptions(BOOSTER_TYPE)}
                   value={form.booster_type}
@@ -76,9 +92,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Number Parallel Tree
-                </Label>
+                <TooltipLabel setting='numberParallelTree'/>
                 <FieldText
                   value={form.num_parallel_tree}
                   onChange={(e: any) => handleTextChange(e, 'num_parallel_tree')}
@@ -88,9 +102,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               </div>
               { form.booster_type === 'DART' &&
                 <div className="form-row">
-                  <Label>
-                    Dart Normalize Type
-                  </Label>
+                  <TooltipLabel setting='dartNormalizeType'/>
                   <Select
                     options={arrayToSelectOptions(DART_NORMALIZE_TYPE)}
                     value={form.dart_normalize_type}
@@ -99,9 +111,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 </div>
               }
               <div className="form-row">
-                <Label>
-                  Tree Method
-                </Label>
+                <TooltipLabel setting='treeMethod'/>
                 <Select
                   options={arrayToSelectOptions(TREE_METHOD)}
                   value={form.tree_method}
@@ -109,9 +119,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Minimum Tree Child Weight
-                </Label>
+                <TooltipLabel setting='minimumTreeChildWeight'/>
                 <FieldText
                   value={form.min_tree_child_weight}
                   onChange={(e: any) => handleTextChange(e, 'min_tree_child_weight')}
@@ -120,9 +128,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Column sample by tree
-                </Label>
+                <TooltipLabel setting='columnSampleByTree'/>
                 <FieldText
                   value={form.colsample_bytree}
                   onChange={(e: any) => handleTextChange(e, 'colsample_bytree')}
@@ -131,9 +137,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Column sample by level
-                </Label>
+                <TooltipLabel setting='columnSampleByLevel'/>
                 <FieldText
                   value={form.colsample_bylevel}
                   onChange={(e: any) => handleTextChange(e, 'colsample_bylevel')}
@@ -142,9 +146,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Column sample by node
-                </Label>
+                <TooltipLabel setting='columnSampleByNode'/>
                 <FieldText
                   value={form.colsample_bynode}
                   onChange={(e: any) => handleTextChange(e, 'colsample_bynode')}
@@ -153,9 +155,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Minimum split loss
-                </Label>
+                <TooltipLabel setting='minimumSplitLoss'/>
                 <FieldText
                   value={form.min_split_loss}
                   onChange={(e: any) => handleTextChange(e, 'min_split_loss')}
@@ -164,9 +164,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Maximum Tree Depth
-                </Label>
+                <TooltipLabel setting='maximumTreeDepth'/>
                 <FieldText
                   value={form.max_tree_depth}
                   onChange={(e: any) => handleTextChange(e, 'max_tree_depth')}
@@ -175,9 +173,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Subsample
-                </Label>
+                <TooltipLabel setting='subsample'/>
                 <FieldText
                   value={form.subsample}
                   onChange={(e: any) => handleTextChange(e, 'subsample')}
@@ -188,9 +184,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               { objective === MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value &&
                 (<>
                   <div className="form-row">
-                    <Label>
-                      Auto class weights
-                    </Label>
+                    <TooltipLabel setting='autoClassWeights'/>
                     <div className="settings-form-checkbox">
                       <Checkbox
                         checked={form.auto_class_weights}
@@ -208,9 +202,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 </>)
               }
               <div className="form-row">
-                <Label>
-                  L1 reg
-                </Label>
+                <TooltipLabel setting='L1reg'/>
                 <FieldText
                   value={form.l1_reg}
                   onChange={(e: any) => handleTextChange(e, 'l1_reg')}
@@ -219,9 +211,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  L2 reg
-                </Label>
+                <TooltipLabel setting='L2reg'/>
                 <FieldText
                   value={form.l2_reg}
                   onChange={(e: any) => handleTextChange(e, 'l2_reg')}
@@ -230,9 +220,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Early stop
-                </Label>
+                <TooltipLabel setting='Earlystop'/>
                 <div className="settings-form-checkbox">
                   <Checkbox
                     checked={form.early_stop}
@@ -241,9 +229,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 </div>
               </div>
               <div className="form-row">
-                <Label>
-                  Learn rate
-                </Label>
+                <TooltipLabel setting='Learnrate'/>
                 <FieldText
                   value={form.learn_rate}
                   onChange={(e: any) => handleTextChange(e, 'learn_rate')}
@@ -252,9 +238,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Maximum iterations
-                </Label>
+                <TooltipLabel setting='MaximumIterations'/>
                 <FieldText
                   value={form.max_iterations}
                   onChange={(e: any) => handleTextChange(e, 'max_iterations')}
@@ -263,9 +247,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Minimum relative progress
-                </Label>
+                <TooltipLabel setting='MinimumRelativeProgress'/>
                 <FieldText
                   value={form.min_rel_progress}
                   onChange={(e: any) => handleTextChange(e, 'min_rel_progress')}
@@ -274,9 +256,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 />
               </div>
               <div className="form-row">
-                <Label>
-                  Data split method
-                </Label>
+                <TooltipLabel setting='dataSplitMethod'/>
                 <Select
                   options={arrayToSelectOptions(DATA_SPLIT_METHOD)}
                   value={form.data_split_method}
@@ -286,9 +266,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               {
                 showDataSplitEvalFraction(form.data_split_method) &&
                 (<div className="form-row">
-                  <Label>
-                    Data split evaluation fraction
-                  </Label>
+                  <TooltipLabel setting='dataSplitEvaluationFraction'/>
                   <FieldText
                     value={form.data_split_eval_fraction}
                     onChange={(e: any) => handleTextChange(e, 'data_split_eval_fraction')}
@@ -300,9 +278,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
               {
                 showDataSplitCol(form.data_split_method) &&
                 (<div className="form-row">
-                  <Label>
-                    Data split column
-                  </Label>
+                  <TooltipLabel setting='dataSplitColumn'/>
                   <Select
                     options={arrayToSelectOptions(state.wizard.steps.step3.selectedFeatures || [])}
                     value={form.data_split_col}
@@ -311,9 +287,7 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                 </div>)
               }
               <div className="form-row">
-                <Label>
-                  Enable Global Explain
-                </Label>
+                <TooltipLabel setting='enableGlobalExplain'/>
                 <div className="settings-form-checkbox">
                   <Checkbox
                     checked={form.enable_global_explain}
