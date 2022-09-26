@@ -203,6 +203,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         />
         <div className="wizard-card">
           <h2>Select your target</h2>
+          <p>This is the field you wish to predict</p>
           <Select
             options={targetFieldOptions}
             value={targetField}
@@ -227,20 +228,24 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             )
         }
         <div className="wizard-card">
+          <div>
           <h2>Data Summary Statistics</h2>
-          <div className="summary-factoid">
-            Columns: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.input_data_column_count?.value ? summary?.data[0]?.input_data_column_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '???'}</span>
+            <div className="summary-factoid">
+              Columns: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.input_data_column_count?.value ? summary?.data[0]?.input_data_column_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '???'}</span>
+            </div>
+            <div className="summary-factoid">
+              Rows: <span className="factoid-bold">{(summary?.data?.length > 0 && summary?.data[0]?.input_data_row_count?.value) ? summary?.data[0]?.input_data_row_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")  : '???'}</span>
+            </div>
           </div>
-          <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{(summary?.data?.length > 0 && summary?.data[0]?.input_data_row_count?.value) ? summary?.data[0]?.input_data_row_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")  : '???'}</span>
+          <div>
+            <GenerateSummaryButton
+              setIsLoading={setIsLoading}
+              loadingNameStatus={loadingNameStatus}
+              nameCheckStatus={nameCheckStatus}
+              summaryUpToDate={summaryUpToDate}
+              targetTimeColumnChanged={targetTimeColumnChanged}
+              />
           </div>
-          <GenerateSummaryButton
-            setIsLoading={setIsLoading}
-            loadingNameStatus={loadingNameStatus}
-            nameCheckStatus={nameCheckStatus}
-            summaryUpToDate={summaryUpToDate}
-            targetTimeColumnChanged={targetTimeColumnChanged}
-          />
         </div>
       </div>
       { buildOptionalParameters() }
