@@ -21,9 +21,9 @@ const Step1: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const objective = state.wizard.steps.step1.objective
-
+  const preContinueToolTipText = "You must select an objective before continuing"
   return (
-    <StepContainer stepComplete={stepComplete} stepNumber={1}>
+    <StepContainer stepComplete={stepComplete} stepNumber={1} tooltipDisabledText={preContinueToolTipText}>
       <h2>Choose your objective</h2>
       <div className="modeltypes">
         {

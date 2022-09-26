@@ -10,12 +10,13 @@ import './Step2.scss'
 const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { stepName } = useContext(QueryBuilderContext)
-
+  const preContinueToolTipText = "You must select fields from an explore and run the query before continuing"
   return (
     <StepContainer
       isLoading={isLoading}
       stepComplete={stepComplete}
       stepNumber={2}
+      tooltipDisabledText={preContinueToolTipText}
       customClass="step2-container"
       stepInfo={stepName === 'step2' && <RequiredFieldMessages />}>
       <h2>Select your input data</h2>

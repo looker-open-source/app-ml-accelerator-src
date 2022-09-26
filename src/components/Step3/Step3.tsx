@@ -178,6 +178,9 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
   }
 
+  // TODO: could make this a function with more specific criteria depending on current state
+  const preContinueToolTipText = "You must name your model, select your target and generate summary stats to continue."
+
   return (
     <StepContainer
       isLoading={isLoading}
@@ -185,6 +188,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepComplete={!isInvalid && stepComplete}
       stepNumber={3}
       buttonText={stepCompleteButtonText()}
+      tooltipDisabledText={preContinueToolTipText}
       handleCompleteClick={buildHandleCompleteClick()}
       stepInfo={!isArima(objective || '') ? (<AdvancedSettings objective={objective}/>) : ''}
     >
