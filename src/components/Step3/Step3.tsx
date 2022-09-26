@@ -205,7 +205,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           setLoadingNameStatus={setLoadingNameStatus}
           disabled={!!modelNameParam || (!!summary.data && !!inputData.target) === true}
         />
-        <div className="wizard-card">
+        <div className="wizard-card spaced">
           <h2>Select your target</h2>
           <p>This is the field you wish to predict</p>
           <Select
@@ -219,7 +219,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         {
           arima &&
             (
-              <div className="wizard-card">
+              <div className="wizard-card spaced">
                 <h2>Select your Time Column</h2>
                 <Select
                   options={timeColumnFieldOptions}
@@ -231,7 +231,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
               </div>
             )
         }
-        <div className="wizard-card">
+        <div className="wizard-card spaced">
           <div>
           <h2>Data Summary Statistics</h2>
             <div className="summary-factoid">
