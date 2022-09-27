@@ -1,11 +1,11 @@
 import { Button, ButtonTransparent, Checkbox, DialogContent, DialogFooter, DialogHeader, FieldText, Icon, Label, Select, Tooltip } from '@looker/components'
 import { Save } from '@styled-icons/material'
-import { Info } from '@styled-icons/material-outlined'
 import React, { useState } from 'react'
 import { useStore } from '../../../contexts/StoreProvider'
 import { getBoostedSettingsDefaults, BOOSTER_TYPE, DART_NORMALIZE_TYPE, DATA_SPLIT_METHOD, showClassWeights, showDataSplitCol, showDataSplitEvalFraction, TREE_METHOD, SettingsLabelsAndTooltips } from '../../../services/advancedSettings'
 import { arrayToSelectOptions, floatOnly, numericOnly } from '../../../services/common'
 import { MODEL_TYPES } from '../../../services/modelTypes'
+import { InfoTip } from '../../InfoTip/InfoTip'
 import { ClassWeights } from './ClassWeights'
 
 
@@ -15,11 +15,10 @@ type TooltipLabelProps = {
 
 const TooltipLabel: React.FC<TooltipLabelProps> = ({setting}) => {
   return (
-    <Tooltip content={SettingsLabelsAndTooltips[setting].tooltip}>
-      <Label>{SettingsLabelsAndTooltips[setting].label}
-        <Icon icon={<Info/>} />
-      </Label>
-    </Tooltip>
+    <div className='advanced-settings-tooltip-label'>
+      <Label>{SettingsLabelsAndTooltips[setting].label}</Label>
+      <InfoTip content={SettingsLabelsAndTooltips[setting].tooltip}></InfoTip>
+    </div>
   )
 }
 

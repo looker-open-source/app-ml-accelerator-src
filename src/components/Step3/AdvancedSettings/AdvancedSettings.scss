@@ -35,7 +35,7 @@
 
     .form-row {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       flex-direction: row;
       margin-top: 20px;
       gap: 18px;
@@ -90,6 +90,12 @@
       }
     }
   }
+}
+
+.advanced-settings-tooltip-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start
 }
 
 .settings-dialog--buttons {
