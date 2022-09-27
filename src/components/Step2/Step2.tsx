@@ -21,8 +21,9 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepInfo={stepName === 'step2' && <RequiredFieldMessages />}>
       <h2>Select your input data</h2>
       <p>NOTES:
+        <br/> Only the explores that use the specific BQ connection configured by your Looker Admin for this application will be shown below.
         <br/> A row limit of 5,000 will be applied to the Explore below, but this limit will not be applied during model training.
-        <br/> Only the explores that use the specific BQ connection configured by your Looker Admin for this application will be shown below.</p>
+        </p>
       <QueryBuilder setIsLoading={setIsLoading}/>
     </StepContainer>
   )
