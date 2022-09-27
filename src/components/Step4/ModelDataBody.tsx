@@ -1,8 +1,6 @@
-import { Card, CardContent, Heading, Icon, Tooltip } from '@looker/components'
-import { Info } from '@styled-icons/material'
+import { Card, CardContent, Heading } from '@looker/components'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
-import { hsl } from 'chroma-js'
 import { sortBy } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
@@ -34,14 +32,11 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
   }
 }
 
-const ProgressBar: React.FC<{ value: number, highIsBad: boolean }> = ({ value, highIsBad }) => {
-  
-  const normalizedFig = value >=1 ? 1 : value //Some numbers can be infinitely big
-
-  const plotFig = Number(normalizedFig) * 100
+const ProgressBar: React.FC<{ value: number, highIsBad: boolean, scaleValue: number }> = ({ value, highIsBad, scaleValue }) => {
+  const normalized = (value > scaleValue ? scaleValue : value) / scaleValue
 
   const calcColor = () => {
-    const quantized = Math.round(value * 10) * 10
+    const quantized = Math.round(normalized * 10) * 10
     const colFig = highIsBad ? 100 - quantized : quantized
     return `hsl(${colFig}, 90%, 40%)`
   }
@@ -51,7 +46,7 @@ const ProgressBar: React.FC<{ value: number, highIsBad: boolean }> = ({ value, h
     <div className="progress--container">
       <div className="progress--bar"
         style={{
-          width: `${plotFig}%`,
+          width: `${Number(normalized) * 100}%`,
           backgroundColor: calcColor()
           }}>
       </div>
@@ -61,14 +56,28 @@ const ProgressBar: React.FC<{ value: number, highIsBad: boolean }> = ({ value, h
 }
 
 const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
+  const { state } = useStore()
+  const { wizard } = state
+  const { step3 } = wizard.steps
+  const { summary } = step3
+  const targetData = summary.data.filter((r: any) => r.column_name.value == summary.data[0].target_column.value)
+  
+  const fetchScaleVal = (key: string) => {
+    if (evaluationAdditionalInfo[key].highIsBad) {
+      return targetData[0]._avg_value.value || 1 //TODO -> validate
+    } else {
+      return 1
+    }
+  }
+  
   const dataItems = []
   const firstRow = data[0]
   for (const key in firstRow) {
     const value = firstRow[key]
     dataItems.push(
-      <Card>
+      <Card key={key}>
         <CardContent>
-        <div className='model-evaluation--item' key={key}>
+        <div className='model-evaluation--item'>
           <div className='model-evaluation--column'>
             <div className='model-evaluation--title'>
                 <Heading>{titilize(splitFieldName(key))}</Heading>
@@ -83,7 +92,11 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
           <div className='model-evaluation--column'>
             <div className='model-evaluation--chart-area'>
               <p>{Number(value).toFixed(4)}</p>
-              <ProgressBar value={value} highIsBad={evaluationAdditionalInfo[key].highIsBad} />
+              <ProgressBar
+                value={value}
+                highIsBad={evaluationAdditionalInfo[key].highIsBad}
+                scaleValue={fetchScaleVal(key)}
+              />
             </div>
           </div>
         </div>
