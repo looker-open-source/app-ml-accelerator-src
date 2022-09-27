@@ -541,7 +541,7 @@ type TEvaluationInfo = {
   [key: string]: {
     tooltip: string,
     subtitle: string,
-    highIsBad: boolean
+    highIsBad: boolean,
   }
 }
 
@@ -575,5 +575,35 @@ export const evaluationAdditionalInfo: TEvaluationInfo = {
     tooltip: "The area under receiver operating characteristic curve. This ranges from zero to one, where a higher value indicates a higher-quality model.",
     subtitle: "Higher is Better",
     highIsBad: false
+  },
+  "mean_absolute_error": {
+    tooltip: "Average absolute difference between the target values and the predicted values. This metric ranges from zero to infinity; a lower value indicates a higher quality model.",
+    subtitle: "Lower is Better",
+    highIsBad: true,
+  },
+  "mean_squared_error": {
+    tooltip: "The square root of the average squared difference between the target and predicted values. More sensitive to outliers than mean absolute error,so if you're concerned about large errors, then this can be a more useful metric to evaluate. A smaller value indicates a higher quality model (0 represents a perfect predictor).",
+    subtitle: "Lower is Better",
+    highIsBad: true,
+  },
+  "mean_squared_log_error": {
+    tooltip: "Similar to mean squared error, but with the natural logarithm of the predicted and actual values plus 1. This penalizes under-prediction more heavily than over-prediction. It can be a good metric when you don't want to penalize differences for large prediction values more heavily than for small prediction values. This metric ranges from zero to infinity; a lower value indicates a higher quality model. This is returned only if all label and predicted values are non-negative.",
+    subtitle: "Lower is Better",
+    highIsBad: true,
+  },
+  "median_absolute_error": {
+    tooltip: "The average absolute percentage difference between the labels and the predicted values. This metric ranges between zero and infinity; a lower value indicates a higher quality model. This is not shown if the target column contains any 0 values, in which case this is undefined.",
+    subtitle: "Lower is Better",
+    highIsBad: true,
+  },
+  "r2_score": {
+    tooltip: "The square of the Pearson correlation coefficient between the labels and predicted values. This metric ranges between zero and one; a higher value indicates a higher quality model.",
+    subtitle: "Higher is Better",
+    highIsBad: false,
+  },
+  "explained_variance": { //TODO
+    tooltip: "Foo Bar Bat Baz",
+    subtitle: "Foo Bar Bat Baz",
+    highIsBad: false,
   },
 }
