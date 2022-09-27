@@ -1,12 +1,16 @@
+import { Card, CardContent, Heading, Icon, Tooltip } from '@looker/components'
+import { Info } from '@styled-icons/material'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
+import { hsl } from 'chroma-js'
 import { sortBy } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
-import { MODEL_EVAL_FUNCS } from '../../services/modelTypes'
+import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo } from '../../services/modelTypes'
 import { noDot, splitFieldName, titilize } from '../../services/string'
 import GlobalExplain from '../GlobalExplain'
+import { InfoTip } from '../InfoTip/InfoTip'
 
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'explain') { return <GlobalExplain /> }
@@ -30,21 +34,72 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
   }
 }
 
+const ProgressBar: React.FC<{ value: number, highIsBad: boolean }> = ({ value, highIsBad }) => {
+  
+  const normalizedFig = value >=1 ? 1 : value //Some numbers can be infinitely big
+
+  const plotFig = Number(normalizedFig) * 100
+
+  const calcColor = () => {
+    const quantized = Math.round(value * 10) * 10
+    const colFig = highIsBad ? 100 - quantized : quantized
+    return `hsl(${colFig}, 90%, 40%)`
+  }
+
+  return (
+      <div className="progress">
+    <div className="progress--container">
+      <div className="progress--bar"
+        style={{
+          width: `${plotFig}%`,
+          backgroundColor: calcColor()
+          }}>
+      </div>
+      </div>
+  </div>
+  )
+}
+
 const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
   const dataItems = []
   const firstRow = data[0]
   for (const key in firstRow) {
     const value = firstRow[key]
     dataItems.push(
-      <div className="model-data-item" key={key}>
-        <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
-        <div className="model-data-item--value">{Number(value).toFixed(4)}</div>
-      </div>
+      <Card>
+        <CardContent>
+        <div className='model-evaluation--item' key={key}>
+          <div className='model-evaluation--column'>
+            <div className='model-evaluation--title'>
+                <Heading>{titilize(splitFieldName(key))}</Heading>
+                <InfoTip content={evaluationAdditionalInfo[key].tooltip} />
+          </div>
+              <p className='model-evaluation--subtitle'
+                style={{
+                  color: evaluationAdditionalInfo[key].highIsBad ? 'red' : 'black'
+                }}
+              >{`${evaluationAdditionalInfo[key].subtitle}`}</p>
+          </div>
+          <div className='model-evaluation--column'>
+            <div className='model-evaluation--chart-area'>
+              <p>{Number(value).toFixed(4)}</p>
+              <ProgressBar value={value} highIsBad={evaluationAdditionalInfo[key].highIsBad} />
+            </div>
+          </div>
+        </div>
+        </CardContent>
+      </Card>
+      // <div className="model-data-item" key={key}>
+      //   <Tooltip content={evaluationAdditionalInfo[key]}>
+      //   <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
+      //   </Tooltip>
+      //   <div className="model-data-item--value">{Number(value).toFixed(4)}</div>
+      // </div>
     )
   }
 
   return (
-    <div>
+    <div className='model-evaluation'>
       { dataItems }
     </div>
   )

@@ -536,3 +536,44 @@ export const getPredictSql = ({
     SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} ${sortString} LIMIT ${limit || 500}
   `
 }
+
+type TEvaluationInfo = {
+  [key: string]: {
+    tooltip: string,
+    subtitle: string,
+    highIsBad: boolean
+  }
+}
+
+export const evaluationAdditionalInfo: TEvaluationInfo = {
+  "precision": {
+    tooltip: "The fraction of classification predictions produced by the model that were correct.",
+    subtitle: "Higher is Better",
+    highIsBad: false
+  },
+  "recall": {
+    tooltip: "The fraction of predictions with this class that the model correctly predicted. Also called true positive rate.",
+    subtitle: "Higher is Better",
+    highIsBad: false
+  },
+  "accuracy": {
+    tooltip: "Foo Bar Bat Baz", // TODO
+    subtitle: "Higher is Better",
+    highIsBad: false
+  },
+  "f1_score": {
+    tooltip: "The harmonic mean of precision and recall. F1 is a useful metric if you're looking for a balance between precision and recall and there's an uneven class distribution.",
+    subtitle: "Higher is Better",
+    highIsBad: false
+  },
+  "log_loss": {
+    tooltip: "The cross-entropy between the model predictions and the target values. This ranges from zero to infinity, where a lower value indicates a higher-quality model.",
+    subtitle: "Lower is Better",
+    highIsBad: true
+  },
+  "roc_auc": {
+    tooltip: "The area under receiver operating characteristic curve. This ranges from zero to one, where a higher value indicates a higher-quality model.",
+    subtitle: "Higher is Better",
+    highIsBad: false
+  },
+}

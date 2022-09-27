@@ -108,41 +108,107 @@
   margin-bottom: 32px;
 }
 
-.model-data-item {
+.model-evaluation {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+&--item {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  gap: 0.5em;
+  align-items: center
+}
+&--column {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+&--title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.2rem;
+  line-height: 1rem;
+}
+&--subtitle {
+  font-style: italic;
+  color: #5F6368;
+  font-size: 10px;
+}
+&--chart-area {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
 
-  & &--placeholder {
-    margin-bottom: 6px;
-    margin-right: 6px;
-    padding: 12px 20px;
-    width: 420px;
+}
+
+#line-progress {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.progress {
+  flex: 1;
+  &--container {
+    height: 1.25rem;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
   }
-
-  & &--name {
-    margin-bottom: 6px;
-    margin-right: 6px;
-    padding: 12px 20px;
-    width: 420px;
-    background-color: #f7f7f7;
-  }
-
-  & &--value {
-    margin-bottom: 6px;
-    padding: 12px 20px;
-    width: 420px;
-    background-color: #f7f7f7;
-  }
-
-  & &--header {
-    margin-right: 6px;
-    margin-bottom: 6px;
-    padding: 12px 20px;
-    width: 420px;
-    background-color: #ccd8e4;
+  &--bar {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #4285F4;
+    top:0;
+    bottom: 0;
+    left: 0;
+    border-radius: inherit;
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    color: white;
+    font-family: sans-serif;
   }
 }
+
+// .model-data-item {
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: flex-start;
+
+//   & &--placeholder {
+//     margin-bottom: 6px;
+//     margin-right: 6px;
+//     padding: 12px 20px;
+//     width: 420px;
+//   }
+
+//   & &--name {
+//     margin-bottom: 6px;
+//     margin-right: 6px;
+//     padding: 12px 20px;
+//     width: 420px;
+//     background-color: #f7f7f7;
+//   }
+
+//   & &--value {
+//     margin-bottom: 6px;
+//     padding: 12px 20px;
+//     width: 420px;
+//     background-color: #f7f7f7;
+//   }
+
+//   & &--header {
+//     margin-right: 6px;
+//     margin-bottom: 6px;
+//     padding: 12px 20px;
+//     width: 420px;
+//     background-color: #ccd8e4;
+//   }
+// }
 
 .model-cm-container {
   position: relative;
