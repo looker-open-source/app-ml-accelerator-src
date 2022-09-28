@@ -178,7 +178,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
   }
 
-  // TODO: could make this a function with more specific criteria depending on current state
   const preContinueToolTipText = "You must name your model, select your target and generate summary stats to continue."
 
   //TODO input_data_row_count?.value is the row count -> compare this to each row in summary.ts and untick + warn 

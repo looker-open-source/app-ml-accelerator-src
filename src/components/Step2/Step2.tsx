@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import withWizardStep from '../WizardStepHOC'
 import StepContainer from '../StepContainer'
 import { getWizardStepCompleteCallback } from '../../services/wizard'
@@ -9,8 +9,18 @@ import './Step2.scss'
 
 const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState(false)
-  const { stepName } = useContext(QueryBuilderContext)
+  const [exploreIsSelected, setExploreIsSelected] = useState(false)
+  const { stepData, stepName } = useContext(QueryBuilderContext)
   const preContinueToolTipText = "You must select fields from an explore and run the query before continuing"
+  
+  useEffect(() => {
+    if (!stepData.exploreName) {
+      setExploreIsSelected(false)
+    } else {
+      setExploreIsSelected(true)
+    }
+  }, [stepData.exploreName])
+
   return (
     <StepContainer
       isLoading={isLoading}
@@ -20,9 +30,10 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       customClass="step2-container"
       stepInfo={stepName === 'step2' && <RequiredFieldMessages />}>
       <h2>Select your input data</h2>
-      <p>NOTES:
-        <br/> Only the explores that use the specific BQ connection configured by your Looker Admin for this application will be shown below.
-        <br/> A row limit of 5,000 will be applied to the Explore below, but this limit will not be applied during model training.
+      <p>NOTE:
+        {exploreIsSelected
+        ? <> A row limit of 5,000 will be applied to the Explore below, but this limit will not be applied during model training.</>
+        : <> Only the explores that use the specific BQ connection configured by your Looker Admin for this application will be shown below.</>}
         </p>
       <QueryBuilder setIsLoading={setIsLoading}/>
     </StepContainer>
