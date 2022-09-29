@@ -1,7 +1,8 @@
 import React from 'react'
 import { SummaryTableHeaders } from '../../types'
-import { Checkbox, Icon } from "@looker/components"
+import { Checkbox, Icon, Tooltip } from "@looker/components"
 import { TrackChanges, AccessTime } from '@styled-icons/material'
+import { Error } from '@styled-icons/material-outlined'
 import { noDot } from '../../services/string'
 
 type SummaryTableRows = {
@@ -40,19 +41,35 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
     }
     return (
       <td className="checkbox">
-        <Checkbox
+        { rowData.isInvalid
+        ? <Icon color='grey' icon={<Error/>}/> :
+         <Checkbox
           checked={selectedFeatures?.indexOf(rowColumnName) >= 0}
           onChange={() => { checkboxChange(rowColumnName) }}
           className="feature-checkbox"
         />
+        }
       </td>
     )
   }
 
+
   const tableRows = data.map((rowData, i) => {
-    const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => (
-      <td className={headers[col].align} key={j}>{ headers[col].converter(rowData) || "∅" }</td>
-    ))
+    const invalidMessage = "Cannot select the primary key of a table as this results in overfitting of the model."
+    const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => {
+      let rowClassNames = [headers[col].align]
+      if (rowData.isInvalid) {
+        rowClassNames.push('invalid')
+      }
+      return (
+      
+          <Tooltip content={rowData.isInvalid ? invalidMessage : ''}>
+            <td className={rowClassNames.join(' ')} key={j}>
+                { headers[col].converter(rowData) || "∅" }
+            </td>
+            </Tooltip>
+      )
+    })
     return (
       <tr key={i}>
         {checkBoxCell(rowData)}

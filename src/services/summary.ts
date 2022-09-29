@@ -26,6 +26,7 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
     for (const key in row) {
       newRow[splitFieldName(key)] = row[key]
     }
+    newRow.isInvalid = newRow.count_distinct_values.value == newRow.input_data_row_count.value
     return newRow
   })
 }

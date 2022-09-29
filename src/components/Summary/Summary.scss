@@ -41,6 +41,9 @@
         }
       }
     }
+    &.invalid {
+      color: gray
+    }
   }
 
   td.right {
