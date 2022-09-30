@@ -24,6 +24,19 @@ export const formatMetaData = (metadata: any) => ({
   subsample: getFirstTrainingOptions(metadata).subsample
 })
 
+export const formatMetaDataBQMLModelTable = (metadata: any) => {
+  const stateJson = JSON.parse(metadata[0].state_json)
+  return {
+    modelId: `${metadata[0].project_name}:${metadata[0].dataset_name}.${metadata[0].model_name}`,
+    creationTime: new Date(Number(metadata[0].model_created_at)),
+    modifiedTime: new Date(Number(metadata[0].model_updated_at)),
+    modelType: stateJson.bqModel.objective,
+    ...('min_split_loss' in stateJson.bqModel.advancedSettings && {minSplitLoss: stateJson.bqModel.advancedSettings.min_split_loss}),
+    ...('max_tree_depth' in stateJson.bqModel.advancedSettings && {maxTreeDepth: stateJson.bqModel.advancedSettings.max_tree_depth}),
+    ...('subsample' in stateJson.bqModel.advancedSettings && {subsample: stateJson.bqModel.advancedSettings.subsample}),
+  }
+}
+
 const getFirstTrainingOptions = (metadata: any) => {
   const firstTraining = metadata.trainingRuns[0]
   if (!firstTraining) { return {} }

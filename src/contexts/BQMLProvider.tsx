@@ -205,10 +205,18 @@ export const BQMLProvider = ({ children }: any) => {
     if (!modelName) {
       throw "Failed fetch model because modelName was not provided"
     }
-    const result = await invokeBQApi(
-      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`
-    )
-    return result
+    // const result = await invokeBQApi(
+    //   `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`
+    // )
+    // return result
+    const sql = `
+      SELECT *, 
+      '${gcpProject}' AS project_name, 
+      '${bqmlModelDatasetName}' AS dataset_name 
+      FROM ${bqmlModelDatasetName}.bqml_model_info
+      WHERE model_name = '${modelName}'
+    `
+    return queryJob(sql)
   }
 
   /**

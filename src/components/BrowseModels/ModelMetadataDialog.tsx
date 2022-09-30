@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { DateFormat, TimeFormat } from "@looker/components-date"
 import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 import { AdminContext } from "../../contexts/AdminProvider"
-import { formatMetaData, METADATA_LABEL_MAP } from '../../services/admin'
+import { formatMetaDataBQMLModelTable, METADATA_LABEL_MAP } from '../../services/admin'
 import Spinner from "../Spinner"
 
 type ModelMetadataDialogProps = {
@@ -37,7 +37,8 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
     setIsLoading(false)
     if (!ok) { return }
     setMetadataRaw(body)
-    setFormattedMetadata(formatMetaData(body))
+    setFormattedMetadata(formatMetaDataBQMLModelTable(body))
+    // setFormattedMetadata(formatMetaData(body))
   }
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +131,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
             >
               Close
             </ButtonTransparent>
-            <Button
+            {/* <Button
               className="action-button"
               color="key"
               iconBefore={<Save />}
@@ -138,7 +139,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
               disabled={isLoading}
             >
               Save
-            </Button>
+            </Button> */}
             { isLoading && <Spinner className="inline-spinner" size={28} />}
             { /* @ts-ignore */ }
             { isSaved && <Icon icon={<Check />} color="positive" size="small" className="inline-spinner" />}

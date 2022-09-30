@@ -117,9 +117,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         type: 'setBQModel',
         data: {
           jobStatus: JOB_STATUSES.done,
-          job: {
-            endTime: new Date()
-          }
         }
       })
     })
