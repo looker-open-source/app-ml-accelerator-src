@@ -100,17 +100,32 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const createModel = async () => {
-    const { ok } = await createBQMLModel?.(
+    // const { ok } = await createBQMLModel?.(
+    await createBQMLModel?.(
       inputData.uid,
       objective,
       inputData.bqModelName,
       inputData.target,
       selectedFeatures,
       inputData.arimaTimeColumn,
-      advancedSettings
-    )
-    setIsLoading(false)
-    return { ok }
+      advancedSettings,
+      setIsLoading
+    ).catch((error) => {
+      return { ok: false }
+    }).then((response) => {
+      dispatch({
+        type: 'setBQModel',
+        data: {
+          jobStatus: JOB_STATUSES.done,
+          job: {
+            endTime: new Date()
+          }
+        }
+      })
+    })
+    return { ok: true }
+    // setIsLoading(false)
+    // return { ok }
   }
 
   const targetTimeColumnChanged = () => (

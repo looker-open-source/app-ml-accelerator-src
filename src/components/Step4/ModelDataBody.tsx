@@ -53,6 +53,7 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
 const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {
   const dataItems = []
   const sortedData = sortBy(data, 'expected_label')
+  // TODO fix unique key error
   const valueCount = sortedData.length
   const firstRow = sortedData[0]
   const matrixColor = (pct: number) => `rgba(66, 133, 244, ${pct / 100})`

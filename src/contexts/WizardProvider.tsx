@@ -13,6 +13,7 @@ import { renameSummaryDataKeys } from '../services/summary'
 import { formatParameterFilter } from '../services/string'
 import { bqModelInitialState } from '../reducers/bqModel'
 import { getBQInputDataSql } from '../services/modelTypes'
+import { lookerToBqResults} from '../services/LookerToBQResults'
 import { bqResultsToLookerFormat } from '../services/apply'
 import { SaveSummaryProps } from '../types/summary'
 import { SaveInputDataProps } from '../types/inputData'
@@ -96,7 +97,7 @@ export const WizardProvider = ({ children }: any) => {
           throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
         }
         const results = {
-          data: bqResultsToLookerFormat(body, step2.exploreName, exploreData),
+          data: bqResultsToLookerFormat(lookerToBqResults(body), step2.exploreName, exploreData),
           sql: ''
         }
         const headers = getHeaderColumns(
@@ -339,7 +340,8 @@ export const WizardProvider = ({ children }: any) => {
     try {
       {
         const { ok, body } = await createModelStateTable?.()
-        if (!ok || !body.jobComplete) {
+        if (!ok) {
+        // if (!ok || !body.jobComplete) {
           throw "Failed to create table"
         }
       }

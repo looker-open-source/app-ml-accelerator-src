@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from 'react'
 import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
+import { lookerToBqResults} from '../services/LookerToBQResults'
 import { createClassifierGlobalExplainSql, createRegressorGlobalExplainSql, isClassifier, selectBoostedTreeGlobalExplainSql } from '../services/modelTypes'
 import { OauthContext } from './OauthProvider'
 
@@ -50,7 +51,8 @@ export const ExplainProvider = ({ children }: any) => {
       // fetch table results now that table is created
       const { ok: selectOk, body: selectBody } = await queryJobAndWait?.(selectSql)
       if (!selectOk) { throw 'Failed to fetch explain data' }
-      queryResults = selectBody
+      queryResults = lookerToBqResults(selectBody)
+      // queryResults = selectBody
 
       dispatch({ type: 'setExplain', explainLevel: classLevelExplain ? 'class' : 'model', data: queryResults })
       return { ok: true, body: queryResults }

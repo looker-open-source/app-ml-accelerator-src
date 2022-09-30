@@ -4,6 +4,7 @@ import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { JOB_STATUSES } from '../constants'
 import { EVALUATE_CREATE_SQL_METHODS, getEvaluateDataSql } from '../services/modelTypes'
+import { lookerToBqResults} from '../services/LookerToBQResults'
 import { WizardContext } from './WizardProvider'
 
 type IModelContext = {
@@ -34,7 +35,7 @@ export const ModelProvider = ({ children }: any) => {
   useEffect(() => {
     if (!job || polling || !modelNameParam) { return }
     if (jobStatus !== JOB_STATUSES.done && jobStatus !== JOB_STATUSES.canceled) {
-      getJobStatus()
+      // getJobStatus()
     }
   }, [])
 
@@ -156,7 +157,8 @@ export const ModelProvider = ({ children }: any) => {
 
       const { ok: selectOk, body: selectBody } = await queryJobAndWait?.(selectSql)
       if (!selectOk) { throw 'Failed to fetch evaluate table data' }
-      queryResults = selectBody
+      queryResults = lookerToBqResults(selectBody)
+      // queryResults = selectBody
 
       dispatch({ type: 'addToStepData', step: 'step4', data: {
         evaluateData: {

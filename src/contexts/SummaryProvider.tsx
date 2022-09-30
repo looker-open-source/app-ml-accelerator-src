@@ -25,7 +25,8 @@ type ISummaryContext = {
     targetField?: string,
     features?: string[],
     arimaTimeColumn?:  string,
-    advancedSettings?: any
+    advancedSettings?: any,
+    setIsLoading?: any
   ) => Promise<any>
 }
 
@@ -202,7 +203,8 @@ export const SummaryProvider = ({ children }: any) => {
     target?: string,
     features?: string[],
     arimaTimeColumn?: string,
-    advancedSettings?: any
+    advancedSettings?: any,
+    setIsLoading?: any
   ) => {
     try {
       if (
@@ -230,15 +232,24 @@ export const SummaryProvider = ({ children }: any) => {
       if (!sql) {
         throw "Failed to create BigQuery Model SQL statement"
       }
-      const { ok, body } = await createJob?.(sql)
-      if (!ok || !body.jobReference.jobId) {
-        throw "Something went wrong, please try again."
-      }
-      await checkCreateModelSuccess(body.jobReference.jobId)
+      const response = createJob?.(sql) 
+      // const { ok, body } = await createJob?.(sql)
+      // if (!ok || !body.jobReference.jobId) {
+      //   throw "Something went wrong, please try again."
+      // }
+      // await checkCreateModelSuccess(body.jobReference.jobId)
 
+      // stubbing the jobState
       const jobState = {
-        jobStatus: JOB_STATUSES.pending,
-        job: body.jobReference,
+        jobStatus: JOB_STATUSES.running,
+        job: {
+          projectId: gcpProject,
+          jobId: "Looker SQL Runner Query",
+          location: "GCP",
+          startTime: new Date(),
+        },
+        // jobStatus: JOB_STATUSES.pending,
+        // job: body.jobReference,
       }
       const { wizard, bqModel } = state
       const tempWizard = {
@@ -248,7 +259,11 @@ export const SummaryProvider = ({ children }: any) => {
       const isModelCreate = !bqModel.name
       const tempBQModel = buildBaseBQModel(wizard, bqModel, jobState, features, advancedSettings)
 
-      await persistModelState?.({ wizardState: tempWizard, bqModel: tempBQModel, isModelCreate, isModelUpdate: true })
+      await persistModelState?.({ wizardState: tempWizard, bqModel: tempBQModel, isModelCreate, isModelUpdate: true }).then(() => {
+        // show spinner until model state is saved to bqml model info table
+        setIsLoading(false)
+        // TODO navigate to review page here
+      })
 
       const { step1, step3 } = wizard.steps
       dispatch({
@@ -276,7 +291,8 @@ export const SummaryProvider = ({ children }: any) => {
           predictSettings: tempBQModel.predictSettings || {}
         }
       })
-      return { ok, body }
+      return response // return the promise instead
+      // return { ok, body }
     } catch (error) {
       dispatch({type: 'addError', error: "Failed to create model: " + error})
       return { ok: false }
