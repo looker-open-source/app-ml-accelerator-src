@@ -3,19 +3,24 @@ import { UIState } from '../types'
 type Action = {type: 'isLoading', value: boolean} |
   {type: 'setFiltersOpen', value: boolean} |
   {type: 'setVizOpen', value: boolean} |
-  {type: 'setDataOpen', value: boolean}
+  {type: 'setDataOpen', value: boolean} | 
+  {type: 'setModelIsBuilding', value: boolean}
 
 const uiInitialState = {
   isLoading: false,
   filtersOpen: false,
   vizOpen: false,
-  dataOpen: true
+  dataOpen: true, 
+  modelIsBuilding: false
 }
 
 function uiReducer(state: UIState, action: Action): any {
   switch (action.type) {
     case 'isLoading': {
       return {...state, isLoading: action.value}
+    }
+    case 'setModelIsBuilding': {
+      return {...state, modelIsBuilding: action.value}
     }
     case 'setFiltersOpen': {
       return {...state, filtersOpen: action.value}
