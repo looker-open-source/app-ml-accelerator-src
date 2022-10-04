@@ -42,7 +42,18 @@
       }
     }
     &.invalid {
+      color: rgb(180, 0, 0)
+    }
+    &.warning {
       color: gray
+    }
+    &.title-icon {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      div[role=img] {
+        width: 5%;
+      }
     }
   }
 

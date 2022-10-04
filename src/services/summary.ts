@@ -21,12 +21,21 @@ export const removeLimit = (sql: string) => {
 // Removes the table name from the column keys
 // e.g. summary_table.pct_null => pct_null
 export const renameSummaryDataKeys = (summaryData: any[]) => {
+  
+  // Warn when a column contains > this % of distinct values in dataset
+  const maxFractionBadData = 0.25; //0.25
+
   return summaryData.map((row) => {
     const newRow: { [key: string]: any } = {}
     for (const key in row) {
       newRow[splitFieldName(key)] = row[key]
     }
-    newRow.isInvalid = newRow.count_distinct_values.value == newRow.input_data_row_count.value
+    // If row count matches dataset row count + type is string it's the Primary Key and cannot be selected
+    // If the row count is >= some fraction of the unique values in the dataset it's possibly a bad to select
+    newRow.summary_status = {
+      isInvalid: newRow.count_distinct_values.value == newRow.input_data_row_count.value && newRow.data_type.value == 'STRING',
+      isWarning: newRow.count_distinct_values.value >= (newRow.input_data_row_count.value * maxFractionBadData),
+    }
     return newRow
   })
 }

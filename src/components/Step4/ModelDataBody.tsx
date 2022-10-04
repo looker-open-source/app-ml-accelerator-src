@@ -1,4 +1,5 @@
-import { Card, CardContent, Heading } from '@looker/components'
+import { Card, CardContent, Heading, IconButton } from '@looker/components'
+import { ArrowCircleDown, ArrowDropDown, ArrowDropUp } from '@styled-icons/material'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
 import { sortBy } from 'lodash'
@@ -32,22 +33,16 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
   }
 }
 
-const ProgressBar: React.FC<{ value: number, highIsBad: boolean, scaleValue: number }> = ({ value, highIsBad, scaleValue }) => {
-  const normalized = (value > scaleValue ? scaleValue : value) / scaleValue
+const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
 
-  const calcColor = () => {
-    const quantized = Math.round(normalized * 10) * 10
-    const colFig = highIsBad ? 100 - quantized : quantized
-    return `hsl(${colFig}, 90%, 40%)`
-  }
 
   return (
       <div className="progress">
     <div className="progress--container">
       <div className="progress--bar"
         style={{
-          width: `${Number(normalized) * 100}%`,
-          backgroundColor: calcColor()
+          width: `${Number(value) * 100}%`,
+          backgroundColor: `hsl(${value * 100}, 90%, 40%)`
           }}>
       </div>
       </div>
@@ -55,67 +50,55 @@ const ProgressBar: React.FC<{ value: number, highIsBad: boolean, scaleValue: num
   )
 }
 
-const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
-  const { state } = useStore()
-  const { wizard } = state
-  const { step3 } = wizard.steps
-  const { summary } = step3
-  const targetData = summary.data.filter((r: any) => r.column_name.value == summary.data[0].target_column.value)
-  
-  const fetchScaleVal = (key: string) => {
-    if (evaluationAdditionalInfo[key].highIsBad) {
-      return targetData[0]._avg_value.value || 1 //TODO -> validate
-    } else {
-      return 1
-    }
-  }
-  
-  const dataItems = []
-  const firstRow = data[0]
-  for (const key in firstRow) {
-    const value = firstRow[key]
-    dataItems.push(
-      <Card key={key}>
-        <CardContent>
-        <div className='model-evaluation--item'>
-          <div className='model-evaluation--column'>
-            <div className='model-evaluation--title'>
-                <Heading>{titilize(splitFieldName(key))}</Heading>
-                <InfoTip content={evaluationAdditionalInfo[key].tooltip} />
-          </div>
-              <p className='model-evaluation--subtitle'
-                style={{
-                  color: evaluationAdditionalInfo[key].highIsBad ? 'red' : 'black'
-                }}
-              >{`${evaluationAdditionalInfo[key].subtitle}`}</p>
-          </div>
-          <div className='model-evaluation--column'>
-            <div className='model-evaluation--chart-area'>
-              <p>{Number(value).toFixed(4)}</p>
-              <ProgressBar
-                value={value}
-                highIsBad={evaluationAdditionalInfo[key].highIsBad}
-                scaleValue={fetchScaleVal(key)}
-              />
-            </div>
-          </div>
-        </div>
-        </CardContent>
-      </Card>
-      // <div className="model-data-item" key={key}>
-      //   <Tooltip content={evaluationAdditionalInfo[key]}>
-      //   <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
-      //   </Tooltip>
-      //   <div className="model-data-item--value">{Number(value).toFixed(4)}</div>
-      // </div>
-    )
-  }
+const EvaluateTableItem: React.FC<{ heading: string, subtitle: string, extraInfo: string[], plottable: boolean, value: number }> = ({ heading, subtitle, extraInfo, plottable, value }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
 
+  const toggleCard = () => setIsExpanded(!isExpanded)
   return (
-    <div className='model-evaluation'>
-      { dataItems }
-    </div>
+    <Card>
+            <div className='model-evaluation--header-row'>
+              <div className='model-evaluation--title'>
+                <Heading>{heading}</Heading>
+                <p className='model-evaluation--subtitle'>{`${subtitle}`}</p>
+              </div>
+              <div className='model-evaluation--details'>
+              <p>{Number(value).toFixed(4)}</p>
+              </div>
+              {isExpanded
+              ? <IconButton icon={<ArrowDropUp/>} size='medium' label='Show more information' onClick={toggleCard}/>
+              : <IconButton icon={<ArrowDropDown/>} size='medium' label='Hide more information' onClick={toggleCard}/>
+            }
+            </div>
+            {isExpanded && <CardContent>
+              {/* TODO - CSS */}
+              {/* {plottable && <ProgressBar value={value}/>} */}
+              {/* TODO - extra info like mins and maxes */}
+              {extraInfo.map(i => <p>{i}</p>)}
+              </CardContent>
+            }
+          </Card>
   )
+}
+
+const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {  
+  const firstRow = data[0]
+  return <div className='model-evaluation'>{ Object.keys(firstRow).map((k) => {
+    const heading = titilize(splitFieldName(k))
+    const subtitle = evaluationAdditionalInfo[k].subtitle
+    const extraInfo = evaluationAdditionalInfo[k].extraInfo
+    const plottable = evaluationAdditionalInfo[k].plottable
+    const value = firstRow[k]
+    return (
+    <EvaluateTableItem
+      key={k}
+      heading={heading}
+      subtitle={subtitle}
+      extraInfo={extraInfo}
+      plottable={plottable}
+      value={value}
+      />
+    )}
+    )}</div>
 }
 
 const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {

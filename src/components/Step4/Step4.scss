@@ -112,23 +112,32 @@
   display: flex;
   flex-direction: column;
   gap: 1em;
+&--header-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 1rem;
+  align-items: center;
+}
 &--item {
   display: flex;
   flex-direction: row;
   gap: 0.5em;
   align-items: center
 }
-&--column {
+&--details {
   width: 50%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 &--title {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.2rem;
-  line-height: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 30%;
+  h2 {
+    line-height: 1.5rem
+  }
 }
 &--subtitle {
   font-style: italic;
@@ -144,10 +153,6 @@
 
 }
 
-#line-progress {
-  width: 100%;
-  padding: 0.5rem;
-}
 
 .progress {
   flex: 1;
