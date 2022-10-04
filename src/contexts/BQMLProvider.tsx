@@ -110,14 +110,11 @@ export const BQMLProvider = ({ children }: any) => {
    * Create job to build summary data
    */
   const queryJob = async (sql: string) => {
-    console.log(`queryJob start at ${new Date()}`)
     const { value: query } = await coreSDK.create_sql_query({
       connection_name: "bigquery",
       sql: sql.replace(/\n/g, ' ')
     })
     const { ok, value } = await coreSDK.run_sql_query(query.slug, "json")
-    console.log(sql)
-    console.log(JSON.stringify( { ok, body: value }))
     // const result = await invokeBQApi(
     //   `projects/${gcpProject}/queries`,
     //   {
@@ -126,7 +123,6 @@ export const BQMLProvider = ({ children }: any) => {
     //     useQueryCache: false
     //   }
     // )
-    console.log(`queryJob end at ${new Date()}`)
     return  { ok, body: value } // raname value to body 
     // return result
   }

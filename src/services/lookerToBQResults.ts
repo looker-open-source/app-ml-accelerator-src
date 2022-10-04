@@ -1,6 +1,7 @@
 export const lookerToBqResults = (lookerQueryResponse: any)  => {
-  const fields = Object.keys(lookerQueryResponse[0]).map((columnName) => {
-    return { "name": columnName, "type": dataType(columnName, lookerQueryResponse)}
+  const firstRow = lookerQueryResponse[0]
+  const fields = Object.keys(firstRow).map((columnName) => {
+    return { "name": columnName, "type": dataType(columnName, firstRow)}
   })
   const rows =  lookerQueryResponse.map((row: any) => { 
     return { f: Object.keys(row).map((key) => {
@@ -18,8 +19,8 @@ export const lookerToBqResults = (lookerQueryResponse: any)  => {
   return bqResults
 }
 
-const dataType = (columnName: any, lookerQueryResponse: any) => {
-  const value = lookerQueryResponse[0][columnName]
+const dataType = (columnName: any, row: any) => {
+  const value = row[columnName]
   if (typeof value == 'number' && !isNaN(value)) {
     if (Number.isInteger(value)) {
       return 'INTEGER'

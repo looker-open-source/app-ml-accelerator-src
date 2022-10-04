@@ -70,40 +70,59 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
     if (ok) { setIsSaved(true) }
   }
 
-  const buildMetadataContent = () => {
-    return Object.keys(formattedMetadata).map((key) => {
-      let fieldValue: any
+  const buildMetadataContentModelDetails = () => {
+    if (formattedMetadata.details) {
+      return  Object.keys(formattedMetadata.details).map((key) => {
+        let fieldValue: any
 
-      switch (key) {
-        case 'description':
-          fieldValue = <FieldText value={description} onChange={onDescChange}/>
-          break
-        case 'labels':
-          fieldValue = <FieldText value={labels.bqmlAccelerator || ''} onChange={onLabelChange} />
-          break
-        case 'creationTime':
-        case 'modifiedTime':
-        case 'expiration':
-          if (typeof formattedMetadata[key] !== 'string') {
-            fieldValue = (<>
-              <DateFormat>{formattedMetadata[key]}</DateFormat> { ' ' }
-              <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{formattedMetadata[key]}</TimeFormat>
-            </>)
+        switch (key) {
+          case 'description':
+            fieldValue = <FieldText value={description} onChange={onDescChange}/>
             break
-          }
-        default:
-          fieldValue = formattedMetadata[key]
-      }
+          case 'labels':
+            fieldValue = <FieldText value={labels.bqmlAccelerator || ''} onChange={onLabelChange} />
+            break
+          case 'creationTime':
+          case 'modifiedTime':
+          case 'expiration':
+            if (typeof formattedMetadata.details[key] !== 'string') {
+              fieldValue = (<>
+                <DateFormat>{formattedMetadata.details[key]}</DateFormat> { ' ' }
+                <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{formattedMetadata.details[key]}</TimeFormat>
+              </>)
+              break
+            }
+          default:
+            fieldValue = formattedMetadata.details[key]
+        }
 
-      return (
-        <div className="metadata-item" key={key}>
-          <Label>{ METADATA_LABEL_MAP[key] }</Label>
-          <div className="metadata-item--value">
-            { fieldValue }
+        return (
+          <div className="metadata-item" key={key}>
+            <Label>{ METADATA_LABEL_MAP[key] }</Label>
+            <div className="metadata-item--value">
+              { fieldValue }
+            </div>
           </div>
-        </div>
-      )
-    })
+        )
+      })
+    }
+  }
+
+  const buildMetadataContentTrainingOptions = () => {
+    if (formattedMetadata.training_options) {
+      return  Object.keys(formattedMetadata.training_options).map((key) => {
+        const fieldValue = formattedMetadata.training_options[key]
+  
+        return (
+          <div className="metadata-item" key={key}>
+            <Label>{ METADATA_LABEL_MAP[key] }</Label>
+            <div className="metadata-item--value">
+              { fieldValue }
+            </div>
+          </div>
+        )
+      })
+    }
   }
 
 
@@ -116,11 +135,24 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
       <DialogContent className="share-dialog--content">
         <div className="metadata-dialog--container modal-pane">
           {
-            buildMetadataContent()
+            buildMetadataContentModelDetails()
           }
         </div>
       </DialogContent>
-      <DialogFooter className="settings-dialog--footer">
+      { formattedMetadata && formattedMetadata.training_options && Object.keys(formattedMetadata.training_options).length > 0 && <>
+          <DialogHeader hideClose="true" borderBottom="transparent" className="share-dialog--header">
+            Training Options
+          </DialogHeader>
+          <DialogContent className="share-dialog--content">
+            <div className="metadata-dialog--container modal-pane">
+              {
+                buildMetadataContentTrainingOptions()
+              }
+            </div>
+          </DialogContent>
+        </>
+      }   
+      <DialogFooter className="settings-dialog--footer"> 
         <div className="settings-dialog--footer-content">
           <div className="settings-dialog--buttons">
             <ButtonTransparent
