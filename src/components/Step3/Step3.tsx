@@ -100,7 +100,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const createModel = async () => {
-    dispatch({type: 'setModelIsBuilding', value: true})
+    dispatch({type: 'setUnsavedState', value: true})
     console.log(state.ui)
     // const { ok } = await createBQMLModel?.(
     await createBQMLModel?.(
@@ -121,7 +121,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           jobStatus: JOB_STATUSES.done,
         }
       })
-      dispatch({type: 'setModelIsBuilding', value: false})
+      dispatch({type: 'setUnsavedState', value: false})
     })
     return { ok: true }
     // setIsLoading(false)
