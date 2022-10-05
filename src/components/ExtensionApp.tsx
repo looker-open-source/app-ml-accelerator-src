@@ -8,20 +8,24 @@ import './ExtensionApp.scss'
 import { useStore } from '../contexts/StoreProvider'
 import { BQMLProvider } from '../contexts/BQMLProvider'
 import ErrorBar from './ErrorBar'
-import { useUnload } from '../services/hooks'
 
 export const ExtensionApp: React.FC = () => {
   const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
   const { state, dispatch } = useStore()
   const [clientId, setClientId] = useState<string | null>()
-
-  useUnload(e => {
-    const msg = "A BQML model is building - exiting the page will lose your work"
-    if (state.ui.unsavedState) {
-      e.preventDefault();
-      e.returnValue  = msg
+  
+  // Warn on page close if state is possibly unsaved
+  useEffect(() => {
+    const warnOnClose = (e) => {
+      const msg = "A BQML model is building - exiting the page will lose your work"
+      if (state.ui.unsavedState) {
+        e.preventDefault();
+        e.returnValue  = msg
+      }
     }
-  })
+    window.addEventListener('beforeunload', warnOnClose)
+    return () => window.removeEventListener('beforeunload', warnOnClose)
+  }, [state.ui.unsavedState])  
 
   useEffect(() => {
     init()
