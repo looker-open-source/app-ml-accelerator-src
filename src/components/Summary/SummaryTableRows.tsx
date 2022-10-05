@@ -2,7 +2,7 @@ import React from 'react'
 import { SummaryTableHeaders } from '../../types'
 import { Checkbox, Icon, Tooltip } from "@looker/components"
 import { TrackChanges, AccessTime } from '@styled-icons/material'
-import { Error } from '@styled-icons/material-outlined'
+import { ErrorOutline } from '@styled-icons/material-outlined'
 import { noDot } from '../../services/string'
 
 type SummaryTableRows = {
@@ -68,7 +68,7 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
         }
       } else if (rowData.summary_status.isWarning) {
         rowClassNames.push('warning')
-        tooltipContent = "This column contains many distinct values. Be cautious as this may cause overfitting."
+        tooltipContent = "This column contains many distinct values relative to the size of the training data. Be cautious as this may cause overfitting."
         iconColor = 'gray'
         if (j == 0 ) {
           rowClassNames.push('title-icon')
@@ -79,8 +79,8 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
       
           <Tooltip content={tooltipContent}>
             <td className={rowClassNames.join(' ')} key={j}>
-                { (j == 0 && (rowData.summary_status.isInvalid || rowData.summary_status.isWarning)) && <Icon color={iconColor} icon={<Error/>}/>}
                 { headers[col].converter(rowData) || "∅" }
+                { (j == 0 && (rowData.summary_status.isInvalid || rowData.summary_status.isWarning)) && <Icon color={iconColor} icon={<ErrorOutline/>}/>}
             </td>
             </Tooltip>
       )

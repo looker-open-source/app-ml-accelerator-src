@@ -45,12 +45,12 @@
       color: rgb(180, 0, 0)
     }
     &.warning {
-      color: gray
+      color: black
     }
     &.title-icon {
       display: flex;
       align-items: center;
-      gap: 0.2rem;
+      gap: 0.3rem;
       div[role=img] {
         width: 5%;
       }
