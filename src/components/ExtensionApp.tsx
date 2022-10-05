@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { OauthProvider } from '../contexts/OauthProvider'
 import { GOOGLE_SCOPES } from '../constants'

@@ -101,7 +101,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const createModel = async () => {
     dispatch({type: 'setUnsavedState', value: true})
-    console.log(state.ui)
     // const { ok } = await createBQMLModel?.(
     await createBQMLModel?.(
       inputData.uid,
@@ -121,6 +120,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           jobStatus: JOB_STATUSES.done,
         }
       })
+      // TODO - this may need to be moved
       dispatch({type: 'setUnsavedState', value: false})
     })
     return { ok: true }
