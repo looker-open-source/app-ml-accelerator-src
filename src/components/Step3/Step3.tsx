@@ -178,7 +178,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
   }
 
-  const preContinueToolTipText = "You must name your model, select your target and generate summary stats to continue."
+  const preContinueToolTipText = "You must name your model, select a target and generate a summary to continue."
 
   //TODO input_data_row_count?.value is the row count -> compare this to each row in summary.ts and untick + warn 
   // when the row count matches the distinct values and the type is STRING = must be the primary key

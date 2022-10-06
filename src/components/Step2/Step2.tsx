@@ -11,7 +11,7 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [exploreIsSelected, setExploreIsSelected] = useState(false)
   const { stepData, stepName } = useContext(QueryBuilderContext)
-  const preContinueToolTipText = "You must select fields from an explore and run the query before continuing"
+  const preContinueToolTipText = "You must select fields from an explore and run the query before continuing."
   
   useEffect(() => {
     if (!stepData.exploreName) {
