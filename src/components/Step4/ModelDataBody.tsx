@@ -52,7 +52,7 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
 // }
 
 const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, value: number }> = ({heading, info, value }) => {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const toggleCard = () => setIsExpanded(!isExpanded)
   return (
