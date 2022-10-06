@@ -45,20 +45,18 @@
       color: rgb(180, 0, 0)
     }
     &.warning {
-      color: black
+      color: rgb(139, 139, 139)
     }
     &.title-icon {
       display: flex;
       align-items: center;
       gap: 0.3rem;
-      div[role=img] {
-        width: 5%;
-      }
     }
   }
 
   td.right {
     text-align: right;
+    justify-content: flex-end;
   }
 
   tbody tr:nth-child(odd) {

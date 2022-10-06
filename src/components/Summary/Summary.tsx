@@ -27,7 +27,7 @@ export const Summary: React.FC<SummaryParams> = ({ targetField, arimaTimeColumn,
 
   const toggleAllFeatures = (evt: any): void => {
     const checked: boolean = evt.currentTarget.checked
-    const selectedFeatures = checked ? summaryData.filter(d => !d.summary_status.isInvalid).map(d => d["column_name"].value) : [targetFieldFormatted]
+    const selectedFeatures = checked ? summaryData.filter(d => d.summary_status.status == 'ok').map(d => d["column_name"].value) : [targetFieldFormatted]
     updateSelectedFeatures(selectedFeatures)
     setAllChecked(checked)
   }

@@ -551,7 +551,7 @@ export const evaluationAdditionalInfo: TEvaluationInfo = {
     extraInfo: [
       "The fraction of classification predictions produced by the model that were correct."
     ],
-    subtitle: "Higher is Better",
+    subtitle: "Higher is better",
     plottable: true
   },
   "recall": {
@@ -560,52 +560,52 @@ export const evaluationAdditionalInfo: TEvaluationInfo = {
       "Value is between 0 and 1",
       "Higher is better"
     ],
-    subtitle: "Higher is Better",
+    subtitle: "Higher is better",
     plottable: true
   },
   "accuracy": {
     extraInfo: ["The global, unweighted ratio of correct predictions"],
-    subtitle: "Higher is Better",
+    subtitle: "Higher is better",
     plottable: true
   },
   "f1_score": {
     extraInfo: ["The harmonic mean of precision and recall. F1 is a useful metric if you're looking for a balance between precision and recall and there's an uneven class distribution."],
-    subtitle: "Higher is Better",
+    subtitle: "Higher is better",
     plottable: true
   },
   "log_loss": {
     extraInfo: ["The cross-entropy between the model predictions and the target values. This ranges from zero to infinity, where a lower value indicates a higher-quality model."],
-    subtitle: "Lower is Better",
+    subtitle: "Lower is better",
     plottable: false
   },
   "roc_auc": {
     extraInfo: ["The area under receiver operating characteristic curve. This ranges from zero to one, where a higher value indicates a higher-quality model."],
-    subtitle: "Higher is Better",
+    subtitle: "Higher is better",
     plottable: true
   },
   "mean_absolute_error": {
     extraInfo: ["Average absolute difference between the target values and the predicted values. This metric ranges from zero to infinity; a lower value indicates a higher quality model."],
-    subtitle: "Lower is Better",
+    subtitle: "Lower is better",
     plottable: false,
   },
   "mean_squared_error": {
     extraInfo: ["The square root of the average squared difference between the target and predicted values. More sensitive to outliers than mean absolute error,so if you're concerned about large errors, then this can be a more useful metric to evaluate. A smaller value indicates a higher quality model (0 represents a perfect predictor)."],
-    subtitle: "Lower is Better",
+    subtitle: "Lower is better",
     plottable: false,
   },
   "mean_squared_log_error": {
     extraInfo: ["Similar to mean squared error, but with the natural logarithm of the predicted and actual values plus 1. This penalizes under-prediction more heavily than over-prediction. It can be a good metric when you don't want to penalize differences for large prediction values more heavily than for small prediction values. This metric ranges from zero to infinity; a lower value indicates a higher quality model. This is returned only if all label and predicted values are non-negative."],
-    subtitle: "Lower is Better",
+    subtitle: "Lower is better",
     plottable: false,
   },
   "median_absolute_error": {
     extraInfo: ["The average absolute percentage difference between the labels and the predicted values. This metric ranges between zero and infinity; a lower value indicates a higher quality model. This is not shown if the target column contains any 0 values, in which case this is undefined."],
-    subtitle: "Lower is Better",
+    subtitle: "Lower is better",
     plottable: false,
   },
   "r2_score": {
     extraInfo: ["The square of the Pearson correlation coefficient between the labels and predicted values. This metric ranges between zero and one; a higher value indicates a higher quality model."],
-    subtitle: "Higher is Better",
+    subtitle: "Higher is better",
     plottable: true,
   },
   "explained_variance": {

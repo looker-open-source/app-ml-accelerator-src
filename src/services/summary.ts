@@ -22,8 +22,27 @@ export const removeLimit = (sql: string) => {
 // e.g. summary_table.pct_null => pct_null
 export const renameSummaryDataKeys = (summaryData: any[]) => {
   
-  // Warn when a column contains > this % of distinct values in dataset
-  const maxFractionBadData = 0.25; //0.25
+  const calcStatus = (newRow: any) => {
+    // Warn when a column contains > this % of distinct values in dataset
+    const maxFractionBadData = 0.5;
+
+    let status = 'ok', message = ''
+    if (newRow.column_name.value == newRow.target_column.value) return {status: status, message: message} // Skip warnings for target
+    if (newRow.data_type.value == 'STRING') {
+      if (newRow.count_distinct_values.value == newRow.input_data_row_count.value) {
+        status = 'invalid'
+        message = 'This field uniquely identifies each row and should not be included in the training data.'
+      }
+      else if (newRow.count_distinct_values.value > (newRow.input_data_row_count.value * maxFractionBadData)) {
+        status = 'warning'
+        message = 'This categorical field contains many distinct values and may cause target leakage or overfitting.'
+      }
+    } else if (newRow.count_distinct_values.value == 1) {
+      status = 'warning'
+      message = 'This field contains only one distinct value and may not be suitable for prediction'
+    }
+      return { status: status, message: message}
+  }
 
   return summaryData.map((row) => {
     const newRow: { [key: string]: any } = {}
@@ -32,10 +51,7 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
     }
     // If row count matches dataset row count + type is string it's the Primary Key and cannot be selected
     // If the row count is >= some fraction of the unique values in the dataset it's possibly a bad to select
-    newRow.summary_status = {
-      isInvalid: newRow.count_distinct_values.value == newRow.input_data_row_count.value && newRow.data_type.value == 'STRING',
-      isWarning: newRow.count_distinct_values.value >= (newRow.input_data_row_count.value * maxFractionBadData),
-    }
+    newRow.summary_status = calcStatus(newRow)
     return newRow
   })
 }

@@ -44,7 +44,7 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
       <td className="checkbox">
          <Checkbox
           checked={selectedFeatures?.indexOf(rowColumnName) >= 0}
-          disabled={rowData.summary_status.isInvalid}
+          disabled={rowData.summary_status.status == 'invalid'}
           onChange={() => { checkboxChange(rowColumnName) }}
           className="feature-checkbox"
         />
@@ -56,21 +56,20 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
   const tableRows = data.map((rowData, i) => {
     
     const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => {
+      const iconRowIdxs = [0, 3] // Which columns to show Warning Icons in
       let rowClassNames = [headers[col].align]
-      let tooltipContent = ''
+      let tooltipContent = rowData.summary_status.message
       let iconColor = ''
-      if (rowData.summary_status.isInvalid) {
+      if (rowData.summary_status.status == 'invalid') {
         rowClassNames.push('invalid')
-        tooltipContent = "Cannot select the primary key of a table as this results in overfitting of the model."
         iconColor = 'rgb(180, 0, 0)'
-        if (j == 0 ) {
+        if (iconRowIdxs.includes(j) ) {
           rowClassNames.push('title-icon')
         }
-      } else if (rowData.summary_status.isWarning) {
+      } else if (rowData.summary_status.status == 'warning') {
         rowClassNames.push('warning')
-        tooltipContent = "This column contains many distinct values relative to the size of the training data. Be cautious as this may cause overfitting."
         iconColor = 'gray'
-        if (j == 0 ) {
+        if (iconRowIdxs.includes(j)) {
           rowClassNames.push('title-icon')
         }
       }
@@ -80,7 +79,7 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
           <Tooltip content={tooltipContent}>
             <td className={rowClassNames.join(' ')} key={j}>
                 { headers[col].converter(rowData) || "∅" }
-                { (j == 0 && (rowData.summary_status.isInvalid || rowData.summary_status.isWarning)) && <Icon color={iconColor} icon={<ErrorOutline/>}/>}
+                { iconRowIdxs.includes(j) && (rowData.summary_status.status !== 'ok') && <Icon color={iconColor} icon={<ErrorOutline/>} size='xsmall'/>}
             </td>
             </Tooltip>
       )
