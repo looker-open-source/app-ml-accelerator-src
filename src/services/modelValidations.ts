@@ -30,7 +30,7 @@ const getTargetRow = (data: any[], target: string) => {
 
 const noNullsValidation = (targetRow: any | undefined) => {
   if (targetRow.length > 0 && targetRow[0].count_nulls.value > 0) {
-    return 'Missing % for target row(s) must be 0%. Return to "Source" tab and filter out null values'
+    return 'The model target cannot contain any rows with missing values. Return to Source tab and filter out null values.'
   }
 }
 
