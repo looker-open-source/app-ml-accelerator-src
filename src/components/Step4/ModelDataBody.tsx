@@ -1,15 +1,15 @@
-import { Card, CardContent, Heading, IconButton } from '@looker/components'
-import { ArrowCircleDown, ArrowDropDown, ArrowDropUp } from '@styled-icons/material'
+import { Card, CardContent, Heading, Icon, IconButton, Text, Tooltip } from '@looker/components'
+import { ArrowDropDown, ArrowDropUp } from '@styled-icons/material'
+import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
 import { sortBy } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
-import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo } from '../../services/modelTypes'
+import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo, TEvaluationInfo } from '../../services/modelTypes'
 import { noDot, splitFieldName, titilize } from '../../services/string'
 import GlobalExplain from '../GlobalExplain'
-import { InfoTip } from '../InfoTip/InfoTip'
 
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'explain') { return <GlobalExplain /> }
@@ -33,72 +33,88 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
   }
 }
 
-const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
+// TODO: investigate
 
+// const ProgressBar: React.FC<{ value: number, plottable: boolean }> = ({ value, plottable }) => {
+//   return (
+//     <div className="progress">
+//     <div className="progress--container">
+//       <div className="progress--bar"
+//         style={{
+//           width: `${Number(value) * 100}%`,
+//           // backgroundColor: `hsl(${value * 100}, 90%, 40%)`
+//           }}>
+//             <p>{Number(value).toFixed(4)}</p>
+//       </div>
+//       </div>
+//   </div>
+//   )
+// }
 
-  return (
-      <div className="progress">
-    <div className="progress--container">
-      <div className="progress--bar"
-        style={{
-          width: `${Number(value) * 100}%`,
-          backgroundColor: `hsl(${value * 100}, 90%, 40%)`
-          }}>
-      </div>
-      </div>
-  </div>
-  )
-}
-
-const EvaluateTableItem: React.FC<{ heading: string, subtitle: string, extraInfo: string[], plottable: boolean, value: number }> = ({ heading, subtitle, extraInfo, plottable, value }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, value: number }> = ({heading, info, value }) => {
+  const [isExpanded, setIsExpanded] = useState(true)
 
   const toggleCard = () => setIsExpanded(!isExpanded)
   return (
-    <Card>
-            <div className='model-evaluation--header-row'>
-              <div className='model-evaluation--title'>
-                <Heading>{heading}</Heading>
-                <p className='model-evaluation--subtitle'>{`${subtitle}`}</p>
-              </div>
+    <div className='model-evaluation--card'>
+            <div className='model-evaluation--hover-area' onClick={toggleCard} >
+              <div className='model-evaluation--topRow'>
+                <div className='model-evaluation--mainInfo'>
+                  <Heading>{heading}</Heading>
+                <Tooltip content={info.subtitle}>
+                <Icon icon={info.high_is_positive 
+                  ? <ArrowCircleUp color='rgb(39, 117, 26)'/> 
+                  : <ArrowCircleDown color='rgb(0, 99, 198)'/>}/>
+                </Tooltip>
+                </div>
               <div className='model-evaluation--details'>
-              <p>{Number(value).toFixed(4)}</p>
+              {/* <ProgressBar value={value} plottable={info.plottable}/>               */}
+              {Number(value).toFixed(4)}
               </div>
               {isExpanded
-              ? <IconButton icon={<ArrowDropUp/>} size='medium' label='Show more information' onClick={toggleCard}/>
-              : <IconButton icon={<ArrowDropDown/>} size='medium' label='Hide more information' onClick={toggleCard}/>
+              ? <IconButton icon={<ArrowDropUp/>} size='medium' label='Show more information'/>
+              : <IconButton icon={<ArrowDropDown/>} size='medium' label='Hide more information'/>
             }
             </div>
-            {isExpanded && <CardContent>
-              {/* TODO - CSS */}
-              {/* {plottable && <ProgressBar value={value}/>} */}
-              {/* TODO - extra info like mins and maxes */}
-              {extraInfo.map(i => <p>{i}</p>)}
-              </CardContent>
-            }
-          </Card>
+            </div>
+            {isExpanded && 
+            <div className='model-evaluation--card-content'>
+              {info.extraInfo.map(i => <p>{i}</p>)}
+          </div>
+          }
+    </div>
   )
 }
 
 const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {  
   const firstRow = data[0]
-  return <div className='model-evaluation'>{ Object.keys(firstRow).map((k) => {
-    const heading = titilize(splitFieldName(k))
-    const subtitle = evaluationAdditionalInfo[k].subtitle
-    const extraInfo = evaluationAdditionalInfo[k].extraInfo
-    const plottable = evaluationAdditionalInfo[k].plottable
-    const value = firstRow[k]
-    return (
-    <EvaluateTableItem
-      key={k}
-      heading={heading}
-      subtitle={subtitle}
-      extraInfo={extraInfo}
-      plottable={plottable}
-      value={value}
-      />
-    )}
-    )}</div>
+  const keys = Object.keys(firstRow)
+  const half = Math.ceil(Object.keys(firstRow).length / 2);    
+  const firstHalf = keys.slice(0, half)
+  const secondHalf = keys.slice(half)
+
+  return (
+    <div className='model-evaluation'>
+      <div className='model-evaluation--column'>
+        {firstHalf.map((k) => <EvaluateTableItem
+            key={k}
+            heading={titilize(splitFieldName(k))}
+            info={evaluationAdditionalInfo[k]}
+            value={firstRow[k]}
+            />
+          )}
+      </div>
+      <div className='model-evaluation--column'>
+        {secondHalf.map((k) => <EvaluateTableItem
+            key={k}
+            heading={titilize(splitFieldName(k))}
+            info={evaluationAdditionalInfo[k]}
+            value={firstRow[k]}
+            />
+          )}
+      </div>
+      </div>
+    )
 }
 
 const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {
