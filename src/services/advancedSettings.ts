@@ -305,7 +305,7 @@ type tooltipMapping = {
 export const SettingsLabelsAndTooltips: tooltipMapping = {
   boosterType: {
     label: "Booster type", 
-    tooltip: "For boosted tree models, specify the booster type to use, with default value 'GBTREE'"
+    tooltip: "For boosted tree models, specify the booster type to use, with default value 'GBTREE'."
   },
   numberParallelTree: {
     label: "Number parallel trees", 

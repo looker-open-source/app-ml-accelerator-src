@@ -41,19 +41,20 @@
         }
       }
     }
-    &.invalid {
-      color: rgb(180, 0, 0)
-    }
-    &.warning {
-      color: rgb(139, 139, 139)
-    }
     &.title-icon {
       display: flex;
       align-items: center;
       gap: 0.3rem;
     }
   }
-
+  
+  .invalid {
+    color: rgb(221, 34, 59)
+  }
+  .warning {
+    color: rgb(76, 83, 91)
+  }
+  
   td.right {
     text-align: right;
     justify-content: flex-end;

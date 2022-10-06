@@ -95,7 +95,10 @@
 .advanced-settings-tooltip-label {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start
+  align-items: flex-start;
+  div[role=img] {
+    color: rgb(95, 101, 110)
+  }
 }
 
 .settings-dialog--buttons {

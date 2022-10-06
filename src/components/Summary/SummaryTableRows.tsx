@@ -59,16 +59,13 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
       const iconRowIdxs = [0, 3] // Which columns to show Warning Icons in
       let rowClassNames = [headers[col].align]
       let tooltipContent = rowData.summary_status.message
-      let iconColor = ''
       if (rowData.summary_status.status == 'invalid') {
         rowClassNames.push('invalid')
-        iconColor = 'rgb(180, 0, 0)'
         if (iconRowIdxs.includes(j) ) {
           rowClassNames.push('title-icon')
         }
       } else if (rowData.summary_status.status == 'warning') {
         rowClassNames.push('warning')
-        iconColor = 'gray'
         if (iconRowIdxs.includes(j)) {
           rowClassNames.push('title-icon')
         }
@@ -79,7 +76,7 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
           <Tooltip content={tooltipContent}>
             <td className={rowClassNames.join(' ')} key={j}>
                 { headers[col].converter(rowData) || "∅" }
-                { iconRowIdxs.includes(j) && (rowData.summary_status.status !== 'ok') && <Icon color={iconColor} icon={<ErrorOutline/>} size='xsmall'/>}
+                { iconRowIdxs.includes(j) && (rowData.summary_status.status !== 'ok') && <Icon icon={<ErrorOutline/>} size='xsmall'/>}
             </td>
             </Tooltip>
       )
