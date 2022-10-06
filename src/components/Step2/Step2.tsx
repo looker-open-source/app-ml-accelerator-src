@@ -33,7 +33,7 @@ const Step2: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       <p>NOTE:
         {exploreIsSelected
         ? <> A row limit of 5,000 will be applied to the Explore below, but this limit will not be applied during model training.</>
-        : <> Only the explores that use the specific BQ connection configured by your Looker Admin for this application will be shown below.</>}
+        : <> You will only see the Explores allowed to access the application’s BigQuery connection.</>}
         </p>
       <QueryBuilder setIsLoading={setIsLoading}/>
     </StepContainer>
