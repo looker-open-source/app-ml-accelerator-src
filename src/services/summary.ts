@@ -39,7 +39,7 @@ export const renameSummaryDataKeys = (summaryData: any[]) => {
       }
     } else if (newRow.count_distinct_values.value == 1) {
       status = 'warning'
-      message = 'This field contains only one distinct value and may not be suitable for prediction'
+      message = 'This field contains only one distinct value and may not be useful for model training.'
     }
       return { status: status, message: message}
   }
