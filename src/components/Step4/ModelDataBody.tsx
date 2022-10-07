@@ -1,5 +1,4 @@
-import { Card, CardContent, Heading, Icon, IconButton, Text, Tooltip } from '@looker/components'
-import { ArrowDropDown, ArrowDropUp } from '@styled-icons/material'
+import {  Icon, Tooltip } from '@looker/components'
 import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
@@ -60,21 +59,16 @@ const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, valu
             <div className='model-evaluation--hover-area' onClick={toggleCard} >
               <div className='model-evaluation--topRow'>
                 <div className='model-evaluation--mainInfo'>
-                  <Heading>{heading}</Heading>
                 <Tooltip content={info.subtitle}>
                 <Icon icon={info.high_is_positive 
                   ? <ArrowCircleUp color='rgb(39, 117, 26)'/> 
                   : <ArrowCircleDown color='rgb(0, 99, 198)'/>}/>
                 </Tooltip>
+                  <div className='model-evaluation--heading'>{heading}</div>
                 </div>
               <div className='model-evaluation--details'>
-              {/* <ProgressBar value={value} plottable={info.plottable}/>               */}
               {Number(value).toFixed(4)}
               </div>
-              {isExpanded
-              ? <IconButton icon={<ArrowDropUp/>} size='medium' label='Show more information'/>
-              : <IconButton icon={<ArrowDropDown/>} size='medium' label='Hide more information'/>
-            }
             </div>
             </div>
             {isExpanded && 

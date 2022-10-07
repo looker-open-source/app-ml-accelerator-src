@@ -124,6 +124,13 @@
   &--card-content {
     padding: 1rem;
   }
+  &--heading {
+    line-height: 1.25rem;
+    font-weight: 500;
+    font-size: 18px;
+    padding: 0;
+    margin: 0;
+  }
   &--column {
     flex: 1;
     display: flex;
@@ -141,9 +148,8 @@
   &--mainInfo {
   display: flex;
   flex-direction: row;
-  gap: 0.2em;
+  gap: 0.3rem;
   align-items: center;
-  width: 50%;
 }
 &--hover-area {
   &:hover {
@@ -154,6 +160,10 @@
 &--details {
   display: flex;
   flex-direction: row;
+  border: 1px solid grey;
+  padding: 0.3rem;
+  border-radius: 0.25rem;
+  color: rgb(76, 83, 91);
 }
  &--cardContent {
   color: rgb(76, 83, 91);
