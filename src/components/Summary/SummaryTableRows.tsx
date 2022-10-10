@@ -16,7 +16,6 @@ type SummaryTableRows = {
 
 export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, targetField, arimaTimeColumn, selectedFeatures, checkboxChange }) => {
   if (!data) { return null }
-  console.log(data)
 
   const checkBoxCell = (rowData: any) => {
     const rowColumnName = rowData["column_name"].value
