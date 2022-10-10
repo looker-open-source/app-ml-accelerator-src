@@ -293,12 +293,8 @@ export const formConfusionMatrixSql = ({
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.confusionMatrix} AS (
     SELECT *
     FROM ML.CONFUSION_MATRIX (
-      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
-      (SELECT ${selectedFeatures.join(', ')}
-      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
-      ${threshold ?
-      `, STRUCT(${threshold} as threshold)` : ''
-    }
+      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}
+      ${threshold ? `, STRUCT(${threshold} as threshold)` : '' } 
     ))
   `
 }
@@ -328,12 +324,8 @@ export const formROCCurveSql = ({
   }
   return `CREATE OR REPLACE VIEW
     \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.rocCurve} AS (
-    SELECT *
-    FROM ML.ROC_CURVE(
-      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
-      (SELECT ${selectedFeatures.join(', ')}
-      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid})
-    ))
+    SELECT * FROM ML.ROC_CURVE(MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName})
+    )
   `
 }
 
