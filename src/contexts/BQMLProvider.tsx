@@ -288,7 +288,6 @@ export const BQMLProvider = ({ children }: any) => {
     const  { name: bqModelName } = bqModel
     const { email: userEmail, firstName: firstName, lastName: lastName } = state.user
     const stateJson = JSON.stringify(generateModelState(wizardState, bqModel))
-
     let timeSql: string = ''
     let timestampCreate: string = ''
     let timestampUpdate: string = ''
@@ -301,7 +300,7 @@ export const BQMLProvider = ({ children }: any) => {
       timeSql +=`, ${now} as model_updated_at`
       timestampUpdate = ', model_updated_at=S.model_updated_at'
     }
-
+    console.log(`Calling persistModelState with bqModel details: ${JSON.stringify(bqModel, null, 2)}`) //TODO delete
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
           USING (SELECT '${bqModelName}' AS model_name
@@ -318,6 +317,7 @@ export const BQMLProvider = ({ children }: any) => {
             INSERT (model_name, state_json, created_by_first_name, created_by_last_name, created_by_email${timestampCreate})
             VALUES(model_name, state_json, created_by_first_name, created_by_last_name, created_by_email${timestampCreate})
     `
+    console.log(`Executing SQL: ${sql}`) //TODO delete
     return queryJobAndWait(sql)
   }
 

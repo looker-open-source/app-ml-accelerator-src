@@ -115,13 +115,13 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     ).catch((_e) => {
       return { ok: false }
     })
-    const { wizard, bqModel } = state
+    const { wizard, bqModel } = state // TODO - this is not working properly - state is not accurately retrieved
     const tmpBQModel = {
       ...bqModel,
       jobStatus: JOB_STATUSES.done
     }
     // Second persist with the finished Job state once the sql finishes executing and the promise inside createBQMLModel resolves
-    await persistModelState?.({ wizardState: wizard, bqModel: tmpBQModel, isModelCreate: false, isModelUpdate: true }).then(() => {
+    await persistModelState?.({ wizardState: wizard, bqModel: tmpBQModel, isModelCreate: false, isModelUpdate: false }).then(() => {
       dispatch({type: 'setUnsavedState', value: false})
     }).catch((_e) => {
       return { ok: false }
