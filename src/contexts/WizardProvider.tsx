@@ -282,12 +282,13 @@ export const WizardProvider = ({ children }: any) => {
     const fields = (rawSummary.fields || {})
     const summaryData = renameSummaryDataKeys(rawSummary.data)
     const allFeatures = summaryData.map((d: any) => d["column_name"].value)
+    const allValidFeatures = summaryData.filter(d => d.summary_status.status == 'ok').map((d: any) => d["column_name"].value)
     dispatch({
       type: 'addToStepData',
       step: 'step3',
       data: {
         allFeatures,
-        selectedFeatures: selectedFeatures || [...allFeatures],
+        selectedFeatures: selectedFeatures || [...allValidFeatures],
         advancedSettings: cloneDeep(step3.advancedSettings) || {},
         summary: {
           data: summaryData,

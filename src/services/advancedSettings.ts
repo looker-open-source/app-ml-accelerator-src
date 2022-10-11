@@ -293,3 +293,102 @@ export const HOLIDAY_REGION_OPTIONS = [
   { value: 'VN', label: 'Vietnam' },
   { value: 'ZA', label: 'South Africa' }
 ]
+
+type tooltipMapping = {
+  [key: string]: {
+    label: string,
+    tooltip: string
+  }
+}
+
+//TODO - proofread and investigate if more detail is needed
+export const SettingsLabelsAndTooltips: tooltipMapping = {
+  boosterType: {
+    label: "Booster type", 
+    tooltip: "For boosted tree models, specify the booster type to use, with default value 'GBTREE'."
+  },
+  numberParallelTree: {
+    label: "Number parallel trees", 
+    tooltip: "Number of parallel trees constructed during each iteration. Default value is 1. To train a boosted random forest, set this value larger than 1."
+  },
+  dartNormalizeType: {
+    label: "Dart normalize type", 
+    tooltip: "Type of normalization algorithm for DART booster. Default value is 'TREE'."
+  },
+  treeMethod: {
+    label: "Tree Method", 
+    tooltip: "Type of tree construction algorithm. Default value is 'AUTO', but 'HIST' is recommended for large datasets in order to achieve faster training speed and lower resource consumption."
+  },
+  minimumTreeChildWeight: {
+    label: "Minimum tree child weight", 
+    tooltip: "Minimum sum of instance weight needed in a child for further partitioning. If the tree partition step results in a leaf node with the sum of instance weight less than 'Minimum tree child weight', then the building process will give up further partitioning. The larger 'Minimum tree child weight' is, the more conservative the algorithm will be. The value should be greater than or equal to 0, with default value 1."
+  },
+  columnSampleByTree: {
+    label: "Column sample by tree", 
+    tooltip: "Subsample ratio of columns when constructing each tree. Subsampling occurs once for every tree constructed. The value should be between 0 and 1, with default value 1."
+  },
+  columnSampleByLevel: {
+    label: "Column sample by level", 
+    tooltip: "Subsample ratio of columns for each level. Subsampling occurs once for every new depth level reached in a tree. Columns are subsampled from the set of columns chosen for the current tree. The value should be between 0 and 1, with default value 1."
+  },
+  columnSampleByNode: {
+    label: "Column sample by node", 
+    tooltip: "Subsample ratio of columns for each node (split). Subsampling occurs once every time a new split is evaluated. Columns are subsampled from the set of columns chosen for the current level. The value should be between 0 and 1, with default value 1."
+  },
+  minimumSplitLoss: {
+    label: "Minimum split loss", 
+    tooltip: "Minimum loss reduction required to make a further partition on a leaf node of the tree. The larger 'Minimum split loss' is, the more conservative the algorithm will be. Default value is 0."
+  },
+  maximumTreeDepth: {
+    label: "Maximum tree depth", 
+    tooltip: "Maximum depth of a tree. Default value is 6."
+  },
+  subsample: {
+    label: "Subsample", 
+    tooltip: "Subsample ratio of the training instances. Setting this value to 0.5 means that training randomly samples half of the training data prior to growing trees, which prevents overfitting. Subsampling will occur once in every boosting iteration. This is independent of the training-test data split used in the training options (80/20 random by default)."
+  },
+  autoClassWeights: {
+    label: "Auto class weights", 
+    tooltip: "Whether to balance class labels using weights for each class in inverse proportion to the frequency of that class."
+  },
+  L1reg: {
+    label: "L1 reg", 
+    tooltip: "The amount of L1 regularization applied."
+  },
+  L2reg: {
+    label: "L2 reg", 
+    tooltip: "The amount of L2 regularization applied."
+  },
+  Earlystop: {
+    label: "Early stop", 
+    tooltip: "Whether training should stop after the first iteration in which the relative loss improvement is less than the value specified for 'Minimum relative progress'."
+  },
+  Learnrate: {
+    label: "Learn rate", 
+    tooltip: "Learn rate is the step size shrinkage used in update to prevents overfitting. After each boosting step, learn_rate shrinks the feature weights to make the boosting process more conservative."
+  },
+  MaximumIterations: {
+    label: "Maximum iterations", 
+    tooltip: "The maximum number of rounds for boosting."
+  },
+  MinimumRelativeProgress: {
+    label: "Minimum relative progress", 
+    tooltip: "The minimum relative loss improvement that is necessary to continue training when 'Early stop' is set to true. For example, a value of 0.01 specifies that each iteration must reduce the loss by 1% for training to continue."
+  },
+  dataSplitMethod: {
+    label: "Data split method", 
+    tooltip: "The method to split input data into training and evaluation sets. Training data is used to train the model. Evaluation data is used to avoid overfitting due to early stopping."
+  },
+  dataSplitEvaluationFraction: {
+    label: "Data split evaluation fraction", 
+    tooltip: "This option is used with 'RANDOM' and 'SEQ' splits. It specifies the fraction of the data used for evaluation, accurate to two decimal places."
+  },
+  dataSplitColumn: {
+    label: "Data split column", 
+    tooltip: "Identifies the column used to split the data. This column cannot be used as a feature or label, and will be excluded from features automatically."
+  },
+  enableGlobalExplain: {
+    label: "Enable global explain", 
+    tooltip: "Whether to compute global explanations using explainable AI to evaluate global feature importance to the model."
+  }
+}

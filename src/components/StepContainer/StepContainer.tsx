@@ -12,6 +12,7 @@ type StepContainerParams = {
   children: any,
   stepInfo?: any,
   buttonText?: string,
+  tooltipDisabledText?: string,
   handleCompleteClick?: () => Promise<boolean>
 }
 
@@ -25,7 +26,8 @@ export const StepContainer: React.FC<StepContainerParams> = ({
   children,
   stepInfo,
   buttonText,
-  handleCompleteClick
+  handleCompleteClick,
+  tooltipDisabledText
 }) => {
   const loadingClass = isLoading ? 'loading' : ''
 
@@ -42,6 +44,7 @@ export const StepContainer: React.FC<StepContainerParams> = ({
             stepNumber={stepNumber}
             buttonText={buttonText}
             handleCompleteClick={handleCompleteClick}
+            tooltipDisabledText={tooltipDisabledText}
           />
         </div>
       }

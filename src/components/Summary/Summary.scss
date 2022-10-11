@@ -41,10 +41,23 @@
         }
       }
     }
+    &.title-icon {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
   }
-
+  
+  .invalid {
+    color: rgb(221, 34, 59)
+  }
+  .warning {
+    color: rgb(76, 83, 91)
+  }
+  
   td.right {
     text-align: right;
+    justify-content: flex-end;
   }
 
   tbody tr:nth-child(odd) {

@@ -1,7 +1,8 @@
 import React from 'react'
 import { SummaryTableHeaders } from '../../types'
-import { Checkbox, Icon } from "@looker/components"
+import { Checkbox, Icon, Tooltip } from "@looker/components"
 import { TrackChanges, AccessTime } from '@styled-icons/material'
+import { ErrorOutline } from '@styled-icons/material-outlined'
 import { noDot } from '../../services/string'
 
 type SummaryTableRows = {
@@ -40,8 +41,9 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
     }
     return (
       <td className="checkbox">
-        <Checkbox
+         <Checkbox
           checked={selectedFeatures?.indexOf(rowColumnName) >= 0}
+          disabled={rowData.summary_status.status == 'invalid'}
           onChange={() => { checkboxChange(rowColumnName) }}
           className="feature-checkbox"
         />
@@ -49,10 +51,35 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
     )
   }
 
+
   const tableRows = data.map((rowData, i) => {
-    const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => (
-      <td className={headers[col].align} key={j}>{ headers[col].converter(rowData) || "∅" }</td>
-    ))
+    
+    const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => {
+      const iconRowIdxs = [0, 3] // Which columns to show Warning Icons in
+      let rowClassNames = [headers[col].align]
+      let tooltipContent = rowData.summary_status.message
+      if (rowData.summary_status.status == 'invalid') {
+        rowClassNames.push('invalid')
+        if (iconRowIdxs.includes(j) ) {
+          rowClassNames.push('title-icon')
+        }
+      } else if (rowData.summary_status.status == 'warning') {
+        rowClassNames.push('warning')
+        if (iconRowIdxs.includes(j)) {
+          rowClassNames.push('title-icon')
+        }
+      }
+
+      return (
+      
+          <Tooltip content={tooltipContent}>
+            <td className={rowClassNames.join(' ')} key={j}>
+                { headers[col].converter(rowData) || "∅" }
+                { iconRowIdxs.includes(j) && (rowData.summary_status.status !== 'ok') && <Icon icon={<ErrorOutline/>} size='xsmall'/>}
+            </td>
+            </Tooltip>
+      )
+    })
     return (
       <tr key={i}>
         {checkBoxCell(rowData)}

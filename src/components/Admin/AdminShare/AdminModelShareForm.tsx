@@ -20,7 +20,6 @@ export const AdminModelShareForm : React.FC<AdminModelsShareFormProps> = ({ mode
 
   const checkboxChange = (email: string) => {
     const newCheckedList = toggleArrayEntry(checkedList, email)
-    console.log({newCheckedList})
     setCheckedList(newCheckedList)
   }
 
