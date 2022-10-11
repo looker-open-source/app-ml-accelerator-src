@@ -201,6 +201,12 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     return jobStatus === JOB_STATUSES.pending || jobStatus === JOB_STATUSES.running
   }
 
+  const preContinueToolTipText = "You must name your model, select a target and generate a summary to continue."
+
+  //TODO input_data_row_count?.value is the row count -> compare this to each row in summary.ts and untick + warn 
+  // when the row count matches the distinct values and the type is STRING = must be the primary key
+  // investigate adding this at the explore stage
+
   return (
     <StepContainer
       isLoading={isLoading}
@@ -208,6 +214,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       stepComplete={!isInvalid && stepComplete}
       stepNumber={3}
       buttonText={stepCompleteButtonText()}
+      tooltipDisabledText={preContinueToolTipText}
       handleCompleteClick={buildHandleCompleteClick()}
       stepInfo={!isArima(objective || '') ? (<AdvancedSettings objective={objective}/>) : ''}
     >
@@ -220,8 +227,9 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           setLoadingNameStatus={setLoadingNameStatus}
           disabled={!!modelNameParam || (!!summary.data && !!inputData.target) === true}
         />
-        <div className="wizard-card">
+        <div className="wizard-card spaced">
           <h2>Select your target</h2>
+          <p>This is the field you wish to predict</p>
           <Select
             options={targetFieldOptions}
             value={targetField}
@@ -233,7 +241,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
         {
           arima &&
             (
-              <div className="wizard-card">
+              <div className="wizard-card spaced">
                 <h2>Select your Time Column</h2>
                 <Select
                   options={timeColumnFieldOptions}
@@ -245,21 +253,25 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
               </div>
             )
         }
-        <div className="wizard-card">
+        <div className="wizard-card spaced">
+          <div>
           <h2>Data Summary Statistics</h2>
-          <div className="summary-factoid">
-            Columns: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.input_data_column_count?.value ? summary?.data[0]?.input_data_column_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '???'}</span>
+            <div className="summary-factoid">
+              Columns: <span className="factoid-bold">{summary?.data?.length > 0 && summary?.data[0]?.input_data_column_count?.value ? summary?.data[0]?.input_data_column_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '???'}</span>
+            </div>
+            <div className="summary-factoid">
+              Rows: <span className="factoid-bold">{(summary?.data?.length > 0 && summary?.data[0]?.input_data_row_count?.value) ? summary?.data[0]?.input_data_row_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")  : '???'}</span>
+            </div>
           </div>
-          <div className="summary-factoid">
-            Rows: <span className="factoid-bold">{(summary?.data?.length > 0 && summary?.data[0]?.input_data_row_count?.value) ? summary?.data[0]?.input_data_row_count?.value?.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")  : '???'}</span>
+          <div>
+            <GenerateSummaryButton
+              setIsLoading={setIsLoading}
+              loadingNameStatus={loadingNameStatus}
+              nameCheckStatus={nameCheckStatus}
+              summaryUpToDate={summaryUpToDate}
+              targetTimeColumnChanged={targetTimeColumnChanged}
+              />
           </div>
-          <GenerateSummaryButton
-            setIsLoading={setIsLoading}
-            loadingNameStatus={loadingNameStatus}
-            nameCheckStatus={nameCheckStatus}
-            summaryUpToDate={summaryUpToDate}
-            targetTimeColumnChanged={targetTimeColumnChanged}
-          />
         </div>
       </div>
       { buildOptionalParameters() }

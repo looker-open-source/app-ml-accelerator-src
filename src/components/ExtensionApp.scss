@@ -133,6 +133,10 @@ body,
   justify-content: flex-start;
   background-color: #F6F6F6;
   padding: 16px;
+  
+  &.spaced {
+    justify-content: space-between;
+  }
 
   &.active {
     background-color: #bed2f3;

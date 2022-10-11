@@ -1,10 +1,12 @@
+import {  Icon, Tooltip } from '@looker/components'
+import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
 import { sortBy } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
-import { MODEL_EVAL_FUNCS } from '../../services/modelTypes'
+import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo, TEvaluationInfo } from '../../services/modelTypes'
 import { noDot, splitFieldName, titilize } from '../../services/string'
 import GlobalExplain from '../GlobalExplain'
 
@@ -30,24 +32,83 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
   }
 }
 
-const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
-  const dataItems = []
-  const firstRow = data[0]
-  for (const key in firstRow) {
-    const value = firstRow[key]
-    dataItems.push(
-      <div className="model-data-item" key={key}>
-        <div className="model-data-item--name">{titilize(splitFieldName(key))}:</div>
-        <div className="model-data-item--value">{Number(value).toFixed(4)}</div>
-      </div>
-    )
-  }
+// TODO: investigate
 
+// const ProgressBar: React.FC<{ value: number, plottable: boolean }> = ({ value, plottable }) => {
+//   return (
+//     <div className="progress">
+//     <div className="progress--container">
+//       <div className="progress--bar"
+//         style={{
+//           width: `${Number(value) * 100}%`,
+//           // backgroundColor: `hsl(${value * 100}, 90%, 40%)`
+//           }}>
+//             <p>{Number(value).toFixed(4)}</p>
+//       </div>
+//       </div>
+//   </div>
+//   )
+// }
+
+const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, value: number }> = ({heading, info, value }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const toggleCard = () => setIsExpanded(!isExpanded)
   return (
-    <div>
-      { dataItems }
+    <div className='model-evaluation--card'>
+            <div className='model-evaluation--hover-area' onClick={toggleCard} >
+              <div className='model-evaluation--topRow'>
+                <div className='model-evaluation--mainInfo'>
+                <Tooltip content={info.subtitle}>
+                <Icon icon={info.high_is_positive 
+                  ? <ArrowCircleUp color='rgb(39, 117, 26)'/> 
+                  : <ArrowCircleDown color='rgb(0, 99, 198)'/>}/>
+                </Tooltip>
+                  <div className='model-evaluation--heading'>{heading}</div>
+                </div>
+              <div className='model-evaluation--details'>
+              {Number(value).toFixed(4)}
+              </div>
+            </div>
+            </div>
+            {isExpanded && 
+            <div className='model-evaluation--card-content'>
+              {info.extraInfo.map(i => <p>{i}</p>)}
+          </div>
+          }
     </div>
   )
+}
+
+const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {  
+  const firstRow = data[0]
+  const keys = Object.keys(firstRow)
+  const half = Math.ceil(Object.keys(firstRow).length / 2);    
+  const firstHalf = keys.slice(0, half)
+  const secondHalf = keys.slice(half)
+
+  return (
+    <div className='model-evaluation'>
+      <div className='model-evaluation--column'>
+        {firstHalf.map((k) => <EvaluateTableItem
+            key={k}
+            heading={titilize(splitFieldName(k))}
+            info={evaluationAdditionalInfo[k]}
+            value={firstRow[k]}
+            />
+          )}
+      </div>
+      <div className='model-evaluation--column'>
+        {secondHalf.map((k) => <EvaluateTableItem
+            key={k}
+            heading={titilize(splitFieldName(k))}
+            info={evaluationAdditionalInfo[k]}
+            value={firstRow[k]}
+            />
+          )}
+      </div>
+      </div>
+    )
 }
 
 const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { WIZARD_STEPS } from "../../constants"
 import { useHistory, useParams} from 'react-router-dom'
-import { Button } from '@looker/components'
+import { Button, Tooltip } from '@looker/components'
 import { useStore } from '../../contexts/StoreProvider'
 import Spinner from '../Spinner'
 
@@ -10,6 +10,7 @@ type StepCompleteParams = {
   isDisabled?: boolean,
   stepNumber: number,
   buttonText?: string,
+  tooltipDisabledText?: string,
   handleCompleteClick?: () => Promise<any>
 }
 
@@ -18,7 +19,8 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
   isDisabled,
   stepNumber,
   buttonText,
-  handleCompleteClick
+  handleCompleteClick,
+  tooltipDisabledText
 }) => {
   const history = useHistory()
   const { state, dispatch } = useStore()
@@ -49,16 +51,17 @@ export const StepComplete: React.FC<StepCompleteParams> = ({
   }
 
   const btnClass = isStepComplete ? 'complete' : ''
-
   return (
     <>
+    <Tooltip content={!isStepComplete ? (tooltipDisabledText || '') : ''}>
       <Button
         className={`wizard-next-step-btn ${btnClass}`}
         onClick={handleClick}
         disabled={isDisabled}
-      >
+        >
         { buttonText || "Continue" }
       </Button>
+        </Tooltip>
     </>
   )
 }

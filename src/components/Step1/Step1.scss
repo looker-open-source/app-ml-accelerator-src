@@ -39,6 +39,9 @@
     .modeltypecard-button {
       display: inline-block;
       background-color: #4e4644;
+      &.active {
+        background-color: #518ef3;
+      }
     }
   }
 }
