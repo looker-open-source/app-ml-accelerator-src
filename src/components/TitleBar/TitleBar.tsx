@@ -7,7 +7,7 @@ import { ErrorOutline } from "@styled-icons/material-outlined"
 const ModelStatusText = () => {
   const { state } = useStore()
   const [expandMsg, setExpandMsg] = useState(true)
-  const statusText = "A BQML model is currently building. Please don't navigate away"
+  const statusText = "A BQML model is currently training. Do not close this tab or it will be cancelled."
   const btnMessage = expandMsg ? 'Hide' : 'Show'
   return (
     <>

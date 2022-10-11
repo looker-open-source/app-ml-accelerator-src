@@ -17,10 +17,12 @@ import AdvancedSettings from './AdvancedSettings'
 import { ModelValidation } from './ModelValidation'
 import { noDot } from '../../services/string'
 import { JOB_STATUSES } from '../../constants'
+import { WizardContext } from '../../contexts/WizardProvider'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { createBQMLModel } = useContext(SummaryContext)
+  const { persistModelState } = useContext(WizardContext)
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(false)
@@ -101,7 +103,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
 
   const createModel = async () => {
     dispatch({type: 'setUnsavedState', value: true})
-    // const { ok } = await createBQMLModel?.(
     await createBQMLModel?.(
       inputData.uid,
       objective,
@@ -111,21 +112,28 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       inputData.arimaTimeColumn,
       advancedSettings,
       setIsLoading
-    ).catch((error) => {
+    ).catch((_e) => {
       return { ok: false }
-    }).then((response) => {
+    })
+    const { wizard, bqModel } = state
+    const tmpBQModel = {
+      ...bqModel,
+      jobStatus: JOB_STATUSES.done
+    }
+    // Second persist with the finished Job state once the sql finishes executing and the promise inside createBQMLModel resolves
+    await persistModelState?.({ wizardState: wizard, bqModel: tmpBQModel, isModelCreate: false, isModelUpdate: true }).then(() => {
+      dispatch({type: 'setUnsavedState', value: false})
+    }).catch((_e) => {
+      return { ok: false }
+    }).then((_r) => {
       dispatch({
         type: 'setBQModel',
         data: {
           jobStatus: JOB_STATUSES.done,
         }
       })
-      // TODO - this may need to be moved
-      dispatch({type: 'setUnsavedState', value: false})
     })
     return { ok: true }
-    // setIsLoading(false)
-    // return { ok }
   }
 
   const targetTimeColumnChanged = () => (
