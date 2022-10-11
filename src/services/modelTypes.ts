@@ -25,7 +25,7 @@ export const MODEL_TYPES: { [key: string]: any } = {
     value: 'BOOSTED_TREE_REGRESSOR',
     detail: 'BOOSTED_TREE_REGRESSOR',
     techLabel: 'Regression',
-    description: 'Train a model to predict numeric values.',
+    description: 'Train a model to predict continuous numeric values.',
     requiredFieldTypes: ['numeric'],
     targetDataType: 'numeric',
     exploreName: 'boosted_tree',
@@ -548,9 +548,7 @@ export const evaluationAdditionalInfo: {[key: string]: TEvaluationInfo} = {
   },
   "recall": {
     extraInfo: [
-      "The fraction of predictions with this class that the model correctly predicted. Also called true positive rate.",
-      "Value is between 0 and 1",
-      "Higher is better"
+      "The fraction of predictions with this class that the model correctly predicted. Also called true positive rate."
     ],
     subtitle: "Higher is better",
     high_is_positive: true,
