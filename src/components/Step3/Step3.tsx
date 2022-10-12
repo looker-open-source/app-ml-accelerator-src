@@ -100,17 +100,27 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const createModel = async () => {
-    const { ok } = await createBQMLModel?.(
+    dispatch({type: 'setUnsavedState', value: true})
+    await createBQMLModel?.(
       inputData.uid,
       objective,
       inputData.bqModelName,
       inputData.target,
       selectedFeatures,
       inputData.arimaTimeColumn,
-      advancedSettings
-    )
-    setIsLoading(false)
-    return { ok }
+      advancedSettings,
+      setIsLoading
+    ).catch((_e) => {
+      return { ok: false }
+    }).then((_r) => {
+      dispatch({
+        type: 'setBQModel',
+        data: {
+          jobStatus: JOB_STATUSES.done,
+        }
+      })
+    })
+    return { ok: true }
   }
 
   const targetTimeColumnChanged = () => (
@@ -179,10 +189,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const preContinueToolTipText = "You must name your model, select a target and generate a summary to continue."
-
-  //TODO input_data_row_count?.value is the row count -> compare this to each row in summary.ts and untick + warn 
-  // when the row count matches the distinct values and the type is STRING = must be the primary key
-  // investigate adding this at the explore stage
 
   return (
     <StepContainer

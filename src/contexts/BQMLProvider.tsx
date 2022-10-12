@@ -110,15 +110,21 @@ export const BQMLProvider = ({ children }: any) => {
    * Create job to build summary data
    */
   const queryJob = async (sql: string) => {
-    const result = await invokeBQApi(
-      `projects/${gcpProject}/queries`,
-      {
-        query: sql.replace(/\n/g, ' '),
-        useLegacySql: false,
-        useQueryCache: false
-      }
-    )
-    return result
+    const { value: query } = await coreSDK.create_sql_query({
+      connection_name: "bigquery",
+      sql: sql.replace(/\n/g, ' ')
+    })
+    const { ok, value } = await coreSDK.run_sql_query(query.slug, "json")
+    // const result = await invokeBQApi(
+    //   `projects/${gcpProject}/queries`,
+    //   {
+    //     query: sql.replace(/\n/g, ' '),
+    //     useLegacySql: false,
+    //     useQueryCache: false
+    //   }
+    // )
+    return  { ok, body: value } // raname value to body 
+    // return result
   }
 
   /**
@@ -127,17 +133,16 @@ export const BQMLProvider = ({ children }: any) => {
    const queryJobAndWait = async (sql: string, interval?: number, maxAttempts?: number) => {
      try {
       const { ok, body } = await queryJob(sql)
-      if (!ok) { return { ok, body }}
-      if (!body.jobComplete) {
-        // poll job until we get a result
-        const { promise } = pollJobStatus(
-          body.jobReference.jobId,
-          interval || 2000,
-          maxAttempts
-        )
-        const result = await promise
-        return result;
-      }
+      // if (!body.jobComplete) {
+      //   // poll job until we get a result
+      //   const { promise } = pollJobStatus(
+      //     body.jobReference.jobId,
+      //     interval || 2000,
+      //     maxAttempts
+      //   )
+      //   const result = await promise
+      //   return result;
+      // }
 
       return { ok, body }
     } catch (error) {
@@ -196,10 +201,18 @@ export const BQMLProvider = ({ children }: any) => {
     if (!modelName) {
       throw "Failed fetch model because modelName was not provided"
     }
-    const result = await invokeBQApi(
-      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`
-    )
-    return result
+    // const result = await invokeBQApi(
+    //   `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`
+    // )
+    // return result
+    const sql = `
+      SELECT *, 
+      '${gcpProject}' AS project_name, 
+      '${bqmlModelDatasetName}' AS dataset_name 
+      FROM ${bqmlModelDatasetName}.bqml_model_info
+      WHERE model_name = '${modelName}'
+    `
+    return queryJob(sql)
   }
 
   /**
@@ -224,12 +237,14 @@ export const BQMLProvider = ({ children }: any) => {
     if (!modelName) {
       throw "Failed to delete model because modelName was not provided"
     }
-    const result = await invokeBQApi(
-      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`,
-      undefined,
-      'DELETE'
-    )
-    return result
+    // const result = await invokeBQApi(
+    //   `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/models/${modelName}`,
+    //   undefined,
+    //   'DELETE'
+    // )
+    // return result
+    const sql = `DROP MODEL IF EXISTS ${bqmlModelDatasetName}.${modelName}`
+    return queryJob(sql)
   }
 
   /**
@@ -239,12 +254,14 @@ export const BQMLProvider = ({ children }: any) => {
     if (!tableName) {
       throw "Failed to delete table because tableName was not provided"
     }
-    const result = await invokeBQApi(
-      `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/tables/${tableName}`,
-      undefined,
-      'DELETE'
-    )
-    return result
+    // const result = await invokeBQApi(
+    //   `projects/${gcpProject}/datasets/${bqmlModelDatasetName}/tables/${tableName}`,
+    //   undefined,
+    //   'DELETE'
+    // )
+    // return result
+    const sql = `DROP TABLE IF EXISTS ${bqmlModelDatasetName}.${tableName}`
+    return queryJob(sql)
   }
 
   const createModelStateTable = () => {
@@ -271,7 +288,6 @@ export const BQMLProvider = ({ children }: any) => {
     const  { name: bqModelName } = bqModel
     const { email: userEmail, firstName: firstName, lastName: lastName } = state.user
     const stateJson = JSON.stringify(generateModelState(wizardState, bqModel))
-
     let timeSql: string = ''
     let timestampCreate: string = ''
     let timestampUpdate: string = ''
@@ -284,7 +300,6 @@ export const BQMLProvider = ({ children }: any) => {
       timeSql +=`, ${now} as model_updated_at`
       timestampUpdate = ', model_updated_at=S.model_updated_at'
     }
-
     const sql = `
       MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
           USING (SELECT '${bqModelName}' AS model_name

@@ -3,4 +3,5 @@ export type UIState = {
   filtersOpen: boolean
   vizOpen: boolean
   dataOpen: boolean
+  unsavedState: boolean
 }

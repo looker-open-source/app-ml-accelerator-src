@@ -11,11 +11,6 @@
       "type": "string",
       "default_value": ""
     },
-    "google_client_id": {
-      "label": "Google Client ID",
-      "type": "string",
-      "default_value": ""
-    },
     "bqml_model_dataset_name": {
       "label": "BQML Model Dataset Name",
       "type": "string",

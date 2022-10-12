@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react"
 import { DateFormat, TimeFormat } from "@looker/components-date"
 import { MODEL_STATE_TABLE_COLUMNS } from "../../constants"
 import { AdminContext } from "../../contexts/AdminProvider"
-import { formatMetaData, METADATA_LABEL_MAP } from '../../services/admin'
+import { formatMetaDataBQMLModelTable, METADATA_LABEL_MAP } from '../../services/admin'
 import Spinner from "../Spinner"
 
 type ModelMetadataDialogProps = {
@@ -37,7 +37,8 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
     setIsLoading(false)
     if (!ok) { return }
     setMetadataRaw(body)
-    setFormattedMetadata(formatMetaData(body))
+    setFormattedMetadata(formatMetaDataBQMLModelTable(body))
+    // setFormattedMetadata(formatMetaData(body))
   }
 
   const onDescChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,40 +70,59 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
     if (ok) { setIsSaved(true) }
   }
 
-  const buildMetadataContent = () => {
-    return Object.keys(formattedMetadata).map((key) => {
-      let fieldValue: any
+  const buildMetadataContentModelDetails = () => {
+    if (formattedMetadata.details) {
+      return  Object.keys(formattedMetadata.details).map((key) => {
+        let fieldValue: any
 
-      switch (key) {
-        case 'description':
-          fieldValue = <FieldText value={description} onChange={onDescChange}/>
-          break
-        case 'labels':
-          fieldValue = <FieldText value={labels.bqmlAccelerator || ''} onChange={onLabelChange} />
-          break
-        case 'creationTime':
-        case 'modifiedTime':
-        case 'expiration':
-          if (typeof formattedMetadata[key] !== 'string') {
-            fieldValue = (<>
-              <DateFormat>{formattedMetadata[key]}</DateFormat> { ' ' }
-              <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{formattedMetadata[key]}</TimeFormat>
-            </>)
+        switch (key) {
+          case 'description':
+            fieldValue = <FieldText value={description} onChange={onDescChange}/>
             break
-          }
-        default:
-          fieldValue = formattedMetadata[key]
-      }
+          case 'labels':
+            fieldValue = <FieldText value={labels.bqmlAccelerator || ''} onChange={onLabelChange} />
+            break
+          case 'creationTime':
+          case 'modifiedTime':
+          case 'expiration':
+            if (typeof formattedMetadata.details[key] !== 'string') {
+              fieldValue = (<>
+                <DateFormat>{formattedMetadata.details[key]}</DateFormat> { ' ' }
+                <TimeFormat timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}>{formattedMetadata.details[key]}</TimeFormat>
+              </>)
+              break
+            }
+          default:
+            fieldValue = formattedMetadata.details[key]
+        }
 
-      return (
-        <div className="metadata-item" key={key}>
-          <Label>{ METADATA_LABEL_MAP[key] }</Label>
-          <div className="metadata-item--value">
-            { fieldValue }
+        return (
+          <div className="metadata-item" key={key}>
+            <Label>{ METADATA_LABEL_MAP[key] }</Label>
+            <div className="metadata-item--value">
+              { fieldValue }
+            </div>
           </div>
-        </div>
-      )
-    })
+        )
+      })
+    }
+  }
+
+  const buildMetadataContentTrainingOptions = () => {
+    if (formattedMetadata.training_options) {
+      return  Object.keys(formattedMetadata.training_options).map((key) => {
+        const fieldValue = formattedMetadata.training_options[key]
+  
+        return (
+          <div className="metadata-item" key={key}>
+            <Label>{ METADATA_LABEL_MAP[key] }</Label>
+            <div className="metadata-item--value">
+              { fieldValue }
+            </div>
+          </div>
+        )
+      })
+    }
   }
 
 
@@ -115,11 +135,24 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
       <DialogContent className="share-dialog--content">
         <div className="metadata-dialog--container modal-pane">
           {
-            buildMetadataContent()
+            buildMetadataContentModelDetails()
           }
         </div>
       </DialogContent>
-      <DialogFooter className="settings-dialog--footer">
+      { formattedMetadata && formattedMetadata.training_options && Object.keys(formattedMetadata.training_options).length > 0 && <>
+          <DialogHeader hideClose="true" borderBottom="transparent" className="share-dialog--header">
+            Training Options
+          </DialogHeader>
+          <DialogContent className="share-dialog--content">
+            <div className="metadata-dialog--container modal-pane">
+              {
+                buildMetadataContentTrainingOptions()
+              }
+            </div>
+          </DialogContent>
+        </>
+      }   
+      <DialogFooter className="settings-dialog--footer"> 
         <div className="settings-dialog--footer-content">
           <div className="settings-dialog--buttons">
             <ButtonTransparent
@@ -130,7 +163,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
             >
               Close
             </ButtonTransparent>
-            <Button
+            {/* <Button
               className="action-button"
               color="key"
               iconBefore={<Save />}
@@ -138,7 +171,7 @@ export const ModelMetadataDialog: React.FC<ModelMetadataDialogProps> = ({ model,
               disabled={isLoading}
             >
               Save
-            </Button>
+            </Button> */}
             { isLoading && <Spinner className="inline-spinner" size={28} />}
             { /* @ts-ignore */ }
             { isSaved && <Icon icon={<Check />} color="positive" size="small" className="inline-spinner" />}

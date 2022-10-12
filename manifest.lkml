@@ -6,7 +6,7 @@ application: looker-bqml-app {
   url: "http://localhost:8080/bundle.js"
   # file: "bundle.js
   entitlements: {
-    core_api_methods: ["all_lookml_models", "create_query", "run_query", "lookml_model_explore",  "model_fieldname_suggestions", "me", "user_attribute_user_values"]
+    core_api_methods: ["all_lookml_models", "create_query", "run_query", "lookml_model_explore", "model_fieldname_suggestions", "me", "user_attribute_user_values", "create_sql_query", "run_sql_query"]
     use_form_submit:  yes
     use_embeds: yes
     use_iframes:  yes
@@ -16,8 +16,6 @@ application: looker-bqml-app {
       "bqml_model_dataset_name",
       "gcp_project"
     ]
-    external_api_urls: ["https://bigquery.googleapis.com"]
-    oauth2_urls: ["https://accounts.google.com/o/oauth2/v2/auth"]
   }
 }
 

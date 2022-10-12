@@ -48,6 +48,9 @@
 
   .title-logo {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
   }
   .title-logo-text {
     color: white;
@@ -60,5 +63,18 @@
     span {
       opacity: .4;
     }
+  }
+}
+
+.titlebar-status-text {
+  float: right;
+  color: white;
+  font-size: 10pt;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  &--icon {
+    cursor: pointer;
+    color: white;
   }
 }

@@ -14,18 +14,20 @@ import BinaryClassifierThreshold from '../BinaryClassifierThreshold'
 import { titilize } from '../../services/string'
 import { needsModelUpdate } from '../../services/summary'
 import './Step4.scss'
+import { WizardContext } from '../../contexts/WizardProvider'
 
 const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { stopPolling, getModelEvalFuncData } = useContext(ModelContext)
+  const { persistModelState } = useContext(WizardContext)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState<string>('')
   const [jobComplete, setJobComplete] = useState<any>()
   const [jobCanceled, setJobCanceled] = useState<any>()
-  const { state } = useStore()
+  const { state, dispatch } = useStore()
   const { step1, step3, step4, step5 } = state.wizard.steps
   const { jobStatus, job } = state.bqModel
   const { threshold: uiThreshold } = step5.predictSettings
-  const bqModel = state.bqModel
+  const {wizard, bqModel} = state
 
   useEffect(() => {
     if (!bqModel.objective) { return }
@@ -41,6 +43,22 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   useEffect(() => {
     setJobComplete(jobStatus === JOB_STATUSES.done)
     setJobCanceled(jobStatus === JOB_STATUSES.canceled || jobStatus === JOB_STATUSES.failed)
+    const persistState = async () => {
+      await persistModelState?.(
+        {
+          wizardState: wizard,
+          bqModel: bqModel,
+          isModelCreate: false,
+          isModelUpdate: false
+        }).then(() => {
+          dispatch({type: 'setUnsavedState', value: false})
+        })
+      }
+    // Second persist with the finished Job state once the sql finishes executing and the promise inside createBQMLModel resolves
+    if (jobStatus && [JOB_STATUSES.done, JOB_STATUSES.canceled, JOB_STATUSES.failed].includes(jobStatus)) {
+      persistState()
+    }
+
   }, [jobStatus])
 
   useEffect(() => {

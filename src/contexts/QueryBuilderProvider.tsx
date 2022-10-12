@@ -81,9 +81,10 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBu
       const { ok, body } = await queryJob?.(metadataSql)
       if (!ok) { return }
 
-      const timeIndex = getCreationTimeIndex(body)
-      const creationEpoch = body.rows[0].f[timeIndex].v
-      return  new Date(Number(creationEpoch) * 1000) // multiply by milliseconds
+      return new Date(body[0].creation_time)
+      // const timeIndex = getCreationTimeIndex(body)
+      // const creationEpoch = body.rows[0].f[timeIndex].v
+      // return  new Date(Number(creationEpoch) * 1000) // multiply by milliseconds
     } catch (err) {
       console.log('Error fetching static time stamp - ' + err)
     }

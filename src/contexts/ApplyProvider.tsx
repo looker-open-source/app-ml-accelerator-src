@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { useStore } from './StoreProvider'
+import { lookerToBqResults} from '../services/LookerToBQResults'
 import { createArimaPredictSql, createBoostedTreePredictSql, getPredictSql, MODEL_TYPES } from '../services/modelTypes'
 import { bqResultsToLookerFormat, buildApplyFilters, buildPredictSorts, FORECAST_PREDICT_COLUMNS, getPredictedColumnName } from '../services/apply'
 import { BQML_LOOKER_MODEL } from '../constants'
@@ -130,12 +131,14 @@ export const ApplyProvider = ({ children }: any) => {
         limit: step5.limit
       })
 
-      const { ok, body } = await queryJobAndWait?.(sql)
+      const { ok, body: lookerResults } = await queryJobAndWait?.(sql)
+      // const { ok, body } = await queryJobAndWait?.(sql)
       if (!ok) {
         throw "Unable to find table."
       }
 
       if (!step5.exploreData) { throw 'Failed to format data as no explore data was provided.'}
+      const body = lookerToBqResults(lookerResults)
       const formattedResults = bqResultsToLookerFormat(body, bqModel.inputDataQuery.exploreName, step5.exploreData)
 
       // Handles two different code paths.
