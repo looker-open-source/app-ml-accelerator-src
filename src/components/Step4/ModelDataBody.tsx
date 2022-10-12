@@ -59,20 +59,21 @@ const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, valu
             <div className='model-evaluation--hover-area' onClick={toggleCard} >
               <div className='model-evaluation--topRow'>
                 <div className='model-evaluation--mainInfo'>
-                <Tooltip content={info.subtitle}>
-                <Icon icon={info.high_is_positive 
-                  ? <ArrowCircleUp color='rgb(39, 117, 26)'/> 
-                  : <ArrowCircleDown color='rgb(0, 99, 198)'/>}/>
-                </Tooltip>
                   <div className='model-evaluation--heading'>{heading}</div>
                 </div>
               <div className='model-evaluation--details'>
-              {Number(value).toFixed(4)}
+              {Number(value).toFixed(4).toLocaleString()}
               </div>
             </div>
             </div>
             {isExpanded && 
             <div className='model-evaluation--card-content'>
+                <div className='model-evaluation--card-content-header'>
+                {<Icon icon={info.high_is_positive 
+                  ? <ArrowCircleUp color='rgb(39, 117, 26)'/> 
+                  : <ArrowCircleDown color='#CC1F36'/>}/>}
+                  {info.subtitle}
+              </div>
               {info.extraInfo.map(i => <p>{i}</p>)}
           </div>
           }
