@@ -1,4 +1,4 @@
-import {  Icon, Tooltip } from '@looker/components'
+import {  Heading, Icon } from '@looker/components'
 import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
@@ -9,6 +9,9 @@ import { formatBQResults } from '../../services/common'
 import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo, TEvaluationInfo } from '../../services/modelTypes'
 import { noDot, splitFieldName, titilize } from '../../services/string'
 import GlobalExplain from '../GlobalExplain'
+
+//TODO - make abstract object with consistent formatting for title and data
+// CSS - 20% sidebar and 80% area - fit everything within 
 
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'explain') { return <GlobalExplain /> }
@@ -208,7 +211,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const convertedData = data?.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
-  const sortedData = sortBy(convertedData, 'recall')
+  const sortedData = sortBy(convertedData, 'false_positive_rate')
   const sortedDataFormatted = sortedData.map((int: any) => {
     return {
       ...int,
@@ -243,7 +246,7 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
 
   return (
     <div className="model-grid-bg">
-      <ROCCurveLineChart data={sortedData} />
+      <ROCCurveLineChart data={sortedData}/>
       <div className="ag-theme-balham" style={{height: 220}}>
         <AgGridReact
           defaultColDef={defaultColDef}
@@ -279,6 +282,7 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
   const buildChartObj = () => {
     const chartType: keyof ChartTypeRegistry = 'line'
 
+    
     const xyData = data.map((datum: any) => ({
       x: Number(datum['false_positive_rate']),
       y: Number(datum['recall'])
@@ -290,37 +294,89 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
         datasets: [{
           label: 'ROC Curve',
           data: xyData,
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)'
+          fill: {
+            target: 'start',
+            above: 'rgba(66, 133, 244, 0.1)',
+          },
+          pointRadius: 0,
+          borderColor: '#4285F4'
         }]
       },
       options: {
+        plugins: {
+          legend: {
+          display: false
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'white',
+            bodyColor: 'black',
+            titleColor: 'black',
+            borderColor: 'gray',
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+              title: (ctx: any) => {
+                let txt = `Threshold: ${Number(ctx[0].label).toFixed(3)}`
+                return txt
+              },
+              label: (ctx: any) => {
+                let x = `False positive rate: ${(ctx.parsed.x * 100).toFixed(2)}%`
+                let y = `True positive rate:  ${(ctx.parsed.y * 100).toFixed(2)}%`
+                return [y, x]
+              },
+
+          }
+          },
+        },
+       hover: {
+          mode: 'nearest',
+          intersect: true
+        },
         maintainAspectRatio: true,
-        responsive: false,
+        responsive: true,
         scales: {
           x: {
             type: 'linear',
             title: {
+              color: 'rgb(136,136,136)',
+              font: {
+                lineHeight: '1.2rem'
+              },
               display: true,
               text: 'False Positive Rate'
             },
             ticks: {
               callback: function(value: any) {
+                if ((value * 100) % 20 == 0) {
                   return (value * 100)  + '%';
+                }
               }
             }
           },
           y: {
             type: 'linear',
             title: {
+              color: 'rgb(136,136,136)',
+              font: {
+                lineHeight: '1.2rem'
+              },
               display: true,
               text: 'True Positive Rate (Recall)'
             },
             ticks: {
               callback: function(value: any) {
-                  return (value * 100)  + '%';
+                if ((value * 100) % 20 == 0) {
+                  return (value * 100)  + '%'
+                };
               }
             }
+          }
+        },
+        elements: {
+          line: {
+            tension: 0
           }
         }
       }
@@ -328,8 +384,10 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
   }
 
   return (
-    <div className="roc-line-chart" style={{height: '400px'}}>
-      <canvas id="VizChart" ref={chartRef} height={400} width={500}/>
+    <div className="roc-line-chart">
+      <Heading as='h2'>ROC curve</Heading>
+      <canvas id="VizChart" ref={chartRef}/>
+      {/* <p>Area under curve: {auc}</p> TODO - add AUC */}
     </div>
   )
 }
