@@ -301,7 +301,6 @@ type tooltipMapping = {
   }
 }
 
-//TODO - proofread and investigate if more detail is needed
 export const SettingsLabelsAndTooltips: tooltipMapping = {
   boosterType: {
     label: "Booster type", 

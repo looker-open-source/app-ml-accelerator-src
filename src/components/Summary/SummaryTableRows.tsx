@@ -55,7 +55,7 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
   const tableRows = data.map((rowData, i) => {
     
     const tds = Object.keys(headers).map((col: keyof SummaryTableHeaders, j) => {
-      const iconRowIdxs = [0, 3] // Which columns to show Warning Icons in
+      const iconRowIdxs = [3] // Which columns to show Warning Icons in
       let rowClassNames = [headers[col].align]
       let tooltipContent = rowData.summary_status.message
       if (rowData.summary_status.status == 'invalid') {

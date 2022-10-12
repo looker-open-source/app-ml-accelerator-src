@@ -338,7 +338,6 @@ export const WizardProvider = ({ children }: any) => {
     isModelUpdate = false,
     retry = false
   }: PersistModelStateProps) => {
-    console.log(`Calling persistModelState with jobStatus ${JSON.stringify(bqModel.jobStatus)}`)
     try {
       {
         const { ok, body } = await createModelStateTable?.()

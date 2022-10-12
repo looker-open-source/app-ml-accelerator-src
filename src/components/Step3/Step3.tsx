@@ -17,12 +17,10 @@ import AdvancedSettings from './AdvancedSettings'
 import { ModelValidation } from './ModelValidation'
 import { noDot } from '../../services/string'
 import { JOB_STATUSES } from '../../constants'
-import { WizardContext } from '../../contexts/WizardProvider'
 
 
 const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const { createBQMLModel } = useContext(SummaryContext)
-  const { persistModelState } = useContext(WizardContext)
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const [isLoading, setIsLoading] = useState(false)
@@ -114,17 +112,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       setIsLoading
     ).catch((_e) => {
       return { ok: false }
-    })
-    const { wizard, bqModel } = state // TODO - this is not working properly - state is not accurately retrieved
-    const tmpBQModel = {
-      ...bqModel,
-      jobStatus: JOB_STATUSES.done
-    }
-    // Second persist with the finished Job state once the sql finishes executing and the promise inside createBQMLModel resolves
-    await persistModelState?.({ wizardState: wizard, bqModel: tmpBQModel, isModelCreate: false, isModelUpdate: false }).then(() => {
-      dispatch({type: 'setUnsavedState', value: false})
-    }).catch((_e) => {
-      return { ok: false }
     }).then((_r) => {
       dispatch({
         type: 'setBQModel',
@@ -202,10 +189,6 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   }
 
   const preContinueToolTipText = "You must name your model, select a target and generate a summary to continue."
-
-  //TODO input_data_row_count?.value is the row count -> compare this to each row in summary.ts and untick + warn 
-  // when the row count matches the distinct values and the type is STRING = must be the primary key
-  // investigate adding this at the explore stage
 
   return (
     <StepContainer
