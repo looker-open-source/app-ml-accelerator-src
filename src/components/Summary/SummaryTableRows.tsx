@@ -72,8 +72,8 @@ export const SummaryTableRows: React.FC<SummaryTableRows> = ({ data, headers, ta
 
       return (
       
-          <Tooltip content={tooltipContent}>
-            <td className={rowClassNames.join(' ')} key={j}>
+          <Tooltip content={tooltipContent} key={j}>
+            <td className={rowClassNames.join(' ')}>
                 { headers[col].converter(rowData) || "∅" }
                 { iconRowIdxs.includes(j) && (rowData.summary_status.status !== 'ok') && <Icon icon={<ErrorOutline/>} size='xsmall'/>}
             </td>
