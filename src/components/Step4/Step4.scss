@@ -42,12 +42,6 @@
   }
 }
 
-.hover {
-  & &--bold {
-
-  }
-}
-
 .model-sidebar {
   display: flex;
   flex-direction: column;
@@ -278,14 +272,8 @@ table {
 }
 .model-cm-item {
 
-  // & &--placeholder {
-    // border-right: 2px solid rgb(38, 45, 51);
-    // border-bottom: 2px solid rgb(38, 45, 51);
-  // }
-
   & &--header {
     font-weight: 500;
-    border-bottom: 2px solid rgb(38, 45, 51);
     &.xlarge {width: 120px; min-width: 120px; }
     &.large {width: 95px; min-width: 95px; }
     &.medium {width: 80px; min-width: 80px; }
@@ -293,9 +281,9 @@ table {
   }
   & &--col-header {
     font-weight: 500;
-    border-right: 2px solid rgb(38, 45, 51);
     padding: 0.75rem;
     max-width: 160px;
+    text-align: right;
   }
 
   & &--value {

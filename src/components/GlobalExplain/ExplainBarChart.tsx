@@ -58,7 +58,7 @@ export const ExplainBarChart: React.FC<{ data: any[],label: string }> = ({ data,
           },
           y: {
             ticks: {
-              autoSkip: false
+              autoSkip: false,
             }
           }
         }

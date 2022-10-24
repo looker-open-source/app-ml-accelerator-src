@@ -50,6 +50,8 @@ export const GlobalExplainDialog: React.FC = () => {
     setIsLoading(false)
   }
 
+
+
   const isClassLevel = (activeTab: string) => (
     activeTab === EXPLAIN_TABS[1]
   )
@@ -115,7 +117,7 @@ export const GlobalExplainDialog: React.FC = () => {
               {!isClassLevel(activeTab) && <ButtonToggle value={topFeatures} onChange={setTopFeatures} options={topFeaturesOptions} />}
             </div>
           </div>
-          <div className="global-explain--charts">
+          <div className={`global-explain--charts ${isClassLevel(activeTab) ? 'nostretch' : ''}`}>
             {drawCharts()}
           </div>
         </div>
