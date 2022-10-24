@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { ButtonToggle } from '@looker/components'
+import { ButtonToggle, Heading } from '@looker/components'
 import { ExplainContext } from '../../contexts/ExplainProvider'
 import { useStore } from '../../contexts/StoreProvider'
 import LoadingOverlay from '../LoadingOverlay'
@@ -103,6 +103,7 @@ export const GlobalExplainDialog: React.FC = () => {
   return (
     <>
       <div className="global-explain--container">
+        <Heading as='h2'>Feature Importance</Heading>
         <LoadingOverlay isLoading={isLoading} />
         {isClassifier(objective || '') &&
           <GlobalExplainDialogTabs activeTab={activeTab} setActiveTab={setActiveTab} availableTabs={EXPLAIN_TABS} />

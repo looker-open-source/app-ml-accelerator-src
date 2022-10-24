@@ -5,6 +5,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { noDot, titilize } from "../../services/string";
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+import 'ag-grid-community/dist/styles/ag-theme-material.css';
 import { compact } from "lodash";
 
 
