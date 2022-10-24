@@ -47,6 +47,19 @@ export const ExplainBarChart: React.FC<{ data: any[],label: string }> = ({ data,
           title: {
             display: true,
             text: label
+          },
+          tooltip: {
+            backgroundColor: 'white',
+            bodyColor: 'black',
+            titleColor: 'black',
+            borderColor: 'gray',
+            borderRadius: 2,
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+              title: (ctx: any) => ctx[0].label,
+              label: (ctx: any) => `Attribution: ${ctx.raw.toFixed(4)}`,
+          }
           }
         },
         scales: {

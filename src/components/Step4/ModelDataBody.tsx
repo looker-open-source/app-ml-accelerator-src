@@ -10,11 +10,6 @@ import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo, TEvaluationInfo } from '../
 import { noDot, splitFieldName, titilize } from '../../services/string'
 import GlobalExplain from '../GlobalExplain'
 
-//TODO - make abstract object with consistent formatting for title and data
-// CSS - 20% sidebar and 80% area - fit everything within 
-// Better table formatting
-// Ensure CSS changes work for all charts
-
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'explain') { return <GlobalExplain /> }
 
@@ -152,7 +147,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 
   const fontSizeCalc = (base=12) => {
     if (valueCount <= 2) return base + 4
-    if (valueCount <= 4) return base + 12
+    if (valueCount <= 4) return base + 2
     if (valueCount <= 5) return base
     return base
   }
