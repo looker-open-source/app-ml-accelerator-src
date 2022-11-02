@@ -21,7 +21,6 @@ application: bqml-accelerator {
     use_iframes: yes
     scoped_user_attributes: [
       "app_bqml_accelerator_bigquery_connection_name",
-      "app_bqml_accelerator_google_client_id",
       "app_bqml_accelerator_bqml_model_dataset_name",
       "app_bqml_accelerator_gcp_project",
     ]

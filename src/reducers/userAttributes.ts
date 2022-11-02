@@ -4,7 +4,6 @@ type Action = {type: 'setAllAttributes', value: UserAttributesState}
 
 const userAttributesInitialState = {
   bigQueryConn: undefined,
-  googleClientId: undefined,
   bqmlModelDatasetName: undefined,
   gcpProject: undefined
 }

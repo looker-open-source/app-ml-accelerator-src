@@ -18,7 +18,6 @@ import { bqResultsToLookerFormat } from '../services/apply'
 import { SaveSummaryProps } from '../types/summary'
 import { SaveInputDataProps } from '../types/inputData'
 import { cloneDeep } from 'lodash'
-import { OauthContext } from './OauthProvider'
 
 type PersistModelStateProps = {
   wizardState: WizardState,
@@ -48,7 +47,6 @@ export const WizardContext = createContext<IWizardContext>({})
 
 export const WizardProvider = ({ children }: any) => {
   const history = useHistory()
-  const { expiry, signIn } = useContext(OauthContext)
   const { modelNameParam } = useParams<any>()
   const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
@@ -73,7 +71,6 @@ export const WizardProvider = ({ children }: any) => {
   // fetch any data needed to fill out wizard state
   const loadModel = async () => {
     try {
-      if (expiry < new Date()) { await signIn(); }
       const savedModelState = await getSavedModelState?.(modelNameParam)
       if (!savedModelState) {
         history.push(`/ml/create/${WIZARD_STEPS['step1']}`)
@@ -363,7 +360,6 @@ export const WizardProvider = ({ children }: any) => {
 
   const getBQInputData = async (bqModelName: string, uid: string, limit?: string) => {
     try {
-      if (expiry < new Date()) { await signIn(); }
       if (!bqmlModelDatasetName) { throw "No dataset provided" }
       const sql = getBQInputDataSql({
         bqmlModelDatasetName,
