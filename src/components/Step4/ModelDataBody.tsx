@@ -1,4 +1,4 @@
-import {  Icon, Tooltip } from '@looker/components'
+import {  Card, Heading, Icon } from '@looker/components'
 import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
@@ -56,15 +56,13 @@ const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, valu
   const toggleCard = () => setIsExpanded(!isExpanded)
   return (
     <div className='model-evaluation--card'>
-            <div className='model-evaluation--hover-area' onClick={toggleCard} >
-              <div className='model-evaluation--topRow'>
+              <div className='model-evaluation--topRow'  onClick={toggleCard} >
                 <div className='model-evaluation--mainInfo'>
                   <div className='model-evaluation--heading'>{heading}</div>
                 </div>
               <div className='model-evaluation--details'>
               {Number(value).toFixed(4).toLocaleString()}
               </div>
-            </div>
             </div>
             {isExpanded && 
             <div className='model-evaluation--card-content'>
@@ -89,58 +87,105 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
   const secondHalf = keys.slice(half)
 
   return (
-    <div className='model-evaluation'>
-      <div className='model-evaluation--column'>
-        {firstHalf.map((k) => <EvaluateTableItem
-            key={k}
-            heading={titilize(splitFieldName(k))}
-            info={evaluationAdditionalInfo[k]}
-            value={firstRow[k]}
-            />
-          )}
-      </div>
-      <div className='model-evaluation--column'>
-        {secondHalf.map((k) => <EvaluateTableItem
-            key={k}
-            heading={titilize(splitFieldName(k))}
-            info={evaluationAdditionalInfo[k]}
-            value={firstRow[k]}
-            />
-          )}
-      </div>
+    <div className='model-grid-bg'>
+      <Heading as='h2'>Evaluation Metrics</Heading>
+      <div className='model-evaluation'>
+        <div className='model-evaluation--column'>
+          {firstHalf.map((k) => <EvaluateTableItem
+              key={k}
+              heading={titilize(splitFieldName(k))}
+              info={evaluationAdditionalInfo[k]}
+              value={firstRow[k]}
+              />
+              )}
+        </div>
+        <div className='model-evaluation--column'>
+          {secondHalf.map((k) => <EvaluateTableItem
+              key={k}
+              heading={titilize(splitFieldName(k))}
+              info={evaluationAdditionalInfo[k]}
+              value={firstRow[k]}
+              />
+              )}
+        </div>
+        </div>
       </div>
     )
 }
 
 const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {
+  const [hoverCol, setHoverCol] = useState(-1)
+  const [hoverRow, setHoverRow] = useState(-1)
+  
   const dataItems = []
   const sortedData = sortBy(data, 'expected_label')
   const valueCount = sortedData.length
-  const matrixColor = (pct: number) => `rgba(66, 133, 244, ${pct / 100})`
+  
+// TODO: don't do the highlighting for low cardinality confusion matrices 
+  const matrixColor = (pct: number, row:number, col: number, isHeader:boolean = false) => {
+    if ((row == hoverRow || col == hoverCol) && valueCount >= 4) {
+      if (row == hoverRow && col == hoverCol) {
+        return `rgb(39, 117, 26)`
+      } else {
+        return `rgb(222, 237, 219)`
+      }
+    } else {
+      return isHeader ? 'white' : `rgba(66, 133, 244, ${pct / 100})`
+    }
+  };
+  const textColor = (pct: number, row:number, col: number, isHeader:boolean = false) => {
+    if ((row == hoverRow || col == hoverCol) && valueCount >= 4) {
+      if (row == hoverRow && col == hoverCol) {
+        return isHeader ? 'rgb(38, 45, 51)' : `white`;
+      } else {
+        return 'rgb(38, 45, 51)'
+      }
+    } else {
+        return pct >= 80 ? 'white' : 'rgb(38, 45, 51)'
+    }
+  };
 
-  const cellSizeClass = (() => {
-    if (valueCount <= 2) return 'xlarge'
-    if (valueCount <= 4) return 'large'
-    if (valueCount <= 5) return 'medium'
-    return 'small'
-  })()
-
-  const headers = [(
-    <td colSpan={2} className="model-cm-item--placeholder" width="60" key="placeholder"></td>
-  )]
-
-  for (const row of sortedData) {
-    headers.push(
-      <td className={`model-cm-item--header ${cellSizeClass}`} key={row.expected_label}>{row.expected_label}</td>
-    )
+  const fontSizeCalc = (base=12) => {
+    if (valueCount <= 2) return base + 4
+    if (valueCount <= 4) return base + 2
+    if (valueCount <= 5) return base
+    return base
   }
 
-  // Add col header (label for actual values)
-  const tableHeader = [(
-    <tr>
-      <th colSpan={sortedData.length + 2}>Actual Values</th>
-    </tr>
+  const headers = [(
+    <td className="model-cm-item--placeholder" key="placeholder"></td>
   )]
+
+  sortedData.map((row, idx) => {
+    headers.push(
+      <td
+      style={{
+         backgroundColor: matrixColor(0, -2, idx + 1, true),
+         color: textColor(0, -2, idx + 1, true),
+         width: `calc(100% / (${sortedData.length} + 2))`,
+         fontSize: `${fontSizeCalc(12)}px`
+        }}
+      className={`model-cm-item--header`}
+      key={row.expected_label}
+      >
+        {row.expected_label}
+      </td>
+    )
+  })
+
+  // Add col header (label for actual values)
+  
+  const handleCellMouseOver = (row: number, col: number) => {
+    setHoverCol(col)
+    setHoverRow(row)
+  }
+
+  const handleMouseLeave = () => {
+    setHoverCol(-1)
+    setHoverRow(-1)
+  }
+
+  const tableHeader = []
 
   tableHeader.push(
     <tr className="model-cm-item" key='headers'>
@@ -148,14 +193,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
     </tr>
   )
 
-  // Add row header (label for predicted values)
-  dataItems.push(
-    <tr>
-      <th className='rotate' rowSpan={sortedData.length + 2}>Predicted Values</th>
-    </tr>
-  )
-
-  for (const rowKey in sortedData) {
+  Object.keys(sortedData).map((rowKey, idx) => {
     const cells = []
     const row = sortedData[rowKey]
     const rowTotal = Object.keys(row).reduce(
@@ -163,52 +201,82 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
         (index > 0 ? total + Number(row[key]) : total + 0)
       , 0)
 
-    for (const key in row) {
+    Object.keys(row).map((key, idx2) => {
       const value = row[key]
       if (key === 'expected_label') {
-        cells.push(<td className={`model-cm-item--header ${cellSizeClass}`} key={key}>{value}</td>) //titilize(splitFieldName(value))
+        cells.push(
+        <td
+          style={{
+            backgroundColor: matrixColor(0, idx, -2, true),
+            color: textColor(0, idx, -2, true),
+            height: `calc(40vw / (${sortedData.length} + 2))`,
+            fontSize: `${fontSizeCalc(12)}px`
+          }}
+          className={`model-cm-item--col-header`}
+          key={key}
+        >
+          {value}
+        </td>
+        )
       } else {
         const cellAsPercent = Math.round(Number(value) / rowTotal * 100)
         cells.push(
           <td
-            style={{ backgroundColor: matrixColor(cellAsPercent)}}
-            className={`model-cm-item--value ${cellSizeClass}`}
+            style={{
+              backgroundColor: matrixColor(cellAsPercent, idx, idx2),
+              color: textColor(cellAsPercent, idx, idx2),
+              fontWeight: idx + 1 == idx2 ? 'bold' : '',
+              fontSize: `${fontSizeCalc(10)}px`
+            }}
+            className={`model-cm-item--value`}
+            onMouseOver={() => handleCellMouseOver(idx, idx2)}
             key={key}>
               {cellAsPercent + '%'}
           </td>
         )
       }
-    }
+    })
 
     dataItems.push(
       <tr className="model-cm-item" key={rowKey}>
         {cells}
       </tr>
     )
-  }
+  })
 
   return (
     <div className="model-grid-bg fit-contents">
-      <div className="model-cm-container">
+      <Heading as='h2'>Confusion Matrix</Heading>
         <div className="confusion-grid-target">
           Selected Target: <span>{ titilize(noDot(target || '')) }</span>
         </div>
-        <table>
-          <thead>
-            { tableHeader }
-          </thead>
-          <tbody>
-            { dataItems }
-          </tbody>
-        </table>
-      </div>
+          <div className='box-container-raised'>
+            <div className='cm-header x'>
+              Actual Values
+            </div>
+          <div className='cm-inner-row'  onMouseLeave={handleMouseLeave}>
+          <div className='cm-header y rotate'>
+            Predicted Values
+          </div>
+          <div className='cm-inner-col'>
+            <table style={{minWidth: '80%'}}>
+              <thead>
+                { tableHeader }
+              </thead>
+              <tbody>
+                { dataItems }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        </div>
     </div>
   )
 }
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const convertedData = data?.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
-  const sortedData = sortBy(convertedData, 'recall')
+  const sortedData = sortBy(convertedData, 'false_positive_rate')
   const sortedDataFormatted = sortedData.map((int: any) => {
     return {
       ...int,
@@ -222,15 +290,15 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
     const formattedKey = noDot(key)
     return {
       field: formattedKey,
-      headerName: titilize(formattedKey)
+      headerName: titilize(formattedKey),
+      cellStyle: (_params: any) => {
+        if (formattedKey == 'threshold') {
+            return {fontWeight: 'bold'};
+        }
+        return null;
+    }
     }
   })
-
-  const getRowStyle = (params: any) => {
-    if (params.node.rowIndex % 2 === 0) {
-      return { background: '#f0f1f1' };
-    }
-  }
 
   const defaultColDef = {
     resizable: true,
@@ -242,17 +310,23 @@ const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   }
 
   return (
-    <div className="model-grid-bg">
+    <div className="model-grid-bg roc">
+      <Heading as='h2'>ROC curve</Heading>
+      {/* <div className='box-container-raised'> */}
+
       <ROCCurveLineChart data={sortedData} />
-      <div className="ag-theme-balham" style={{height: 220}}>
+      <div
+        className="ag-theme-material"
+        style={{height: '50vh'}}
+        >
         <AgGridReact
           defaultColDef={defaultColDef}
-          getRowStyle={getRowStyle}
           onGridReady={onGridReady}
           rowData={sortedDataFormatted}
           columnDefs={columns}>
         </AgGridReact>
       </div>
+        {/* </div> */}
     </div>
   )
 }
@@ -290,37 +364,90 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
         datasets: [{
           label: 'ROC Curve',
           data: xyData,
-          fill: false,
-          borderColor: 'rgb(75, 192, 192)'
+          fill: {
+            target: 'start',
+            above: 'rgba(66, 133, 244, 0.1)',
+          },
+          pointRadius: 0,
+          borderColor: '#4285F4'
         }]
       },
       options: {
+        plugins: {
+          legend: {
+          display: false
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'white',
+            bodyColor: 'black',
+            titleColor: 'black',
+            borderColor: 'gray',
+            borderRadius: 2,
+            borderWidth: 1,
+            displayColors: false,
+            callbacks: {
+              title: (ctx: any) => {
+                let txt = `Threshold: ${Number(ctx[0].label).toFixed(3)}`
+                return txt
+              },
+              label: (ctx: any) => {
+                let x = `False positive rate: ${(ctx.parsed.x * 100).toFixed(2)}%`
+                let y = `True positive rate:  ${(ctx.parsed.y * 100).toFixed(2)}%`
+                return [y, x]
+              },
+
+          }
+          },
+        },
+       hover: {
+          mode: 'nearest',
+          intersect: true
+        },
         maintainAspectRatio: true,
-        responsive: false,
+        responsive: true,
         scales: {
           x: {
             type: 'linear',
             title: {
+              color: '#555555',
+              font: {
+                lineHeight: '1.5rem'
+              },
               display: true,
               text: 'False Positive Rate'
             },
             ticks: {
               callback: function(value: any) {
+                if ((value * 100) % 20 == 0) {
                   return (value * 100)  + '%';
+                }
               }
             }
           },
           y: {
             type: 'linear',
             title: {
+              color: '#555555',
+              font: {
+                lineHeight: '1.5rem'
+              },
               display: true,
               text: 'True Positive Rate (Recall)'
             },
             ticks: {
               callback: function(value: any) {
-                  return (value * 100)  + '%';
+                if ((value * 100) % 20 == 0) {
+                  return (value * 100)  + '%'
+                };
               }
             }
+          }
+        },
+        elements: {
+          line: {
+            tension: 0
           }
         }
       }
@@ -328,8 +455,9 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
   }
 
   return (
-    <div className="roc-line-chart" style={{height: '400px'}}>
-      <canvas id="VizChart" ref={chartRef} height={400} width={500}/>
+    <div className="roc-line-chart">
+      <canvas id="VizChart" ref={chartRef}/>
+      {/* <p>Area under curve: {auc}</p> TODO - add AUC */}
     </div>
   )
 }
