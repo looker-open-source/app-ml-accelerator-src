@@ -294,6 +294,15 @@ export const BoostedSettingsDialog: React.FC<BoostedSettingsDialogProps> = ({ cl
                   />
                 </div>
               </div>
+              <div className="form-row">
+                <TooltipLabel setting='modelRegistry'/>
+                <div className="settings-form-checkbox">
+                  <Checkbox
+                    checked={form.model_registry}
+                    onChange={() => handleCheckboxChange('model_registry')}
+                  />
+                </div>
+              </div>
             </div>
           </form>
         </div>

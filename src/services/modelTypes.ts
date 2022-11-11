@@ -184,7 +184,11 @@ const formBoostedTreeSQL = ({
   boostedType,
   advancedSettings
 }: IFormBoostedTreeModelCreateSQLProps): string => {
-  const settingsSql = advancedSettingsSql(advancedSettings)
+  let settingsSql = advancedSettingsSql(advancedSettings)
+  if (settingsSql.includes('MODEL_REGISTRY')) {
+    // Model name is unavailable in advancedSettings context so when using Vertex AI model registry we have to set the model ID here instead
+    settingsSql = settingsSql + ", VERTEX_AI_MODEL_ID = '" + bqmlModelDatasetName + "." + bqModelName + "'"
+  }
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'

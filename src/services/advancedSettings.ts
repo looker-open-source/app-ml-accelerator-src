@@ -35,6 +35,10 @@ export const advancedSettingsSql = (advancedSettings: any) => {
     sql = sql + ", ENABLE_GLOBAL_EXPLAIN = true"
   }
 
+  if (!advancedSettings || !Object.getOwnPropertyNames(advancedSettings).includes('model_registry')) {
+    sql = sql + ", MODEL_REGISTRY = {'VERTEX_AI'}" 
+  }
+
   return sql
 }
 
@@ -159,6 +163,10 @@ export const DATA_SPLIT_METHOD = ['AUTO_SPLIT', 'RANDOM', 'CUSTOM', 'SEQ', 'NO_S
 //   type: unquoted
 //   default_value: "FALSE" # { TRUE | FALSE }
 // }
+// parameter: model_registry {
+//   type: quoted
+//   default_value: "" # vertex_ai  
+// }
 
 const BOOSTED_CLASSIFIER_SETTINGS_DEFAULTS = {
   booster_type: 'GBTREE',
@@ -183,7 +191,8 @@ const BOOSTED_CLASSIFIER_SETTINGS_DEFAULTS = {
   data_split_method: 'AUTO_SPLIT',
   data_split_eval_fraction: 0.2,
   data_split_col: undefined,
-  enable_global_explain: true
+  enable_global_explain: true,
+  model_registry: false
 }
 
 const BOOSTED_REGRESSOR_SETTINGS_DEFAULTS = {
@@ -207,7 +216,8 @@ const BOOSTED_REGRESSOR_SETTINGS_DEFAULTS = {
   data_split_method: 'AUTO_SPLIT',
   data_split_eval_fraction: 0.2,
   data_split_col: undefined,
-  enable_global_explain: true
+  enable_global_explain: true,
+  model_registry: false
 }
 
 export const getBoostedSettingsDefaults = (objective: string) => {
@@ -389,5 +399,9 @@ export const SettingsLabelsAndTooltips: tooltipMapping = {
   enableGlobalExplain: {
     label: "Enable global explain", 
     tooltip: "Whether to compute global explanations using explainable AI to evaluate global feature importance to the model."
+  },
+  modelRegistry: {
+    label: "Vertex AI model registry",
+    tooltip: "Use Vertex AI model registry"
   }
 }
