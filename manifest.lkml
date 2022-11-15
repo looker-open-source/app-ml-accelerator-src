@@ -10,6 +10,8 @@ application: looker-bqml-app {
     use_form_submit:  yes
     use_embeds: yes
     use_iframes:  yes
+    new_window: yes
+    new_window_external_urls: ["https://developers.google.com/machine-learning/glossary"]
     scoped_user_attributes: [
       "bigquery_connection_name",
       "google_client_id",
