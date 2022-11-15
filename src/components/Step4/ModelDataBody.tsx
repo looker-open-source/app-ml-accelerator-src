@@ -290,7 +290,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const convertedData = data?.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
-  const sortedData = sortBy(convertedData, 'false_positive_rate')
+  const sortedData = sortBy(convertedData, 'threshold')
   const sortedDataFormatted = sortedData.map((int: any) => {
     return {
       ...int,
