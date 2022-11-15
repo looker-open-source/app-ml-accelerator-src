@@ -1,14 +1,15 @@
-import {  Card, Heading, Icon } from '@looker/components'
+import {  ButtonOutline, Heading, Icon } from '@looker/components'
 import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
 import { sortBy } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
 import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo, TEvaluationInfo } from '../../services/modelTypes'
 import { noDot, splitFieldName, titilize } from '../../services/string'
 import GlobalExplain from '../GlobalExplain'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
 
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'explain') { return <GlobalExplain /> }
@@ -51,9 +52,13 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
 // }
 
 const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, value: number }> = ({heading, info, value }) => {
+  const {extensionSDK} = useContext(ExtensionContext2)
   const [isExpanded, setIsExpanded] = useState(false)
 
   const toggleCard = () => setIsExpanded(!isExpanded)
+  const openUrl = (url: string) => {
+    extensionSDK.openBrowserWindow(url, '_blank')
+  }
   return (
     <div className='model-evaluation--card'>
               <div className='model-evaluation--topRow'  onClick={toggleCard} >
@@ -73,6 +78,14 @@ const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, valu
                   {info.subtitle}
               </div>
               {info.extraInfo.map(i => <p>{i}</p>)}
+              {info.url && <div className='glossaryButton'>
+                <ButtonOutline
+                  size='xsmall'
+                  onClick={() => openUrl(info.url || '')}
+                >
+                  Read More
+                </ButtonOutline>
+              </div>}
           </div>
           }
     </div>

@@ -535,6 +535,7 @@ export type TEvaluationInfo = {
     high_is_positive: boolean,
     plottable: boolean,
     order?: number,
+    url?: string
 }
 
 export const evaluationAdditionalInfo: {[key: string]: TEvaluationInfo} = {
@@ -544,74 +545,86 @@ export const evaluationAdditionalInfo: {[key: string]: TEvaluationInfo} = {
     ],
     high_is_positive: true,
     subtitle: "Higher is better",
-    plottable: true
+    plottable: true,
+    url: 'https://developers.google.com/machine-learning/glossary#precision'
   },
   "recall": {
     extraInfo: [
-      "The fraction of predictions with this class that the model correctly predicted. Also called true positive rate."
+      "The fraction of predictions with positive classification. Also called true positive rate."
     ],
     subtitle: "Higher is better",
     high_is_positive: true,
-    plottable: true
+    plottable: true,
+    url: 'https://developers.google.com/machine-learning/glossary#recall'
   },
   "accuracy": {
-    extraInfo: ["The global, unweighted ratio of correct predictions"],
+    extraInfo: ["The fraction of classification predictions produced by the model that were correct."],
     subtitle: "Higher is better",
     high_is_positive: true,
-    plottable: true
+    plottable: true,
+    url: 'https://developers.google.com/machine-learning/glossary#accuracy'
   },
   "f1_score": {
     extraInfo: ["The harmonic mean of precision and recall. F1 is a useful metric if you're looking for a balance between precision and recall and there's an uneven class distribution."],
     subtitle: "Higher is better",
     high_is_positive: true,
-    plottable: true
+    plottable: true,
+    // url: 'https://developers.google.com/machine-learning/glossary#'
   },
   "log_loss": {
     extraInfo: ["The cross-entropy between the model predictions and the target values. This ranges from zero to infinity, where a lower value indicates a higher-quality model."],
     subtitle: "Lower is better",
     high_is_positive: false,
-    plottable: false
+    plottable: false,
+    url: 'https://developers.google.com/machine-learning/glossary#Log_Loss'
   },
   "roc_auc": {
     extraInfo: ["The area under receiver operating characteristic curve. This ranges from zero to one, where a higher value indicates a higher-quality model."],
     subtitle: "Higher is better",
     high_is_positive: true,
-    plottable: true
+    plottable: true,
+    url: 'https://developers.google.com/machine-learning/glossary#AUC'
   },
   "mean_absolute_error": {
     extraInfo: ["Average absolute difference between the target values and the predicted values. This metric ranges from zero to infinity; a lower value indicates a higher quality model."],
     subtitle: "Lower is better",
     high_is_positive: false,
     plottable: false,
+    url: 'https://developers.google.com/machine-learning/glossary#MAE'
   },
   "mean_squared_error": {
     extraInfo: ["The square root of the average squared difference between the target and predicted values. More sensitive to outliers than mean absolute error,so if you're concerned about large errors, then this can be a more useful metric to evaluate. A smaller value indicates a higher quality model (0 represents a perfect predictor)."],
     subtitle: "Lower is better",
     high_is_positive: false,
     plottable: false,
+    url: 'https://developers.google.com/machine-learning/glossary#MSE'
   },
   "mean_squared_log_error": {
     extraInfo: ["Similar to mean squared error, but with the natural logarithm of the predicted and actual values plus 1. This penalizes under-prediction more heavily than over-prediction. It can be a good metric when you don't want to penalize differences for large prediction values more heavily than for small prediction values. This metric ranges from zero to infinity; a lower value indicates a higher quality model. This is returned only if all label and predicted values are non-negative."],
     subtitle: "Lower is better",
     high_is_positive: false,
     plottable: false,
+    // url: 'https://developers.google.com/machine-learning/glossary#'
   },
   "median_absolute_error": {
     extraInfo: ["The average absolute percentage difference between the labels and the predicted values. This metric ranges between zero and infinity; a lower value indicates a higher quality model. This is not shown if the target column contains any 0 values, in which case this is undefined."],
     subtitle: "Lower is better",
     high_is_positive: false,
     plottable: false,
+    // url: 'https://developers.google.com/machine-learning/glossary#'
   },
   "r2_score": {
     extraInfo: ["The square of the Pearson correlation coefficient between the labels and predicted values. This metric ranges between zero and one; a higher value indicates a higher quality model."],
     subtitle: "Higher is better",
     high_is_positive: true,
     plottable: true,
+    // url: 'https://developers.google.com/machine-learning/glossary#'
   },
   "explained_variance": {
     extraInfo: ["The proportion of the variation of the dataset that is explained by the model."],
     subtitle: "Higher is better",
     high_is_positive: true,
     plottable: true,
+    // url: 'https://developers.google.com/machine-learning/glossary#'
   },
 }
