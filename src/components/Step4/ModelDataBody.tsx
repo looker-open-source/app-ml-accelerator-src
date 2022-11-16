@@ -130,7 +130,6 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
 const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {
   const [hoverCol, setHoverCol] = useState(-1)
   const [hoverRow, setHoverRow] = useState(-1)
-  
   const dataItems = []
   const sortedData = sortBy(data, 'expected_label')
   const valueCount = sortedData.length
@@ -266,11 +265,11 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
         </div>
           <div className='box-container-raised'>
             <div className='cm-header x'>
-              Actual Values
+              Predicted Values
             </div>
           <div className='cm-inner-row'  onMouseLeave={handleMouseLeave}>
           <div className='cm-header y rotate'>
-            Predicted Values
+            Actual Values
           </div>
           <div className='cm-inner-col'>
             <table style={{minWidth: '80%'}}>
