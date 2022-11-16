@@ -2,7 +2,7 @@ import {  ButtonOutline, Heading, Icon } from '@looker/components'
 import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
-import { sortBy } from 'lodash'
+import { orderBy } from 'lodash'
 import React, { useContext, useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
@@ -131,7 +131,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
   const [hoverCol, setHoverCol] = useState(-1)
   const [hoverRow, setHoverRow] = useState(-1)
   const dataItems = []
-  const sortedData = sortBy(data, 'expected_label')
+  const sortedData = orderBy(data, 'expected_label')
   const valueCount = sortedData.length
   
 // TODO: don't do the highlighting for low cardinality confusion matrices 
@@ -289,7 +289,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const convertedData = data?.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
-  const sortedData = sortBy(convertedData, 'threshold')
+  const sortedData = orderBy(convertedData, 'threshold', 'desc')
   const sortedDataFormatted = sortedData.map((int: any) => {
     return {
       ...int,
@@ -403,7 +403,8 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
             displayColors: false,
             callbacks: {
               title: (ctx: any) => {
-                let idx = Number(data.length) - (Number(ctx[0].dataIndex)) - 1
+                // let idx = Number(data.length) - (Number(ctx[0].dataIndex)) - 1
+                let idx = Number(ctx[0].dataIndex)
                 let txt = `Threshold: ${Number(data[idx].threshold).toFixed(3)}`
                 return txt
               },
