@@ -1,9 +1,9 @@
-import {  ButtonOutline, Heading, Icon } from '@looker/components'
+import {  Heading, Icon } from '@looker/components'
 import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
 import { orderBy } from 'lodash'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
 import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo, TEvaluationInfo } from '../../services/modelTypes'
@@ -56,6 +56,7 @@ const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, valu
   const [isExpanded, setIsExpanded] = useState(false)
 
   const toggleCard = () => setIsExpanded(!isExpanded)
+
   const openUrl = (url: string) => {
     extensionSDK.openBrowserWindow(url, '_blank')
   }
@@ -403,7 +404,6 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
             displayColors: false,
             callbacks: {
               title: (ctx: any) => {
-                // let idx = Number(data.length) - (Number(ctx[0].dataIndex)) - 1
                 let idx = Number(ctx[0].dataIndex)
                 let txt = `Threshold: ${Number(data[idx].threshold).toFixed(3)}`
                 return txt
