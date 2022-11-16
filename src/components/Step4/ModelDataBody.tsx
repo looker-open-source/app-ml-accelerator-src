@@ -368,8 +368,9 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
 
     const xyData = data.map((datum: any) => ({
       x: Number(datum['false_positive_rate']),
-      y: Number(datum['recall'])
+      y: Number(datum['recall']),
     }))
+
 
     return {
       type: chartType,
@@ -402,7 +403,8 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
             displayColors: false,
             callbacks: {
               title: (ctx: any) => {
-                let txt = `Threshold: ${Number(ctx[0].label).toFixed(3)}`
+                let idx = Number(data.length) - (Number(ctx[0].dataIndex)) - 1
+                let txt = `Threshold: ${Number(data[idx].threshold).toFixed(3)}`
                 return txt
               },
               label: (ctx: any) => {
