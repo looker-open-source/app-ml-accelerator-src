@@ -20,6 +20,7 @@ export const HomeLanding : React.FC = () => {
   const { firstName } = state.user
 
   useEffect(() => {
+    // TODO Deduplicate caching call here
     fetchMyModels()
     fetchSharedModels()
   }, [])
