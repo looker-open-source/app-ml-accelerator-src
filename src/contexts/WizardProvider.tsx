@@ -6,7 +6,7 @@ import { IQuery } from "@looker/sdk/lib/4.0/models"
 import { BQMLContext } from './BQMLProvider'
 import { useHistory, useParams } from 'react-router-dom'
 import { buildWizardState } from '../services/modelState'
-import { SUMMARY_EXPLORE, BQML_LOOKER_MODEL, WIZARD_STEPS, JOB_STATUSES } from '../constants'
+import { SUMMARY_EXPLORE, BQML_LOOKER_MODEL, WIZARD_STEPS } from '../constants'
 import { mapAPIExploreToClientExplore } from '../services/explores'
 import { getHeaderColumns } from '../services/resultsTable'
 import { renameSummaryDataKeys } from '../services/summary'
@@ -19,6 +19,7 @@ import { SaveSummaryProps } from '../types/summary'
 import { SaveInputDataProps } from '../types/inputData'
 import { cloneDeep } from 'lodash'
 import { OauthContext } from './OauthProvider'
+// import { calcElapsedTime } from '../services/time'
 
 type PersistModelStateProps = {
   wizardState: WizardState,
@@ -83,16 +84,16 @@ export const WizardProvider = ({ children }: any) => {
       const loadedWizardState = buildWizardState(savedModelState)
       dispatch({ type: 'populateWizard', wizardState: loadedWizardState })
       dispatch({ type: 'setBQModel', data: bqModel })
-
+      
       const { step2, step3, step5 } = loadedWizardState.steps
       if (!step2.modelName || !step2.exploreName) {
         throw "Failed to load model"
       }
-
+    
       // Fetch and Populate Step2 Data
       const { value: exploreData } = await fetchExplore(step2.modelName, step2.exploreName, 'step2')
       if (exploreData) {
-        const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID, bqModel.inputDataQuery.limit)
+        const { ok, body } = await getBQInputData(bqModel.name, bqModel.inputDataUID, bqModel.inputDataQuery.limit) // ~4s to load //TODO
         if (!ok) {
           throw `Failed to load source query.  Please try re-running the query from the "${WIZARD_STEPS['step2']}" tab.`
         }
@@ -104,15 +105,15 @@ export const WizardProvider = ({ children }: any) => {
           step2.selectedFields,
           buildRanQuery(step2, results),
           exploreData
-        )
-        saveQueryToState('step2', step2, results, undefined, headers)
-      } else {
-        dispatch({ type: 'addError', error: 'Failed to retrieve explore data' })
-      }
-
-      // Fetch and Populate Step3 Data
-      if (step3.bqModelName && step3.targetField) {
-        const { ok, value } = await fetchSummary(step3.bqModelName, step3.targetField, bqModel.inputDataUID)
+          )
+          saveQueryToState('step2', step2, results, undefined, headers)
+        } else {
+          dispatch({ type: 'addError', error: 'Failed to retrieve explore data' })
+        }
+        
+        // Fetch and Populate Step3 Data
+        if (step3.bqModelName && step3.targetField) {
+        const { ok, value } = await fetchSummary(step3.bqModelName, step3.targetField, bqModel.inputDataUID) // ~5s to load //TODO
         if (!ok || !value) { throw "Failed to load summmary" }
         saveSummary({
           rawSummary: value,
@@ -134,7 +135,7 @@ export const WizardProvider = ({ children }: any) => {
       dispatch({type: 'addError', error: `${error}`})
     }
   }
-
+  
   const buildRanQuery = (stepData: Step2State | Step5State, results: any, exploreUrl?: string) => {
     return {
       selectedFields: {
@@ -360,7 +361,7 @@ export const WizardProvider = ({ children }: any) => {
       persistModelState({ wizardState, bqModel, isModelCreate, isModelUpdate, retry: true })
     }
   }
-
+  
   const getBQInputData = async (bqModelName: string, uid: string, limit?: string) => {
     try {
       if (expiry < new Date()) { await signIn(); }

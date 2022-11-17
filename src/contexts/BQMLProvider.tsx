@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
 import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
@@ -61,6 +61,8 @@ export const BQMLProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
   const [ canExpire, setCanExpire ] = useState(true)
+  const [ cachedModels, setCachedModels ] = useState([])
+  const [ shouldResetCache, setShouldResetCache ] = useState(false)
   const { gcpProject, bqmlModelDatasetName } = state.userAttributes
 
   /**
@@ -227,6 +229,7 @@ export const BQMLProvider = ({ children }: any) => {
       model,
       'PATCH'
     )
+    setShouldResetCache(true)
     return result
   }
 
@@ -244,6 +247,7 @@ export const BQMLProvider = ({ children }: any) => {
     // )
     // return result
     const sql = `DROP MODEL IF EXISTS ${bqmlModelDatasetName}.${modelName}`
+    setShouldResetCache(true)
     return queryJob(sql)
   }
 
@@ -261,6 +265,7 @@ export const BQMLProvider = ({ children }: any) => {
     // )
     // return result
     const sql = `DROP TABLE IF EXISTS ${bqmlModelDatasetName}.${tableName}`
+    setShouldResetCache(true)
     return queryJob(sql)
   }
 
@@ -276,6 +281,7 @@ export const BQMLProvider = ({ children }: any) => {
                    model_created_at       INTEGER,
                    model_updated_at       INTEGER)
     `
+    setShouldResetCache(true)
     return queryJobAndWait(sql)
   }
 
@@ -316,6 +322,7 @@ export const BQMLProvider = ({ children }: any) => {
             INSERT (model_name, state_json, created_by_first_name, created_by_last_name, created_by_email${timestampCreate})
             VALUES(model_name, state_json, created_by_first_name, created_by_last_name, created_by_email${timestampCreate})
     `
+    setShouldResetCache(true)
     return queryJobAndWait(sql)
   }
 
@@ -331,6 +338,7 @@ export const BQMLProvider = ({ children }: any) => {
           WHEN MATCHED THEN
             UPDATE SET shared_with_emails=S.shared_with_emails
     `
+    setShouldResetCache(true)
     return queryJob(sql)
   }
 
@@ -339,32 +347,73 @@ export const BQMLProvider = ({ children }: any) => {
       DELETE ${gcpProject}.${bqmlModelDatasetName}.bqml_model_info
       WHERE model_name = '${bqModelName}'
     `
-
+    setShouldResetCache(true)
     return queryJob(sql)
   }
 
-  const getSavedModels = async (
-    filters: {[key: string]: string},
-    fields?: string[]
-  ) => {
+  // CACHING
+  const hasCachedModels = () => shouldResetCache || cachedModels.length > 0
+
+  const getAndCacheAllSavedModels = async () => {
+    const { email: userEmail} = state.user
     const { value: query } = await coreSDK.create_query({
       model:  BQML_LOOKER_MODEL,
       view: 'model_info',
-      fields: fields || Object.values(MODEL_STATE_TABLE_COLUMNS),
-      filters
+      fields: Object.values(MODEL_STATE_TABLE_COLUMNS),
+      filter_expression: `\${${MODEL_STATE_TABLE_COLUMNS.createdByEmail}\} = \"${userEmail}\" OR contains(\${${MODEL_STATE_TABLE_COLUMNS.sharedWithEmails}\}, \"${userEmail}\")`
     })
     const { ok, value } = await coreSDK.run_query({
       query_id: query.id,
       result_format: "json_detail",
       cache: false
     })
-    if (!ok) {
+    if (ok) {
+      setCachedModels(value.data)
+      setShouldResetCache(false)
+    } else {
       throw "Please try refreshing the page."
     }
     if (value.errors && value.errors.length >= 1) {
       throw value.errors[0].message
     }
     return { ok, value }
+  }
+
+  const getSavedModels = async (
+    filters: {[key: string]: string},
+    fields?: string[],
+    exactMatch: boolean = true
+  ) => {
+    let data
+    if (!hasCachedModels()) {
+      // console.log("SETTING BQ Context Cache") //testing
+      data = (await getAndCacheAllSavedModels()).value.data
+    } else {
+      // console.log("USING BQ Context Cache") //testing
+      data = cachedModels
+    }
+    let ok = true
+    let value = {data : data.filter((m) => {
+      let success = 0
+      Object.keys(filters).forEach(k => {
+        if (exactMatch) {
+          if ((m[k].value === filters[k])) {
+            success += 1
+          } 
+        } else {
+          if ((m[k].value?.includes(filters[k]))) {
+            success += 1
+          } 
+        }
+      })
+      return success === Object.keys(filters).length
+    }).map((m) => {
+      if (fields) {
+        return (({ ...fields }) => ({ ...fields }))(m)
+      } else return m
+    }) 
+  }
+    return {ok, value}
   }
 
   const getSavedModelByName = async (modelName: string) => {
@@ -402,8 +451,8 @@ export const BQMLProvider = ({ children }: any) => {
       const { email: userEmail } = state.user
       if (!userEmail) { return { ok: false } }
       return await getSavedModels({
-        [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: `%"${userEmail}"%`
-      }, Object.values(MODEL_STATE_TABLE_COLUMNS))
+        [MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]: userEmail
+      }, Object.values(MODEL_STATE_TABLE_COLUMNS), false)
     } catch (error) {
       if (!hideError) {
         dispatch({
@@ -419,12 +468,10 @@ export const BQMLProvider = ({ children }: any) => {
     try {
       const { email: userEmail } = state.user
       if (!modelName || !userEmail) { return { ok: false } }
-
       const { value } = await getSavedModels({
         [MODEL_STATE_TABLE_COLUMNS.modelName]: modelName
       })
       const savedData = value.data[0]
-
       // check if current user has access to model
       if (savedData[MODEL_STATE_TABLE_COLUMNS.createdByEmail]?.value !== userEmail &&
         !savedData[MODEL_STATE_TABLE_COLUMNS.sharedWithEmails]?.value.includes(`"${userEmail}"`)) {
