@@ -47,6 +47,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     advancedSettings,
     inputData
   } = step3
+  const registerInVertex = false //TOFIX - retrieve from state
   const arima = isArima(objective || "")
   const ranQueryFields = ranQuery?.selectedFields
   const sourceColumns = [...ranQueryFields?.dimensions || [], ...ranQueryFields?.measures || []]
@@ -109,7 +110,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       selectedFeatures,
       inputData.arimaTimeColumn,
       advancedSettings,
-      setIsLoading
+      setIsLoading,
+      registerInVertex || false
     ).catch((_e) => {
       return { ok: false }
     }).then((_r) => {
@@ -172,7 +174,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const stepCompleteButtonText = () => (
     modelNameParam ?
       modelNeedsUpdate() ?
-        "ReCreate Model" :
+        "Recreate Model" :
         "Continue" :
       "Create Model"
   )
@@ -220,6 +222,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             onChange={handleTargetChange}
             className="wizard-card-select"
           />
+          <div className='chk-space'></div>
         </div>
         {
           arima &&
