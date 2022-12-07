@@ -108,7 +108,7 @@ const Step4: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     if (jobComplete && needsUpdate()) {
       return (
         <div className="minor-error">
-          You have made changes that are not reflected in this model.  Return to the {titilize(WIZARD_STEPS['step3'])} tab and 'ReCreate Model'.
+          You have made changes that are not reflected in this model.  Return to the {titilize(WIZARD_STEPS['step3'])} tab and 'Recreate Model'.
         </div>
       )
     }
