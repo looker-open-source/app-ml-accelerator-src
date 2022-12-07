@@ -3,7 +3,6 @@ import { BQMLContext } from './BQMLProvider'
 import { useStore } from './StoreProvider'
 import { lookerToBqResults} from '../services/LookerToBQResults'
 import { createClassifierGlobalExplainSql, createRegressorGlobalExplainSql, isClassifier, selectBoostedTreeGlobalExplainSql } from '../services/modelTypes'
-import { OauthContext } from './OauthProvider'
 
 type IExplainContext = {
   getGlobalExplainData?: (
@@ -28,7 +27,6 @@ export const ExplainProvider = ({ children }: any) => {
     classLevelExplain: boolean
   ) => {
     try {
-      if (expiry < new Date()) { await signIn(); }
       if (!gcpProject || !bqmlModelDatasetName) { throw 'Gcp project and dataset are incorrectly set up.'}
       
       const { name: bqModelName } = state.bqModel

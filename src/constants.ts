@@ -57,17 +57,12 @@ export const DEFAULT_ARIMA_CONFIDENCE_LEVEL = 0.95
 export const DEFAULT_ARIMA_HORIZON = 1000
 
 export const DESC_STRING = "desc"
-export const GOOGLE_SCOPES = 'https://www.googleapis.com/auth/bigquery'
 
 // Model and explore where the summary data lives
 export const BQML_LOOKER_MODEL = "bqml_accelerator"
 export const SUMMARY_EXPLORE = "selection_summary"
 
 // user attribute keys from marketplace.json
-export const BIGQUERY_CONN = "bigquery_connection_name"
-export const GOOGLE_CLIENT_ID = "google_client_id"
-export const BQML_MODEL_DATASET_NAME = "bqml_model_dataset_name"
-export const GCP_PROJECT = "gcp_project"
-export const ACCESS_TOKEN_SERVER_ENDPOINT = "access_token_server_endpoint"
-export const LOOKER_CLIENT_ID = "looker_client_id"
-export const LOOKER_CLIENT_SECRET = "looker_client_secret"
+export const BIGQUERY_CONN = "app_bqml_accelerator_bigquery_connection_name"
+export const BQML_MODEL_DATASET_NAME = "app_bqml_accelerator_bqml_model_dataset_name"
+export const GCP_PROJECT = "app_bqml_accelerator_gcp_project"
