@@ -1,18 +1,20 @@
-import React, { useContext } from 'react'
-import { FieldText, Icon } from '@looker/components'
+import React, { useState, useContext } from 'react'
+import { Checkbox, FieldText, Icon, Label } from '@looker/components'
 import { useStore } from '../../contexts/StoreProvider'
 import { BQMLContext } from '../../contexts/BQMLProvider'
 import { MODEL_STATE_TABLE_COLUMNS, NAME_CHECK_STATUSES } from '../../constants'
 import { Warning, Check, Error } from "@styled-icons/material"
 import { alphaNumericOnly } from '../../services/common'
 import Spinner from '../Spinner'
+import { InfoTip } from '../InfoTip/InfoTip'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
 
 type ModelNameBlockProps = {
   nameCheckStatus: string | undefined,
   setNameCheckStatus: (value?: string) => void,
   loadingNameStatus: boolean,
   setLoadingNameStatus: (value: boolean) => void,
-  disabled?: boolean,
+  disabled?: boolean
 }
 
 export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
@@ -25,7 +27,16 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
   const { getSavedModelByName } = useContext(BQMLContext)
   const { state, dispatch } = useStore()
   const { bqModelName } = state.wizard.steps.step3
+  const registerInVertex = false //TOFIX - fetch from correct location in state
   const { email: userEmail } = state.user
+  const {extensionSDK} = useContext(ExtensionContext2)
+  const { step3 } = state.wizard.steps
+  const [localVertexToggle, setLocalVertexToggle] = useState(registerInVertex)
+  console.log(step3) //TODO delete
+
+  const openUrl = (url: string) => {
+    extensionSDK.openBrowserWindow(url, '_blank')
+  }
 
   const handleModelNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     dispatch({
@@ -33,6 +44,18 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
       step: 'step3',
       data: {
         bqModelName: e.target.value
+      }
+    })
+  }
+
+  const handleVertexRegistryToggle = (_e: any) => {
+    // TODO verify local state matches saved state
+    setLocalVertexToggle(!localVertexToggle)
+    dispatch({
+      type: 'addToStepData',
+      step: 'step3',
+      data: {
+        registerInVertex: localVertexToggle
       }
     })
   }
@@ -87,6 +110,31 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
         />
       </div>
       <div className={`status-message ${nameCheckStatus}`}>{buildStatusMessage()}</div>
+      <div className='vertex-checkbox chk-space'>
+        <Checkbox
+        name="vertex-register" 
+        checked={registerInVertex}
+        disabled={disabled}
+        onChange={handleVertexRegistryToggle}
+        />
+        <Label
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 'normal',
+            color: disabled ? 'rgb(193, 198, 204)' : '#5F6368'
+          }}
+          >
+            <div>
+            { disabled 
+            ? <span>Model is {!registerInVertex && 'not '}registered in </span> 
+            : <span>Register your model in </span>
+          }
+          <span className={`span-url ${disabled && 'disabled'}`} onClick={() => openUrl('https://cloud.google.com/vertex-ai/docs')}>Vertex AI</span>
+          </div>
+          </Label>
+      {!disabled && <InfoTip content='Ensure you have enabled the Vertex AI API in the Google Cloud Console before using this feature'/>}
+
+    </div>
     </div>
   )
 }
