@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
-import { OauthContext } from './OauthProvider'
 import { useStore } from './StoreProvider'
 import { poll } from '../services/common'
 import { generateModelState } from '../services/modelState'
@@ -56,7 +55,6 @@ export const BQMLContext = createContext<IBQMLContext>({})
  * BQML restful API.
  */
 export const BQMLProvider = ({ children }: any) => {
-  const { token, expiry, signIn } = useContext(OauthContext)
   const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
@@ -71,7 +69,6 @@ export const BQMLProvider = ({ children }: any) => {
    */
   const invokeBQApi = async (pathname: string, requestBody?: any, forcedMethod?: 'PATCH' | 'DELETE') => {
     try {
-      if (expiry < new Date()) { await signIn(); }
       const init: any = requestBody
         ? {
             method: forcedMethod || 'POST',

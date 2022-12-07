@@ -1,7 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { ExtensionContext2 } from '@looker/extension-sdk-react'
-import { OauthProvider } from '../contexts/OauthProvider'
-import { GOOGLE_SCOPES } from '../constants'
 import { getAllUserAttributes } from '../services/userAttributes'
 import { LookerBQMLApp } from './LookerBQMLApp'
 import './ExtensionApp.scss'
@@ -10,9 +8,8 @@ import { BQMLProvider } from '../contexts/BQMLProvider'
 import ErrorBar from './ErrorBar'
 
 export const ExtensionApp: React.FC = () => {
-  const { extensionSDK, coreSDK } = useContext(ExtensionContext2)
+  const { coreSDK } = useContext(ExtensionContext2)
   const { state, dispatch } = useStore()
-  const [clientId, setClientId] = useState<string | null>()
   
   // Warn on page close if state is possibly unsaved
   useEffect(() => {
@@ -35,8 +32,6 @@ export const ExtensionApp: React.FC = () => {
     let userId
     if (!state.user.email) {
       userId = await getUser()
-    }
-    if (!clientId && userId) {
       await getUserAttributes(userId)
     }
   }
@@ -62,7 +57,6 @@ export const ExtensionApp: React.FC = () => {
     try {
       const userAttributes = await getAllUserAttributes(coreSDK, userId)
       dispatch({ type: "setAllAttributes", value: userAttributes })
-      setClientId(userAttributes.googleClientId)
       const hasAllUserAttributes = Object.values(userAttributes).reduce((hasAttr, value) => hasAttr = !!value, true)
       if (!hasAllUserAttributes) {
         dispatch({ type: 'addError', error: 'User Attributes have not been setup correctly.  Please see an administrator.' })
@@ -73,14 +67,12 @@ export const ExtensionApp: React.FC = () => {
   }
 
   return (
-    <OauthProvider clientId={clientId} scopes={GOOGLE_SCOPES}>
       <BQMLProvider>
         {
-          clientId && state.user.email ?
+          state.user.email ?
           (<LookerBQMLApp />) :
           <ErrorBar />
         }
       </BQMLProvider>
-    </OauthProvider>
   )
 }

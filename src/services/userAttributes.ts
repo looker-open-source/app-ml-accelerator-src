@@ -1,5 +1,5 @@
 import { Looker40SDK } from '@looker/sdk'
-import { BIGQUERY_CONN, GOOGLE_CLIENT_ID, BQML_MODEL_DATASET_NAME, GCP_PROJECT } from '../constants'
+import { BIGQUERY_CONN, BQML_MODEL_DATASET_NAME, GCP_PROJECT } from '../constants'
 
 export function getBigQueryConnectionName(userAttributes: any) {
   try {
@@ -12,21 +12,6 @@ export function getBigQueryConnectionName(userAttributes: any) {
       return process.env.BIGQUERY_CONN
     } catch (err) {
       throw new Error("A big query connection name must be provided.")
-    }
-  }
-}
-
-export function getGoogleClientID(userAttributes: any) {
-  try {
-    const googleClientId = userAttributes.find((ua: any) => ua.name === GOOGLE_CLIENT_ID)
-    if (!googleClientId || !googleClientId.value) { throw 'Unable to find Google Client ID'}
-    return googleClientId.value
-  } catch (error) {
-    try {
-      // Hardcoded value for when the extension has not been installed via the marketplace
-      return process.env.GOOGLE_CLIENT_ID
-    } catch (err) {
-      throw new Error("A Google Client ID name must be provided.")
     }
   }
 }
@@ -70,12 +55,10 @@ export async function getAllUserAttributes(coreSDK: Looker40SDK, userId: number)
   }
 
   const bigQueryConn = getBigQueryConnectionName(value)
-  const googleClientId = getGoogleClientID(value)
   const gcpProject = getGCPProject(value)
   const bqmlModelDatasetName = getBqmlModelDatasetName(value)
   return {
     bigQueryConn,
-    googleClientId,
     gcpProject,
     bqmlModelDatasetName
   }
