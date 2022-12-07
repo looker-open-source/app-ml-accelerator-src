@@ -33,3 +33,8 @@ export const formatParameterFilter = (fieldName: string) => (
 export const noDot = (fieldName: string) => (
   fieldName.replace(/\./g, '_')
 )
+
+export const safeVertexName = (modelName: string) => {
+  let clean = modelName.toLowerCase().replace(/[^a-z0-9_-]/g, '')
+  return `ml-accelerator-${clean}`
+} 

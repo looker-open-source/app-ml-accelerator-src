@@ -79,3 +79,23 @@
     padding: 6px 20px;
   }
 }
+
+.vertex-checkbox {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.chk-space {
+  min-height: 2rem;
+}
+
+.span-url {
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+  &.disabled {
+    color: rgb(138, 138, 222);
+  }
+}
