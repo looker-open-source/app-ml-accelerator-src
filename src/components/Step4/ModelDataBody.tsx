@@ -1,14 +1,15 @@
-import {  Card, Heading, Icon } from '@looker/components'
+import {  ButtonOutline, Heading, Icon } from '@looker/components'
 import { ArrowCircleUp, ArrowCircleDown } from '@styled-icons/material-outlined'
 import { AgGridReact } from 'ag-grid-react'
 import { Chart, ChartTypeRegistry } from 'chart.js'
-import { sortBy } from 'lodash'
-import React, { useEffect, useState } from 'react'
+import { orderBy } from 'lodash'
+import React, { useContext, useEffect, useState } from 'react'
 import { useStore } from '../../contexts/StoreProvider'
 import { formatBQResults } from '../../services/common'
 import { MODEL_EVAL_FUNCS, evaluationAdditionalInfo, TEvaluationInfo } from '../../services/modelTypes'
 import { noDot, splitFieldName, titilize } from '../../services/string'
 import GlobalExplain from '../GlobalExplain'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
 
 export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) => {
   if (activeTab === 'explain') { return <GlobalExplain /> }
@@ -51,9 +52,14 @@ export const ModelDataBody: React.FC<{ activeTab: string }> = ({ activeTab }) =>
 // }
 
 const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, value: number }> = ({heading, info, value }) => {
+  const {extensionSDK} = useContext(ExtensionContext2)
   const [isExpanded, setIsExpanded] = useState(false)
 
   const toggleCard = () => setIsExpanded(!isExpanded)
+
+  const openUrl = (url: string) => {
+    extensionSDK.openBrowserWindow(url, '_blank')
+  }
   return (
     <div className='model-evaluation--card'>
               <div className='model-evaluation--topRow'  onClick={toggleCard} >
@@ -73,6 +79,15 @@ const EvaluateTableItem: React.FC<{ heading: string, info: TEvaluationInfo, valu
                   {info.subtitle}
               </div>
               {info.extraInfo.map(i => <p>{i}</p>)}
+              {info.url && <div>
+                <ButtonOutline
+                  className='glossary-button'
+                  size='xsmall'
+                  onClick={() => openUrl(info.url || '')}
+                >
+                  Read More
+                </ButtonOutline>
+              </div>}
           </div>
           }
     </div>
@@ -116,9 +131,8 @@ const EvaluateTable: React.FC<{ data: any[] }> = ({ data }) => {
 const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data, target }) => {
   const [hoverCol, setHoverCol] = useState(-1)
   const [hoverRow, setHoverRow] = useState(-1)
-  
   const dataItems = []
-  const sortedData = sortBy(data, 'expected_label')
+  const sortedData = orderBy(data, 'expected_label')
   const valueCount = sortedData.length
   
 // TODO: don't do the highlighting for low cardinality confusion matrices 
@@ -252,11 +266,11 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
         </div>
           <div className='box-container-raised'>
             <div className='cm-header x'>
-              Actual Values
+              Predicted Values
             </div>
           <div className='cm-inner-row'  onMouseLeave={handleMouseLeave}>
           <div className='cm-header y rotate'>
-            Predicted Values
+            Actual Values
           </div>
           <div className='cm-inner-col'>
             <table style={{minWidth: '80%'}}>
@@ -276,7 +290,7 @@ const ConfusionMatrixTable: React.FC<{ data: any[], target?: string }> = ({ data
 
 const ROCCurveTable: React.FC<{ data: any[] }> = ({ data }) => {
   const convertedData = data?.map((datum: any) => ({ ...datum, recall: Number(datum.recall)}))
-  const sortedData = sortBy(convertedData, 'false_positive_rate')
+  const sortedData = orderBy(convertedData, 'threshold', 'desc')
   const sortedDataFormatted = sortedData.map((int: any) => {
     return {
       ...int,
@@ -355,8 +369,9 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
 
     const xyData = data.map((datum: any) => ({
       x: Number(datum['false_positive_rate']),
-      y: Number(datum['recall'])
+      y: Number(datum['recall']),
     }))
+
 
     return {
       type: chartType,
@@ -389,7 +404,8 @@ const ROCCurveLineChart: React.FC<{ data: any[] }> = ({ data }) => {
             displayColors: false,
             callbacks: {
               title: (ctx: any) => {
-                let txt = `Threshold: ${Number(ctx[0].label).toFixed(3)}`
+                let idx = Number(ctx[0].dataIndex)
+                let txt = `Threshold: ${Number(data[idx].threshold).toFixed(3)}`
                 return txt
               },
               label: (ctx: any) => {
