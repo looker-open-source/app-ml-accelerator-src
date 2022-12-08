@@ -1,4 +1,4 @@
-# Looker BQML Accelerator Extension App
+# Machine Learning Accelerator
 
 ## local app setup
 
@@ -55,7 +55,7 @@ In GCP Console:
 
      - This is the endpoint for the custom access token server that you'll be using to get access tokens from Google Auth Server.
        - See: https://github.com/4mile/looker-ext-access-token-server
-     - **NOTE:** If this user attribute is not properly set, the BQML Accelerator app will not be able to use service account authentication and will attempt to fall back on OAuth2 implicit flow instead (using end-user credentials rather than service account)
+     - **NOTE:** If this user attribute is not properly set, the Machine Learning Accelerator app will not be able to use service account authentication and will attempt to fall back on OAuth2 implicit flow instead (using end-user credentials rather than service account)
 
      **IMPORTANT:** All three of these user attributes **must be namespaced/scoped for the extension app** ([see Looker docs regarding scoped user attributes](https://docs.looker.com/data-modeling/extension-framework/js-r-extension-examples#user_attributes)), so make sure that the **attribute names** are prepended with `your_project_name_your_project_name_`.
 
