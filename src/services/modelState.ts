@@ -10,6 +10,8 @@ import { cloneDeep } from "lodash"
 // This object is saved in bigquery and used to load
 // previously created models, changing these keys will
 // make previously saved models unable to load
+
+
 export const generateModelState = (wizardState: WizardState, bqModelState: BQModelState): SavedModelState => {
   const { unlockedStep } = wizardState
   const modelStateToSave = {
@@ -17,6 +19,7 @@ export const generateModelState = (wizardState: WizardState, bqModelState: BQMod
     bqModel: {
       objective: bqModelState.objective,
       name: bqModelState.name,
+      registerVertex: bqModelState.registerVertex,
       target: bqModelState.target,
       arimaTimeColumn: bqModelState.arimaTimeColumn,
       selectedFeatures: bqModelState.selectedFeatures,
@@ -83,6 +86,7 @@ const buildWizardStep2 = (bqModelState: BQModelState, wizardStep2: Step2State): 
 const buildWizardStep3 = (bqModelState: BQModelState, wizardStep3: Step3State): Step3State => {
   const mappedModelState = {
     bqModelName: bqModelState.name,
+    registerVertex: bqModelState.registerVertex,
     targetField: bqModelState.target,
     arimaTimeColumn: bqModelState.arimaTimeColumn,
     selectedFeatures: bqModelState.selectedFeatures,

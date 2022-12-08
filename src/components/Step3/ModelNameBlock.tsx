@@ -14,6 +14,8 @@ type ModelNameBlockProps = {
   setNameCheckStatus: (value?: string) => void,
   loadingNameStatus: boolean,
   setLoadingNameStatus: (value: boolean) => void,
+  localVertexOption: boolean,
+  handleLocalVertexToggle: () => void,
   disabled?: boolean
 }
 
@@ -22,17 +24,15 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
   setNameCheckStatus,
   loadingNameStatus,
   setLoadingNameStatus,
+  localVertexOption,
+  handleLocalVertexToggle,
   disabled = false
 }) => {
   const { getSavedModelByName } = useContext(BQMLContext)
   const { state, dispatch } = useStore()
   const { bqModelName } = state.wizard.steps.step3
-  const registerInVertex = false //TOFIX - fetch from correct location in state
   const { email: userEmail } = state.user
   const {extensionSDK} = useContext(ExtensionContext2)
-  const { step3 } = state.wizard.steps
-  const [localVertexToggle, setLocalVertexToggle] = useState(registerInVertex)
-  console.log(step3) //TODO delete
 
   const openUrl = (url: string) => {
     extensionSDK.openBrowserWindow(url, '_blank')
@@ -48,17 +48,6 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
     })
   }
 
-  const handleVertexRegistryToggle = (_e: any) => {
-    // TODO verify local state matches saved state
-    setLocalVertexToggle(!localVertexToggle)
-    dispatch({
-      type: 'addToStepData',
-      step: 'step3',
-      data: {
-        registerInVertex: localVertexToggle
-      }
-    })
-  }
 
   const handleModelNameBlur = async (e: any) => {
     setLoadingNameStatus(true)
@@ -113,9 +102,9 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
       <div className='vertex-checkbox chk-space'>
         <Checkbox
         name="vertex-register" 
-        checked={registerInVertex}
+        checked={localVertexOption}
         disabled={disabled}
-        onChange={handleVertexRegistryToggle}
+        onChange={(_e) => handleLocalVertexToggle()}
         />
         <Label
           style={{
@@ -126,7 +115,7 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
           >
             <div>
             { disabled 
-            ? <span>Model is {!registerInVertex && 'not '}registered in </span> 
+            ? <span>Model is {!localVertexOption && 'not '}registered in </span> 
             : <span>Register your model in </span>
           }
           <span className={`span-url ${disabled && 'disabled'}`} onClick={() => openUrl('https://cloud.google.com/vertex-ai/docs')}>Vertex AI</span>

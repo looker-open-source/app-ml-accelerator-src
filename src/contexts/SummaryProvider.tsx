@@ -184,6 +184,7 @@ export const SummaryProvider = ({ children }: any) => {
       inputDataUID: step3.inputData.uid,
       objective: step1.objective,
       binaryClassifier: isBinaryClassifier(step1.objective || '', step3),
+      registerVertex: step3.registerVertex,
       name: step3.bqModelName,
       target: step3.targetField,
       arimaTimeColumn: step3.arimaTimeColumn,
@@ -233,7 +234,6 @@ export const SummaryProvider = ({ children }: any) => {
         arimaTimeColumn,
         advancedSettings
       })
-      console.log(sql) //TODO delete
       if (!sql) {
         throw "Failed to create BigQuery Model SQL statement"
       }
