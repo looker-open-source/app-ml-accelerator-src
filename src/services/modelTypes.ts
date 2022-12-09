@@ -1,6 +1,6 @@
 import { DEFAULT_ARIMA_HORIZON } from "../constants"
 import { advancedSettingsSql } from "./advancedSettings"
-import { noDot } from "./string"
+import { noDot, safeVertexName } from "./string"
 import { removeLimit } from "./summary"
 
 export const MODEL_EVAL_FUNCS: { [key: string]: string } = {
@@ -166,8 +166,9 @@ type IFormModelCreateSQLProps = {
   bqModelName: string,
   target: string,
   features: string[],
+  registerVertex?: boolean,
   arimaTimeColumn?: string,
-  advancedSettings?: any
+  advancedSettings?: any,
 }
 
 interface IFormBoostedTreeModelCreateSQLProps extends IFormModelCreateSQLProps {
@@ -181,6 +182,7 @@ const formBoostedTreeSQL = ({
   bqModelName,
   target,
   features,
+  registerVertex,
   boostedType,
   advancedSettings
 }: IFormBoostedTreeModelCreateSQLProps): string => {
@@ -188,6 +190,7 @@ const formBoostedTreeSQL = ({
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
+          ${registerVertex ? `, MODEL_REGISTRY = 'VERTEX_AI', VERTEX_AI_MODEL_ID = '${safeVertexName(bqModelName)}'` : ''}
           , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
           ${settingsSql})
     AS SELECT ${features.join(', ')} FROM \`${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}\`;
@@ -208,6 +211,7 @@ const formArimaSQL = ({
   bqmlModelDatasetName,
   bqModelName,
   target,
+  registerVertex,
   advancedSettings = {},
   arimaTimeColumn
 }: IFormModelCreateSQLProps) => {
@@ -215,6 +219,7 @@ const formArimaSQL = ({
   return `
     CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
+    ${registerVertex ? `, MODEL_REGISTRY = 'VERTEX_AI', VERTEX_AI_MODEL_ID = '${safeVertexName(bqModelName)}'` : ''}
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
       , time_series_data_col = '${target.replace(".", "_")}'
       , HORIZON = ${advancedSettings.horizon || DEFAULT_ARIMA_HORIZON}

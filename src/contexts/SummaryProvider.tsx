@@ -8,7 +8,6 @@ import { DEFAULT_ARIMA_HORIZON, JOB_STATUSES, WIZARD_STEPS } from '../constants'
 import { wizardInitialState } from '../reducers/wizard'
 import { BQModelState, WizardState } from '../types'
 import { bqModelInitialState } from '../reducers/bqModel'
-import { v4 as uuidv4 } from 'uuid';
 import { isBinaryClassifier } from '../services/summary'
 
 type ISummaryContext = {
@@ -27,7 +26,8 @@ type ISummaryContext = {
     features?: string[],
     arimaTimeColumn?:  string,
     advancedSettings?: any,
-    setIsLoading?: any
+    setIsLoading?: any,
+    registerVertex?: boolean
   ) => Promise<any>
 }
 
@@ -184,6 +184,7 @@ export const SummaryProvider = ({ children }: any) => {
       inputDataUID: step3.inputData.uid,
       objective: step1.objective,
       binaryClassifier: isBinaryClassifier(step1.objective || '', step3),
+      registerVertex: step3.registerVertex,
       name: step3.bqModelName,
       target: step3.targetField,
       arimaTimeColumn: step3.arimaTimeColumn,
@@ -206,7 +207,8 @@ export const SummaryProvider = ({ children }: any) => {
     features?: string[],
     arimaTimeColumn?: string,
     advancedSettings?: any,
-    setIsLoading?: any
+    setIsLoading?: any,
+    registerVertex?: boolean
   ) => {
     try {
       if (
@@ -228,6 +230,7 @@ export const SummaryProvider = ({ children }: any) => {
         bqModelName,
         target,
         features,
+        registerVertex,
         arimaTimeColumn,
         advancedSettings
       })

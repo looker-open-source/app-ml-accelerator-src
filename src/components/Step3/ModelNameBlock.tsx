@@ -1,18 +1,22 @@
-import React, { useContext } from 'react'
-import { FieldText, Icon } from '@looker/components'
+import React, { useState, useContext } from 'react'
+import { Checkbox, FieldText, Icon, Label } from '@looker/components'
 import { useStore } from '../../contexts/StoreProvider'
 import { BQMLContext } from '../../contexts/BQMLProvider'
 import { MODEL_STATE_TABLE_COLUMNS, NAME_CHECK_STATUSES } from '../../constants'
 import { Warning, Check, Error } from "@styled-icons/material"
 import { alphaNumericOnly } from '../../services/common'
 import Spinner from '../Spinner'
+import { InfoTip } from '../InfoTip/InfoTip'
+import { ExtensionContext2 } from '@looker/extension-sdk-react'
 
 type ModelNameBlockProps = {
   nameCheckStatus: string | undefined,
   setNameCheckStatus: (value?: string) => void,
   loadingNameStatus: boolean,
   setLoadingNameStatus: (value: boolean) => void,
-  disabled?: boolean,
+  localVertexOption: boolean,
+  handleLocalVertexToggle: () => void,
+  disabled?: boolean
 }
 
 export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
@@ -20,12 +24,19 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
   setNameCheckStatus,
   loadingNameStatus,
   setLoadingNameStatus,
+  localVertexOption,
+  handleLocalVertexToggle,
   disabled = false
 }) => {
   const { getSavedModelByName } = useContext(BQMLContext)
   const { state, dispatch } = useStore()
   const { bqModelName } = state.wizard.steps.step3
   const { email: userEmail } = state.user
+  const {extensionSDK} = useContext(ExtensionContext2)
+
+  const openUrl = (url: string) => {
+    extensionSDK.openBrowserWindow(url, '_blank')
+  }
 
   const handleModelNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     dispatch({
@@ -36,6 +47,7 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
       }
     })
   }
+
 
   const handleModelNameBlur = async (e: any) => {
     setLoadingNameStatus(true)
@@ -87,6 +99,32 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
         />
       </div>
       <div className={`status-message ${nameCheckStatus}`}>{buildStatusMessage()}</div>
+      <div className='vertex-checkbox chk-space'>
+        <Checkbox
+        name="vertex-register" 
+        checked={localVertexOption}
+        disabled={disabled}
+        onChange={(_e) => handleLocalVertexToggle()}
+        />
+        <Label
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 'normal',
+            color: disabled ? 'rgb(193, 198, 204)' : '#5F6368'
+          }}
+          >
+            <div>
+            { disabled 
+            ? <span>{!localVertexOption ? 'Not registered' : 'Registered'} in </span> 
+            : <span>Register in </span>
+          }
+          <span className={`span-url ${disabled && 'disabled'}`} onClick={() => openUrl('https://cloud.google.com/vertex-ai/docs/model-registry/introduction')}>Vertex AI</span>
+          <span> Registry</span>
+          </div>
+          </Label>
+      {!disabled && <InfoTip content='Ensure you have enabled the Vertex AI API in the Google Cloud Console before using this feature'/>}
+
+    </div>
     </div>
   )
 }

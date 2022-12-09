@@ -149,7 +149,8 @@ export const ModelProvider = ({ children }: any) => {
       if (!createSql) { throw 'Failed to generate create sql' }
 
       const { ok: createOk } = await queryJobAndWait?.(createSql)
-      if (!createOk) { throw 'Failed to create evaluate table' }
+      // TODO surface specific error if Vertex API is not enabled
+      if (!createOk) {throw 'Failed to create evaluate table' }
 
       // fetch table results now that table is created
       const selectSql = getEvaluateDataSql({ evalFuncName, gcpProject, bqmlModelDatasetName, bqModelName })

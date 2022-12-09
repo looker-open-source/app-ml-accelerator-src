@@ -45,14 +45,17 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     bqModelName,
     arimaTimeColumn,
     advancedSettings,
-    inputData
+    inputData,
+    registerVertex
   } = step3
+
   const arima = isArima(objective || "")
   const ranQueryFields = ranQuery?.selectedFields
   const sourceColumns = [...ranQueryFields?.dimensions || [], ...ranQueryFields?.measures || []]
   const sourceColumnsFormatted = sourceColumns.map((col) => noDot(col)).sort()
   const [targetFieldOptions, setTargetFieldOptions] = useState<any>()
   const [timeColumnFieldOptions, setTimeColumnFieldOptions] = useState<any>()
+  const [localVertexOption, setLocalVertexOption] = useState(registerVertex || false)
 
   useEffect(() => {
     const targetOptions = buildFieldSelectOptions(
@@ -87,6 +90,12 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
     })
   }
 
+  const handleLocalVertexToggle = () => {
+    let tmp = !localVertexOption
+    setLocalVertexOption(tmp)
+    updateStepData({registerVertex: tmp})
+  }
+
   const handleTargetChange = (targetField: string) => {
     updateStepData({ targetField })
   }
@@ -109,7 +118,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
       selectedFeatures,
       inputData.arimaTimeColumn,
       advancedSettings,
-      setIsLoading
+      setIsLoading,
+      localVertexOption
     ).catch((_e) => {
       return { ok: false }
     }).then((_r) => {
@@ -172,7 +182,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
   const stepCompleteButtonText = () => (
     modelNameParam ?
       modelNeedsUpdate() ?
-        "ReCreate Model" :
+        "Recreate Model" :
         "Continue" :
       "Create Model"
   )
@@ -209,6 +219,8 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
           loadingNameStatus={loadingNameStatus}
           setLoadingNameStatus={setLoadingNameStatus}
           disabled={!!modelNameParam || (!!summary.data && !!inputData.target) === true}
+          localVertexOption={localVertexOption}
+          handleLocalVertexToggle={handleLocalVertexToggle}
         />
         <div className="wizard-card spaced">
           <h2>Select your target</h2>
@@ -220,6 +232,7 @@ const Step3: React.FC<{ stepComplete: boolean }> = ({ stepComplete }) => {
             onChange={handleTargetChange}
             className="wizard-card-select"
           />
+          <div className='chk-space'></div>
         </div>
         {
           arima &&

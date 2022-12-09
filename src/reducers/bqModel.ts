@@ -9,6 +9,7 @@ const bqModelInitialState = {
   target: undefined,
   arimaTimeColumn: undefined,
   selectedFeatures: undefined,
+  registerVertex: false,
   advancedSettings: {},
   // The ${model_name}_input_data_${uid} BQML table is created when a summary is generated
   // The UID tells the model which input_data table was used at the time of model creation/update

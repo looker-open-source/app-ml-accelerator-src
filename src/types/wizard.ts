@@ -37,6 +37,7 @@ export type Step2State = {
 
 export type Step3State = {
   bqModelName: string,
+  registerVertex: boolean,
   targetField: string | undefined,
   arimaTimeColumn: string | undefined,
   allFeatures: string[] | undefined,

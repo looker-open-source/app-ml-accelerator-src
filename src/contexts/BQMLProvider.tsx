@@ -129,6 +129,7 @@ export const BQMLProvider = ({ children }: any) => {
    */
    const queryJobAndWait = async (sql: string, interval?: number, maxAttempts?: number) => {
      try {
+      // TODO: Surface useful errors e.g. incorrect APIs enabled
       const { ok, body } = await queryJob(sql)
       // if (!body.jobComplete) {
       //   // poll job until we get a result
