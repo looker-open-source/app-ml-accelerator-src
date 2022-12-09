@@ -20,7 +20,7 @@ application: bqml-accelerator {
     use_embeds: yes
     use_iframes: yes
     new_window: yes
-    new_window_external_urls: ["https://developers.google.com/machine-learning/glossary", "https://cloud.google.com/vertex-ai/docs"]
+    new_window_external_urls: ["https://developers.google.com/machine-learning/glossary", "https://cloud.google.com/vertex-ai/docs/model-registry/introduction"]
     scoped_user_attributes: [
       "app_bqml_accelerator_bigquery_connection_name",
       "app_bqml_accelerator_bqml_model_dataset_name",

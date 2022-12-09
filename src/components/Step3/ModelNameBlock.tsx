@@ -115,10 +115,11 @@ export const ModelNameBlock: React.FC<ModelNameBlockProps> = ({
           >
             <div>
             { disabled 
-            ? <span>Model is {!localVertexOption && 'not '}registered in </span> 
-            : <span>Register your model in </span>
+            ? <span>{!localVertexOption ? 'Not registered' : 'Registered'} in </span> 
+            : <span>Register in </span>
           }
-          <span className={`span-url ${disabled && 'disabled'}`} onClick={() => openUrl('https://cloud.google.com/vertex-ai/docs')}>Vertex AI</span>
+          <span className={`span-url ${disabled && 'disabled'}`} onClick={() => openUrl('https://cloud.google.com/vertex-ai/docs/model-registry/introduction')}>Vertex AI</span>
+          <span> Registry</span>
           </div>
           </Label>
       {!disabled && <InfoTip content='Ensure you have enabled the Vertex AI API in the Google Cloud Console before using this feature'/>}
