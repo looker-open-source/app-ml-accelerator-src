@@ -55,7 +55,7 @@ export const HomeLanding : React.FC = () => {
 
   return (
     <div className="home-landing-container">
-      <h1 className="no-margin-top">Gain deeper insights with machine learning in BigQuery</h1>
+      <h1 className="no-margin-top">Gain deeper insights with machine learning</h1>
       <div className="home-landing-grid">
         <div className="grid-item-large-left">
           <h3>Create New Models</h3>

@@ -7,7 +7,7 @@ import { ErrorOutline } from "@styled-icons/material-outlined"
 const ModelStatusText = () => {
   const { state } = useStore()
   const [expandMsg, setExpandMsg] = useState(true)
-  const statusText = "A BQML model is currently training. Do not close this tab or it will be cancelled."
+  const statusText = "An ML model is currently training. Do not close this tab or it will be cancelled."
   const btnMessage = expandMsg ? 'Hide' : 'Show'
   return (
     <>
@@ -31,7 +31,7 @@ export const TitleBar : React.FC = () => {
     <div className="TitleBar_container">
       <div className="title-logo">
         <Link to={'/'} className="title-logo-text">
-          BigQuery ML <span>Accelerator</span>
+          Machine Learning <span>Accelerator</span>
         </Link>
         <ModelStatusText/>
       </div>
