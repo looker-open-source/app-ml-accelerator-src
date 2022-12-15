@@ -59,7 +59,7 @@ export const BQMLProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const [expired, setExpired] = useState(false)
   const [ canExpire, setCanExpire ] = useState(true)
-  const { gcpProject, bqmlModelDatasetName } = state.userAttributes
+  const { gcpProject, bqmlModelDatasetName, bigQueryConn } = state.userAttributes
 
   /**
    * Low level invocation of the BigQuery API.
@@ -108,7 +108,7 @@ export const BQMLProvider = ({ children }: any) => {
    */
   const queryJob = async (sql: string) => {
     const { value: query } = await coreSDK.create_sql_query({
-      connection_name: "bigquery",
+      connection_name: bigQueryConn, 
       sql: sql.replace(/\n/g, ' ')
     })
     const { ok, value } = await coreSDK.run_sql_query(query.slug, "json")
