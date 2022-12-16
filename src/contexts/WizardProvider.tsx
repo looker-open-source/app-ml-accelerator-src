@@ -52,7 +52,7 @@ export const WizardProvider = ({ children }: any) => {
   const { coreSDK: sdk } = useContext(ExtensionContext2)
   const { queryJobAndWait, getSavedModelState, createModelStateTable, insertOrUpdateModelState } = useContext(BQMLContext)
   const [ loadingModel, setLoadingModel ] = useState<boolean>(true)
-  const { bqmlModelDatasetName } = state.userAttributes
+  const { gcpProject, bqmlModelDatasetName } = state.userAttributes
 
   // on first load
   useEffect(() => {
@@ -362,6 +362,7 @@ export const WizardProvider = ({ children }: any) => {
     try {
       if (!bqmlModelDatasetName) { throw "No dataset provided" }
       const sql = getBQInputDataSql({
+        gcpProject,
         bqmlModelDatasetName,
         bqModelName,
         uid,

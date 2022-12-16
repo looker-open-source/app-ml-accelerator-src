@@ -36,7 +36,7 @@ type IBQMLContext = {
   getModel?: (props: { modelName: string }) => Promise<any>,
   updateModel?: (props: { model: BigQueryModelMetadata, modelName: string }) => Promise<any>,
   deleteModel?: (props: { modelName: string }) => Promise<any>,
-  deleteTable?: (props: { tableName: string }) => Promise<any>,
+  deleteTable?: (props: { tableName: string, isView?: boolean }) => Promise<any>,
   createModelStateTable?: () => Promise<any>,
   insertOrUpdateModelState?: (props: insertOrUpdateModelStateProps) => Promise<any>,
   updateModelStateSharedWithEmails?: (bqModelName: string, sharedWithEmails: string[]) => Promise<any>
@@ -207,7 +207,7 @@ export const BQMLProvider = ({ children }: any) => {
       SELECT *, 
       '${gcpProject}' AS project_name, 
       '${bqmlModelDatasetName}' AS dataset_name 
-      FROM ${bqmlModelDatasetName}.bqml_model_info
+      FROM \`${gcpProject}\`.${bqmlModelDatasetName}.bqml_model_info
       WHERE model_name = '${modelName}'
     `
     return queryJob(sql)
@@ -241,14 +241,15 @@ export const BQMLProvider = ({ children }: any) => {
     //   'DELETE'
     // )
     // return result
-    const sql = `DROP MODEL IF EXISTS ${bqmlModelDatasetName}.${modelName}`
+    const sql = `DROP MODEL IF EXISTS \`${gcpProject}\`.${bqmlModelDatasetName}.${modelName}`
     return queryJob(sql)
   }
 
   /**
   * Delete a model
+  * TODO: currently unused isView argument to prevent errors when using DROP TABLE on VIEWs
   */
-  const deleteTable = async ({ tableName }: { tableName: string }) => {
+  const deleteTable = async ({ tableName, isView = false }: { tableName: string, isView?: boolean }) => {
     if (!tableName) {
       throw "Failed to delete table because tableName was not provided"
     }
@@ -258,13 +259,14 @@ export const BQMLProvider = ({ children }: any) => {
     //   'DELETE'
     // )
     // return result
-    const sql = `DROP TABLE IF EXISTS ${bqmlModelDatasetName}.${tableName}`
+    const entityType = isView ? 'VIEW' : 'TABLE'
+    const sql = `DROP ${entityType} IF EXISTS \`${gcpProject}\`.${bqmlModelDatasetName}.${tableName}`
     return queryJob(sql)
   }
 
   const createModelStateTable = () => {
     const sql = `
-      CREATE TABLE IF NOT EXISTS ${bqmlModelDatasetName}.bqml_model_info
+      CREATE TABLE IF NOT EXISTS \`${gcpProject}\`.${bqmlModelDatasetName}.bqml_model_info
                   (model_name             STRING,
                    state_json             STRING,
                    created_by_email       STRING,
@@ -299,7 +301,7 @@ export const BQMLProvider = ({ children }: any) => {
       timestampUpdate = ', model_updated_at=S.model_updated_at'
     }
     const sql = `
-      MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
+      MERGE \`${gcpProject}\`.${bqmlModelDatasetName}.bqml_model_info AS T
           USING (SELECT '${bqModelName}' AS model_name
                   , '${stateJson}' as state_json
                   , '${userEmail}' as created_by_email
@@ -321,7 +323,7 @@ export const BQMLProvider = ({ children }: any) => {
     const sharedWithEmailsJson = JSON.stringify(sharedWithEmails)
 
     const sql = `
-      MERGE ${bqmlModelDatasetName}.bqml_model_info AS T
+      MERGE \`${gcpProject}\`.${bqmlModelDatasetName}.bqml_model_info AS T
           USING (SELECT '${bqModelName}' AS model_name
                   , '${sharedWithEmailsJson}' as shared_with_emails
                 ) AS S
@@ -334,7 +336,7 @@ export const BQMLProvider = ({ children }: any) => {
 
   const deleteModelFromModelState = (bqModelName: string) => {
     const sql = `
-      DELETE ${gcpProject}.${bqmlModelDatasetName}.bqml_model_info
+      DELETE \`${gcpProject}\`.${bqmlModelDatasetName}.bqml_model_info
       WHERE model_name = '${bqModelName}'
     `
 

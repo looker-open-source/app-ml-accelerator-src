@@ -94,6 +94,7 @@ export const TABLE_SUFFIXES: { [key: string]: string } = {
 
 type FormBQInputDataSQLProps = {
   sql: string | undefined,
+  gcpProject: string | undefined,
   bqmlModelDatasetName: string | undefined,
   bqModelName: string | undefined,
   uid: string | undefined
@@ -101,12 +102,14 @@ type FormBQInputDataSQLProps = {
 
 export const formBQInputDataSQL = ({
   sql,
+  gcpProject,
   bqmlModelDatasetName,
   bqModelName,
   uid
 }: FormBQInputDataSQLProps) => {
   if (
     !sql ||
+    !gcpProject ||
     !bqmlModelDatasetName ||
     !bqModelName ||
     !uid
@@ -115,12 +118,13 @@ export const formBQInputDataSQL = ({
   }
 
   if (uid === 'a' || uid === 'selected') {
-    return `CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} AS (${removeLimit(sql)})`
+    return `CREATE OR REPLACE VIEW \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} AS (${removeLimit(sql)})`
   }
-  return `CREATE OR REPLACE TABLE ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} AS (${removeLimit(sql)})`
+  return `CREATE OR REPLACE TABLE \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} AS (${removeLimit(sql)})`
 }
 
 type GetBQInputDataSqlProps = {
+  gcpProject: string | undefined,
   bqmlModelDatasetName: string,
   bqModelName: string,
   uid: string,
@@ -128,32 +132,36 @@ type GetBQInputDataSqlProps = {
 }
 
 export const getBQInputDataSql = ({
+  gcpProject,
   bqmlModelDatasetName,
   bqModelName,
   uid,
   limit
 }: GetBQInputDataSqlProps) => (
-  `SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} ${limit ? `LIMIT ${limit}` : ''}`
+  `SELECT * FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.inputData}_${uid} ${limit ? `LIMIT ${limit}` : ''}`
 )
 
 export const getBQInputDataMetaDataSql = ({
+  gcpProject,
   bqmlModelDatasetName,
   bqModelName,
   uid
 }: GetBQInputDataSqlProps) => (
-  `SELECT * FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}'`
+  `SELECT * FROM \`${gcpProject}\`.${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name = '${bqModelName}${TABLE_SUFFIXES.inputData}_${uid}'`
 )
 
 type GetAllBQInputDataSqlProps = {
+  gcpProject: string | undefined,
   bqmlModelDatasetName: string,
   bqModelName: string
 }
 
 export const getAllInputDataTablesSql = ({
+  gcpProject,
   bqmlModelDatasetName,
   bqModelName
 }: GetAllBQInputDataSqlProps) => (
-  `SELECT table_name FROM ${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name like '${bqModelName}${TABLE_SUFFIXES.inputData}_%'`
+  `SELECT table_name FROM \`${gcpProject}\`.${bqmlModelDatasetName}.INFORMATION_SCHEMA.TABLES WHERE table_name like '${bqModelName}${TABLE_SUFFIXES.inputData}_%'`
 )
 
 /********************/
@@ -188,7 +196,7 @@ const formBoostedTreeSQL = ({
 }: IFormBoostedTreeModelCreateSQLProps): string => {
   const settingsSql = advancedSettingsSql(advancedSettings)
   return `
-    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
+    CREATE OR REPLACE MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}
           OPTIONS(MODEL_TYPE='BOOSTED_TREE_${boostedType.toUpperCase()}'
           ${registerVertex ? `, MODEL_REGISTRY = 'VERTEX_AI', VERTEX_AI_MODEL_ID = '${safeVertexName(bqModelName)}'` : ''}
           , INPUT_LABEL_COLS = ['${target.replace(".", "_")}']
@@ -217,7 +225,7 @@ const formArimaSQL = ({
 }: IFormModelCreateSQLProps) => {
   if (!arimaTimeColumn) { return '' }
   return `
-    CREATE OR REPLACE MODEL ${bqmlModelDatasetName}.${bqModelName}
+    CREATE OR REPLACE MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}
     OPTIONS(MODEL_TYPE = 'ARIMA_PLUS'
     ${registerVertex ? `, MODEL_REGISTRY = 'VERTEX_AI', VERTEX_AI_MODEL_ID = '${safeVertexName(bqModelName)}'` : ''}
       , time_series_timestamp_col = '${arimaTimeColumn.replace(".", "_")}'
@@ -403,7 +411,7 @@ export const getEvaluateDataSql = ({
       break
   }
 
-  return `SELECT * FROM ${gcpProject}.${bqmlModelDatasetName}.${bqModelName}${tableSuffix}`
+  return `SELECT * FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${tableSuffix}`
 }
 
 /*********************/
@@ -472,6 +480,7 @@ export const selectBoostedTreeGlobalExplainSql = ({
 
 type BoostedTreePredictProps = {
   lookerSql: string,
+  gcpProject: string | undefined,
   bqmlModelDatasetName: string,
   bqModelName: string,
   threshold?: string
@@ -479,14 +488,15 @@ type BoostedTreePredictProps = {
 
 export const createBoostedTreePredictSql = ({
   lookerSql,
+  gcpProject,
   bqmlModelDatasetName,
   bqModelName,
   threshold
 }: BoostedTreePredictProps) => {
   return `
-    CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
+    CREATE OR REPLACE VIEW \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
     ( SELECT * FROM ML.PREDICT(
-      MODEL ${bqmlModelDatasetName}.${bqModelName},
+      MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName},
       (${removeLimit(lookerSql)})
       ${threshold ?
       `, STRUCT(${threshold} as threshold)` : ''
@@ -495,6 +505,7 @@ export const createBoostedTreePredictSql = ({
 }
 
 type ArimaPredictProps = {
+  gcpProject: string | undefined,
   bqmlModelDatasetName: string,
   bqModelName: string,
   horizon?: number,
@@ -502,20 +513,22 @@ type ArimaPredictProps = {
 }
 
 export const createArimaPredictSql = ({
+  gcpProject,
   bqmlModelDatasetName,
   bqModelName,
   horizon = 30,
   confidenceLevel = 0.95
 }: ArimaPredictProps) => {
   return `
-    CREATE OR REPLACE VIEW ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
-    ( SELECT * FROM ML.FORECAST(MODEL ${bqmlModelDatasetName}.${bqModelName}
+    CREATE OR REPLACE VIEW \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} AS
+    ( SELECT * FROM ML.FORECAST(MODEL \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}
       , STRUCT(${horizon} AS horizon
       , ${confidenceLevel} AS confidence_level)))
   `
 }
 
 type GetPredictProps = {
+  gcpProject: string | undefined,
   bqmlModelDatasetName: string,
   bqModelName: string,
   sorts: string[],
@@ -523,6 +536,7 @@ type GetPredictProps = {
 }
 
 export const getPredictSql = ({
+  gcpProject,
   bqmlModelDatasetName,
   bqModelName,
   sorts,
@@ -530,7 +544,7 @@ export const getPredictSql = ({
 }: GetPredictProps) => {
   const sortString = sorts && sorts.length > 0 ? ` ORDER BY ${sorts.map((s) => noDot(s)).join(', ')} ` : ''
   return `
-    SELECT * FROM ${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} ${sortString} LIMIT ${limit || 500}
+    SELECT * FROM \`${gcpProject}\`.${bqmlModelDatasetName}.${bqModelName}${TABLE_SUFFIXES.predictions} ${sortString} LIMIT ${limit || 500}
   `
 }
 

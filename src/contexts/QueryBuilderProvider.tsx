@@ -35,7 +35,7 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBu
   const { state, dispatch } = useStore()
   const { coreSDK: sdk } = useContext(ExtensionContext2)
   const { queryJob } = useContext(BQMLContext)
-  const { bigQueryConn, bqmlModelDatasetName } = state.userAttributes
+  const { gcpProject, bigQueryConn, bqmlModelDatasetName } = state.userAttributes
   const stepData = state.wizard.steps[stepName]
 
   /*
@@ -74,6 +74,7 @@ export const QueryBuilderProvider = ({ children, stepName, lockFields }: QueryBu
       if (!bqmlModelDatasetName || !bqModelName || ! uid) { return }
 
       const metadataSql = getBQInputDataMetaDataSql({
+        gcpProject,
         bqmlModelDatasetName,
         bqModelName,
         uid
