@@ -66,6 +66,7 @@ export const SummaryProvider = ({ children }: any) => {
       }
       const sql = formBQInputDataSQL({
         sql: querySql,
+        gcpProject,
         bqmlModelDatasetName,
         bqModelName,
         uid

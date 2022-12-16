@@ -25,7 +25,7 @@ export const ApplyProvider = ({ children }: any) => {
   const { coreSDK } = useContext(ExtensionContext2)
   const { persistModelState } = useContext(WizardContext)
   const { queryJob, queryJobAndWait } = useContext(BQMLContext)
-  const { bqmlModelDatasetName } = state.userAttributes
+  const { gcpProject, bqmlModelDatasetName } = state.userAttributes
   const { bqModel } = state
   const { step5 } = state.wizard.steps
 
@@ -98,6 +98,7 @@ export const ApplyProvider = ({ children }: any) => {
         case MODEL_TYPES.BOOSTED_TREE_CLASSIFIER.value:
         default:
           sql = createBoostedTreePredictSql({
+            gcpProject,
             bqmlModelDatasetName,
             lookerSql,
             bqModelName: bqModel.name,
@@ -125,6 +126,7 @@ export const ApplyProvider = ({ children }: any) => {
         throw "This model does not have a dataset, target, or an explore, please try reloading."
       }
       const sql = getPredictSql({
+        gcpProject,
         bqmlModelDatasetName,
         bqModelName: bqModel.name,
         sorts: step5.sorts || [],

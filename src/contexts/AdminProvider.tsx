@@ -33,7 +33,7 @@ export const AdminProvider = ({ children }: any) => {
     queryJobAndWait,
     deleteModelFromModelState
   } = useContext(BQMLContext)
-  const { bqmlModelDatasetName } = state.userAttributes
+  const { gcpProject, bqmlModelDatasetName } = state.userAttributes
   const { coreSDK: sdk } = useContext(ExtensionContext2)
 
 
@@ -196,7 +196,7 @@ export const AdminProvider = ({ children }: any) => {
   const getAllInputDataTableNames = async (modelName: string) => {
     try{
       if (!bqmlModelDatasetName || !modelName) { throw 'No dataset or model name provided.' }
-      const sql = getAllInputDataTablesSql({ bqmlModelDatasetName, bqModelName: modelName })
+      const sql = getAllInputDataTablesSql({ gcpProject, bqmlModelDatasetName, bqModelName: modelName })
       const { ok, body } = await queryJobAndWait?.(sql)
       return { ok, body }
     } catch (error) {
