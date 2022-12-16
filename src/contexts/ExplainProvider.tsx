@@ -19,7 +19,6 @@ export const ExplainProvider = ({ children }: any) => {
   const { state, dispatch } = useStore()
   const { queryJobAndWait } = useContext(BQMLContext)
   const { gcpProject, bqmlModelDatasetName } = state.userAttributes
-  const { expiry, signIn } = useContext(OauthContext)
   const [cachedData, setCachedData] = useState<{[key:string] : any} | null>({})
 
   // Create & Fetch Evaluate function data in BigQuery
