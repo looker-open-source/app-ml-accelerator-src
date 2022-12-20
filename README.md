@@ -15,26 +15,8 @@ The ML accelerator your organization to:
 
 # Example Use-cases
 <ul>
-<li>Outlier Detection </li>
-  <ul>
-  <li>Use the ML accelerator to predict fraudulent activity using your customer transactions data to help reduce shrinkage costs. </li>
-  </ul>
-
-<li>Forecasting  </li>
-<ul>
-  <li>Use the ML Accelerator to predict customer acquisition costs based on historical data and economic trends to help budget marketing spend and set upcoming revenue goals. </li>
-  </ul>
-
-<li>Cohort Analysis</li>
-<ul>
-  <li>Use the ML Accelerator to predict which customer segments have the largest customer lifetime value (CLV) to focus marketing efforts and advertising spend. </li>
-  </ul>
-
-
-<li> Churn Prediction  </li>
-<ul>
-  <li>Use the ML Accelerator to predict which customers are most likely to churn and run scenarios on how different marketing campaigns change churn probability. </li>
-  </ul>
+<li> Regression</li>
+<li>Classification</li>
 </ul>
 
 # Installation
@@ -66,13 +48,87 @@ Looker will complete the installation. You can now use the installed content
 
 To install the extension, you can build a JS bundle and load the file through your LookML project. The prescribed way to do this is to drag and drop the file into the desired Looker project from finder or a storage client.
 
+![manifest](/readmeimages/manifest.jpeg)
+
 You can also deploy the JS file to a remote server or content delivery network (CDN) and then reference it via URL.
 
 This option is often the most convenient when used together with continuous deployment automation from your extension’s codebase.
 
 ## Permissions for accessing BigQuery API
 
-### Option 1: Using end-user credentials (OAuth implicit flow)
+There must be an existing connection to BigQuery on the Looker Instance. If this connection is established with a Service Account, the <a href="https://cloud.google.com/bigquery/docs/access-control#bigquery.dataEditor">BigQuery Data Editor</a> & <a href="https://cloud.google.com/bigquery/docs/access-control#bigquery.jobUser">BigQuery Job User </a>roles must be assigned to that account.
+
+### Option 1: Using a Service Account
+
+1. Set the three (3) required scoped <a href="https://cloud.google.com/looker/docs/admin-panel-users-user-attributes">Looker user attributes</a>:
+<ul>
+<li>CONNECTION_NAME</li>
+<li>BQML_MODEL_DATASET_NAME</li>
+<li>GCP_PROJECT</li>
+</ul>
+
+To create a user attribute in Looker, an Admin must go to Admin --> User Attributes --> Create User Attributes.
+
+![create_attribute](/readmeimages/create_attributes.jpeg)
+
+2. Add these three scoped user attributes to your extension app's manifest file.
+
+**([see Looker docs regarding scoped user attributes](https://docs.looker.com/data-modeling/extension-framework/js-r-extension-examples#user_attributes))**
+
+**attribute names** are prepended with `your_project_name`.
+
+     For example, if your Looker project name is `app_ml_accelerator`, then the user attribute name for the `gcp_project` user attribute should look like `app_ml_accelerator_gcp_project`)
+
+ - **NOTE:** If this user attribute is not properly set, the Machine Learning Accelerator app will not be able to use service account authentication and will attempt to fall back on OAuth2 implicit flow instead (using end-user credentials rather than service account)
+
+## Example Manifest
+```
+project_name: "app-ml-accelerator"
+
+application: ml-accelerator {
+  label: "Machine Learning Accelerator"
+  file: "bundle.js"
+  entitlements: {
+    core_api_methods: [
+      "all_lookml_models",
+      "create_query",
+      "run_query",
+      "lookml_model_explore",
+      "model_fieldname_suggestions",
+      "me",
+      "user_attribute_user_values",
+      "create_sql_query",
+      "run_sql_query"
+    ]
+
+    use_form_submit: yes
+    use_embeds: yes
+    use_iframes: yes
+    new_window: yes
+    new_window_external_urls: ["https://developers.google.com/machine-learning/glossary", "https://cloud.google.com/vertex-ai/docs/model-registry/introduction"]
+    scoped_user_attributes: [
+      "app_ml_accelerator_bigquery_connection_name",
+      "app_ml_accelerator_bqml_model_dataset_name",
+      "app_ml_accelerator_gcp_project",
+    ]
+  }
+}
+
+constant: CONNECTION_NAME {
+  value: "ml_accelerator"
+  export: override_required
+}
+
+constant: BQML_MODEL_DATASET_NAME {
+  value: "{{_user_attributes['app_ml_accelerator_bqml_model_dataset_name']}}"
+}
+
+constant: GCP_PROJECT {
+  value: "{{_user_attributes['app_ml_accelerator_gcp_project']}}"
+}
+```
+
+### Option 2 Using end-user credentials (OAuth):
 
 In GCP Console:
 
@@ -86,39 +142,14 @@ In GCP Console:
     - Go to Oauth Consent Screen
       - Add an external user with your email you used for Oauth
 
-- Give User BigQuery Permissions
-  - Go to IAM & Admin
-    - Edit the user and give them permission for "BigQuery Data Editor" & "BigQuery Job User"
-
-### Option 2: Using a service account
-
-1. Set the three (3) required scoped Looker user attributes:
-
-   - `looker_client_id` and `looker_client_secret`
-     - These refer to Looker API3 credentials
-     - You can set default values using one set of API3 credentials (a single Looker admin) for all your users or a group, or you can set individual user values so each of your users is using their own API keys.
-   - `access_token_server_endpoint`
-
-     - This is the endpoint for the custom access token server that you'll be using to get access tokens from Google Auth Server.
-       - See: https://github.com/4mile/looker-ext-access-token-server
-     - **NOTE:** If this user attribute is not properly set, the Machine Learning Accelerator app will not be able to use service account authentication and will attempt to fall back on OAuth2 implicit flow instead (using end-user credentials rather than service account)
-
-     **IMPORTANT:** All three of these user attributes **must be namespaced/scoped for the extension app** ([see Looker docs regarding scoped user attributes](https://docs.looker.com/data-modeling/extension-framework/js-r-extension-examples#user_attributes)), so make sure that the **attribute names** are prepended with `your_project_name_your_project_name_`.
-
-     For example, if your Looker project name is `bqml-accelerator`, then the user attribute name for the `looker_client_id` user attribute should look like `bqml_accelerator_bqml_accelerator_looker_client_id`)
-
-1. Add these three scoped user attributes to your extension app's manifest file as **`scoped_user_attributes`** entitlements
-
-1. Finally, also remember to set the access token server URL in the manifest file as an `external_api_urls` entitlement (so that the extension app will be able to call your access token server to get tokens)
-
-
+![Oauth](/readmeimages/oauth.png)
 
 # Usage
 ## Prerequisites
 <ul>
 <li>Familiarity with Looker</li>
 <ul>
-<li>To upscale your Looker skills or to start your Looker learning journey, please visit connect.looker.com.</li>
+<li>To upscale your Looker skills or to start your Looker learning journey, please visit <a href="https://connect.looker.com/"> connect.looker.com</a>.</li>
 </ul>
 <li>Familiarity with basics of machine learning</li>
 <ul>
@@ -127,24 +158,60 @@ For a review or crash course on machine learning please use <a href="https://dev
 
 </ul>
 
+<ol>
+<li>Choose your objective.
+
+![objective](/readmeimages/objective.jpeg)</li>
+
+<li>Select your Looker Explore that will serve as the base of the model.
+
+![inputs](/readmeimages/inputs.jpeg)</li>
+
+<li>Select the fields that will serve as the base of the model. Be sure to try to filter out any null values in the data.
+
+![fields](/readmeimages/fields.jpeg)
+</li>
+
+<li>Name your model.</li>
+
+<li>Select your target value.
+
+![test model](/readmeimages/test_model.jpeg)
+</li>
+<li>Generate Model
+
+![create_model](/readmeimages/create_model.jpeg)
+</li>
+<li>Review the model performance
+
+![evaluate](/readmeimages/evaluate.jpeg)
+</li>
+<li>Make predictions
+
+![predict](/readmeimages/predict.jpeg)
+</li>
+
+</ol>
+
 ## Troubleshooting
 
-## For a more customized experience please contact your Looker account team and ask them about the ML accelerator service offerings or a Custom AI Engagement.
+<ul>
+<li>To be able to access the ML accelerator users must have see_data, explore, and see_sql_runner permissions.</li>
 
-## Deploying the app locally
+![blank](/readmeimages/blank.jpeg)
 
-node version: v17.3.0
-install yarn: `npm install --global yarn`
-install packages: `yarn install`
+<li>If the application is not running as expected, opening up the javascript console can help point to which specific request is failing. </li>
 
-For development only:
-Add a .env file with the following keys:
+![js error](/readmeimages/js.jpeg)
 
-```
-BIGQUERY_CONN= # the name of the big query connection
-GOOGLE_CLIENT_ID= # the client id of your Oauth Client in GCP console
-BQML_MODEL_DATASET_NAME=  # BigQuery dataset where you'll be storing views/tables/models
-GCP_PROJECT= # name of your GCP project
-```
+![cannot](/readmeimages/cannot.jpeg)
 
-If you are using Heroku to host, ensure you set config variables to the same values as these .env variables
+<li>Some common issues are Looker permissions are not set correctly. </li>
+<li>The BigQuery Service Account the connection is set up with does not have the right permissions. </li>
+<li>Ad blockers, specifically ones that block JavaScript requests can cause unintended effects. </li>
+
+<ul>
+
+
+
+### For a more customized experience please contact your Looker account team and ask them about the ML accelerator service offerings or a Custom AI Engagement.
